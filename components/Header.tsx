@@ -50,7 +50,7 @@ export default function Header({ lang: externalLang, onLangChange }: Props) {
             </Link>
           </nav>
           <p className="hidden items-center gap-2 sm:flex">
-            <span>Call for enquiries 9am–17:30pm</span>
+            <span>{nav.callForEnquiries}</span>
             <PhoneIcon className="h-4 w-4 text-orange" />
             <a href="tel:+442034111999" className="font-semibold text-dark hover:text-orange transition-colors">
               +44 (0)20 34 111 999
@@ -109,7 +109,7 @@ export default function Header({ lang: externalLang, onLangChange }: Props) {
 
             <button
               type="button"
-              aria-label="Wishlist"
+              aria-label={nav.wishlist}
               className="text-dark hover:text-orange transition-colors"
             >
               <HeartIcon className="h-6 w-6" />

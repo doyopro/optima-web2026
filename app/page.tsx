@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
 import { type Language, translations, getLanguage } from '@/lib/i18n'
-import { METRICS } from '@/lib/marketing'
 import SearchWidget from '@/components/SearchWidget'
 import Testimonials from '@/components/Testimonials'
 import Footer from '@/components/Footer'
@@ -50,6 +49,7 @@ export default function Home() {
 
   const hero = translations[lang].hero
   const prop = translations[lang].properties
+  const home = translations[lang].home
 
   return (
     <main className="flex min-h-screen flex-col">
@@ -81,15 +81,15 @@ export default function Home() {
         <div className="mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4 tracking-tight">
-              Why Choose Optima Villas
+              {home.whyChoose}
             </h2>
             <p className="text-dark/60 max-w-2xl mx-auto text-lg">
-              Trusted by thousands of families for premium villa holidays in Lanzarote.
+              {home.whyChooseSub}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {METRICS.map((m) => (
+            {home.metrics.map((m) => (
               <div
                 key={m.label}
                 className="group flex flex-col items-center bg-cream/50 rounded-3xl p-10 text-center hover:bg-cream hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-neutral-100"
@@ -129,11 +129,11 @@ export default function Home() {
               Array.from({ length: 3 }).map((_, i) => <PropertySkeleton key={i} />)
             ) : errorFeatured ? (
               <div className="col-span-full py-12 text-center text-dark/50 bg-white rounded-2xl border border-neutral-200">
-                <p>We could not load the featured properties at this time.</p>
+                <p>{home.featuredError}</p>
               </div>
             ) : featured.length === 0 ? (
               <div className="col-span-full py-12 text-center text-dark/50 bg-white rounded-2xl border border-neutral-200">
-                <p>No featured properties available right now.</p>
+                <p>{home.featuredEmpty}</p>
               </div>
             ) : (
               featured.map((p) => <PropertyCard key={p.id} property={p} lang={lang} />)
@@ -154,7 +154,7 @@ export default function Home() {
       {/* --- TESTIMONIALS & FOOTER --- */}
       <Testimonials lang={lang} />
       <Footer lang={lang} />
-      <WhatsAppWidget />
+      <WhatsAppWidget lang={lang} />
     </main>
   )
 }

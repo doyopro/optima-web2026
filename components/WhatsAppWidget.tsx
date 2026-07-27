@@ -1,15 +1,19 @@
 'use client'
 
+import { type Language, translations } from '@/lib/i18n'
+
 interface Props {
   villaName?: string
+  lang?: Language
 }
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '34648944000'
 
-export default function WhatsAppWidget({ villaName }: Props) {
+export default function WhatsAppWidget({ villaName, lang = 'en' }: Props) {
+  const t = translations[lang].whatsapp
   const message = villaName
-    ? `Hola, me interesa información sobre la villa: ${villaName}`
-    : 'Hola, me interesa información sobre las villas en Lanzarote'
+    ? t.messageVilla.replace('{name}', villaName)
+    : t.messageGeneric
 
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
 
@@ -18,7 +22,7 @@ export default function WhatsAppWidget({ villaName }: Props) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Chat on WhatsApp"
+      aria-label={t.ariaLabel}
       className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200"
     >
       <svg viewBox="0 0 24 24" fill="white" className="h-7 w-7" aria-hidden="true">

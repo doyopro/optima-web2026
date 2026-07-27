@@ -225,7 +225,7 @@ export default function VillasPage() {
       </div>
 
       <Footer lang={lang} />
-      <WhatsAppWidget />
+      <WhatsAppWidget lang={lang} />
     </>
   )
 }

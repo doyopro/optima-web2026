@@ -10,11 +10,40 @@ export const translations = {
       manageBooking: 'Manage your booking',
       help: 'Help & Support',
       login: 'Login',
+      back: 'Back',
+      callForEnquiries: 'Call for enquiries 9am–17:30pm',
+      wishlist: 'Wishlist',
     },
     hero: {
       title: 'Your Holiday Villa in Lanzarote',
       subtitle:
         'Discover exceptional villas with private pools, stunning views, and personalised service.',
+    },
+    home: {
+      whyChoose: 'Why Choose Optima Villas',
+      whyChooseSub: 'Trusted by thousands of families for premium villa holidays in Lanzarote.',
+      featuredError: 'We could not load the featured properties at this time.',
+      featuredEmpty: 'No featured properties available right now.',
+      metrics: [
+        {
+          value: '98%',
+          label: 'Customer Loyalty',
+          description:
+            'Our guests consistently choose to return to Optima Villas for their Lanzarote holidays, trusting our premium standards year after year.',
+        },
+        {
+          value: '210+',
+          label: 'Premium Properties',
+          description:
+            'A handpicked portfolio of luxury villas featuring private pools, stunning views, and prime locations across the island.',
+        },
+        {
+          value: '10,000+',
+          label: 'Happy Stays',
+          description:
+            'Over a decade of delivering seamless, high-end travel experiences and unforgettable family memories since 2018.',
+        },
+      ],
     },
     search: {
       from: 'From',
@@ -27,12 +56,57 @@ export const translations = {
       searching: 'Searching...',
       checkDates: 'Please select check-in and check-out dates.',
       checkOutAfter: 'Check-out must be after check-in.',
+      adults: 'Adults',
+      adultsSub: 'Over 18 years',
+      children: 'Children',
+      childrenSub: '2 to 18 years',
+      infants: 'Infants',
+      infantsSub: 'Using a cot',
+      villaOptional: 'Villa (optional)',
+      selectProperty: 'Select a property',
+      guestWord: 'Guest',
+      guestWordPlural: 'Guests',
+      infantWord: 'Infant',
+      infantWordPlural: 'Infants',
     },
     testimonials: {
       title: 'What our guests say',
       description:
         "Don't just take our word for it — hear from our happy guests who made unforgettable memories in Lanzarote.",
       seeMore: 'See more',
+      previous: 'Previous',
+      next: 'Next',
+    },
+    testimonialsData: [
+      {
+        bgColor: 'blue' as const,
+        rating: 5,
+        title: 'Stunning Villa & Impeccable Service',
+        text: 'We had a wonderful stay. The villa was clean, spacious, and perfectly located. The booking system was seamless, and the local team was incredibly supportive throughout our entire holiday in Lanzarote.',
+        author: 'Michael & Family',
+        date: 'July 2025',
+      },
+      {
+        bgColor: 'yellow' as const,
+        rating: 5,
+        title: 'Highly Recommended!',
+        text: 'Beautiful property, exactly as described on the website. The live booking details and professional photos made everything so easy. Outstanding customer care from the Optima Villas team.',
+        author: 'Emma Harrison',
+        date: 'August 2025',
+      },
+      {
+        bgColor: 'green' as const,
+        rating: 5,
+        title: 'Perfect Family Holiday',
+        text: 'Excellent service and a beautiful, high-quality villa. Everything from check-in to check-out went smoothly. Having the updated rates and property details beforehand gave us total peace of mind.',
+        author: 'Dirk van Deursen',
+        date: 'September 2025',
+      },
+    ],
+    whatsapp: {
+      ariaLabel: 'Chat on WhatsApp',
+      messageGeneric: "Hi, I'm interested in villas in Lanzarote",
+      messageVilla: "Hi, I'm interested in information about the villa: {name}",
     },
     properties: {
       featured: 'Featured Villas',
@@ -70,6 +144,7 @@ export const translations = {
       night: 'night',
       totalPrice: 'Total',
       reviews: 'reviews',
+      amenities: 'Amenities',
     },
     availability: {
       checking: 'Checking availability...',
@@ -119,11 +194,40 @@ export const translations = {
       manageBooking: 'Gestiona tu reserva',
       help: 'Ayuda y soporte',
       login: 'Entrar',
+      back: 'Atrás',
+      callForEnquiries: 'Llámanos de 9:00 a 17:30h',
+      wishlist: 'Favoritos',
     },
     hero: {
       title: 'Tu Villa de Vacaciones en Lanzarote',
       subtitle:
         'Descubre villas excepcionales con piscina privada, vistas espectaculares y servicio personalizado.',
+    },
+    home: {
+      whyChoose: 'Por qué elegir Optima Villas',
+      whyChooseSub: 'La confianza de miles de familias para sus vacaciones en villas de Lanzarote.',
+      featuredError: 'No hemos podido cargar las propiedades destacadas en este momento.',
+      featuredEmpty: 'No hay propiedades destacadas disponibles ahora mismo.',
+      metrics: [
+        {
+          value: '98%',
+          label: 'Fidelidad de clientes',
+          description:
+            'Nuestros huéspedes eligen volver a Optima Villas para sus vacaciones en Lanzarote, confiando en nuestros estándares premium año tras año.',
+        },
+        {
+          value: '210+',
+          label: 'Propiedades Premium',
+          description:
+            'Una selección de villas de lujo con piscina privada, vistas espectaculares y ubicaciones privilegiadas en toda la isla.',
+        },
+        {
+          value: '10.000+',
+          label: 'Estancias felices',
+          description:
+            'Más de una década ofreciendo experiencias de viaje impecables y recuerdos familiares inolvidables desde 2018.',
+        },
+      ],
     },
     search: {
       from: 'Desde',
@@ -136,12 +240,57 @@ export const translations = {
       searching: 'Buscando...',
       checkDates: 'Por favor selecciona fechas de entrada y salida.',
       checkOutAfter: 'La salida debe ser posterior a la entrada.',
+      adults: 'Adultos',
+      adultsSub: 'Mayores de 18 años',
+      children: 'Niños',
+      childrenSub: 'De 2 a 18 años',
+      infants: 'Bebés',
+      infantsSub: 'Con cuna',
+      villaOptional: 'Villa (opcional)',
+      selectProperty: 'Selecciona una propiedad',
+      guestWord: 'Huésped',
+      guestWordPlural: 'Huéspedes',
+      infantWord: 'Bebé',
+      infantWordPlural: 'Bebés',
     },
     testimonials: {
       title: 'Qué dicen nuestros huéspedes',
       description:
         'No te fíes sólo de nuestra palabra — escucha a nuestros felices huéspedes que vivieron momentos inolvidables en Lanzarote.',
       seeMore: 'Ver más',
+      previous: 'Anterior',
+      next: 'Siguiente',
+    },
+    testimonialsData: [
+      {
+        bgColor: 'blue' as const,
+        rating: 5,
+        title: 'Villa espectacular y servicio impecable',
+        text: 'Tuvimos una estancia maravillosa. La villa estaba limpia, era espaciosa y estaba perfectamente ubicada. El sistema de reservas fue muy sencillo y el equipo local nos apoyó en todo momento durante nuestras vacaciones en Lanzarote.',
+        author: 'Michael & Family',
+        date: 'Julio 2025',
+      },
+      {
+        bgColor: 'yellow' as const,
+        rating: 5,
+        title: '¡Muy recomendable!',
+        text: 'Propiedad preciosa, exactamente como se describía en la web. Los detalles de la reserva en tiempo real y las fotos profesionales lo hicieron todo muy fácil. Atención al cliente excepcional por parte del equipo de Optima Villas.',
+        author: 'Emma Harrison',
+        date: 'Agosto 2025',
+      },
+      {
+        bgColor: 'green' as const,
+        rating: 5,
+        title: 'Vacaciones familiares perfectas',
+        text: 'Excelente servicio y una villa preciosa y de gran calidad. Todo fue sobre ruedas desde el check-in hasta el check-out. Tener las tarifas y los detalles de la propiedad actualizados de antemano nos dio total tranquilidad.',
+        author: 'Dirk van Deursen',
+        date: 'Septiembre 2025',
+      },
+    ],
+    whatsapp: {
+      ariaLabel: 'Chatea por WhatsApp',
+      messageGeneric: 'Hola, me interesa información sobre las villas en Lanzarote',
+      messageVilla: 'Hola, me interesa información sobre la villa: {name}',
     },
     properties: {
       featured: 'Villas Destacadas',
@@ -179,6 +328,7 @@ export const translations = {
       night: 'noche',
       totalPrice: 'Total',
       reviews: 'reseñas',
+      amenities: 'Comodidades',
     },
     availability: {
       checking: 'Comprobando disponibilidad...',

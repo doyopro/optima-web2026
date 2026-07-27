@@ -1,5 +1,4 @@
 import { type Language, translations } from '@/lib/i18n'
-import { TESTIMONIALS } from '@/lib/marketing'
 import TestimonialCard from './TestimonialCard'
 
 interface Props {
@@ -8,6 +7,7 @@ interface Props {
 
 export default function Testimonials({ lang }: Props) {
   const t = translations[lang].testimonials
+  const testimonialsData = translations[lang].testimonialsData
 
   return (
     <section className="py-16 md:py-24 px-4 sm:px-6">
@@ -20,14 +20,14 @@ export default function Testimonials({ lang }: Props) {
           <div className="hidden md:flex items-center gap-2 mt-2 shrink-0">
             <button
               type="button"
-              aria-label="Previous"
+              aria-label={t.previous}
               className="h-10 w-10 rounded-full border border-neutral-200 flex items-center justify-center text-dark hover:border-orange hover:text-orange transition-colors"
             >
               ←
             </button>
             <button
               type="button"
-              aria-label="Next"
+              aria-label={t.next}
               className="h-10 w-10 rounded-full border border-neutral-200 flex items-center justify-center text-dark hover:border-orange hover:text-orange transition-colors"
             >
               →
@@ -36,7 +36,7 @@ export default function Testimonials({ lang }: Props) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((testimonial, i) => (
+          {testimonialsData.map((testimonial, i) => (
             <TestimonialCard
               key={i}
               {...testimonial}

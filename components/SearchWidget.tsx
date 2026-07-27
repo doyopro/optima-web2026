@@ -2,14 +2,22 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { type Language, translations, getLanguage } from '@/lib/i18n'
 
 interface Villa {
   id: string
   name: string
 }
 
-export default function SearchWidget({ lang: _lang }: { lang?: string }) {
+export default function SearchWidget({ lang: externalLang }: { lang?: Language }) {
   const router = useRouter()
+  const [lang, setLang] = useState<Language>('en')
+
+  useEffect(() => {
+    setLang(externalLang ?? getLanguage())
+  }, [externalLang])
+
+  const t = translations[lang].search
 
   const [isGuestOpen, setIsGuestOpen] = useState(false)
   const [adults, setAdults] = useState(2)
@@ -49,7 +57,9 @@ export default function SearchWidget({ lang: _lang }: { lang?: string }) {
   }, [])
 
   const totalGuests = adults + children
-  const guestLabel = `${totalGuests} Guest${totalGuests !== 1 ? 's' : ''}${infants > 0 ? `, ${infants} Infant${infants !== 1 ? 's' : ''}` : ''}`
+  const guestWord = totalGuests !== 1 ? t.guestWordPlural : t.guestWord
+  const infantWord = infants !== 1 ? t.infantWordPlural : t.infantWord
+  const guestLabel = `${totalGuests} ${guestWord}${infants > 0 ? `, ${infants} ${infantWord}` : ''}`
 
   function handleSearch() {
     const params = new URLSearchParams()
@@ -67,7 +77,7 @@ export default function SearchWidget({ lang: _lang }: { lang?: string }) {
         {/* DATES */}
         <div className="flex w-full md:w-auto flex-1 gap-4">
           <div className="flex w-full flex-col gap-1.5">
-            <label className="text-xs font-bold uppercase tracking-wide text-dark/70">From</label>
+            <label className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.from}</label>
             <input
               type="date"
               value={fromDate}
@@ -76,7 +86,7 @@ export default function SearchWidget({ lang: _lang }: { lang?: string }) {
             />
           </div>
           <div className="flex w-full flex-col gap-1.5">
-            <label className="text-xs font-bold uppercase tracking-wide text-dark/70">To</label>
+            <label className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.to}</label>
             <input
               type="date"
               value={toDate}
@@ -92,7 +102,7 @@ export default function SearchWidget({ lang: _lang }: { lang?: string }) {
           className="relative flex w-full md:w-auto flex-1 flex-col gap-1.5 pt-4 md:pt-0 md:pl-6"
           ref={guestDropdownRef}
         >
-          <label className="text-xs font-bold uppercase tracking-wide text-dark/70">Guests</label>
+          <label className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.guests}</label>
           <button
             type="button"
             onClick={() => setIsGuestOpen(!isGuestOpen)}
@@ -107,8 +117,8 @@ export default function SearchWidget({ lang: _lang }: { lang?: string }) {
               {/* Adults */}
               <div className="flex items-center justify-between py-3 border-b border-neutral-100">
                 <div>
-                  <p className="text-sm font-bold text-dark">Adults</p>
-                  <p className="text-xs text-dark/60">Over 18 years</p>
+                  <p className="text-sm font-bold text-dark">{t.adults}</p>
+                  <p className="text-xs text-dark/60">{t.adultsSub}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
@@ -129,8 +139,8 @@ export default function SearchWidget({ lang: _lang }: { lang?: string }) {
               {/* Children */}
               <div className="flex items-center justify-between py-3 border-b border-neutral-100">
                 <div>
-                  <p className="text-sm font-bold text-dark">Children</p>
-                  <p className="text-xs text-dark/60">2 to 18 years</p>
+                  <p className="text-sm font-bold text-dark">{t.children}</p>
+                  <p className="text-xs text-dark/60">{t.childrenSub}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
@@ -151,8 +161,8 @@ export default function SearchWidget({ lang: _lang }: { lang?: string }) {
               {/* Infants */}
               <div className="flex items-center justify-between pt-3">
                 <div>
-                  <p className="text-sm font-bold text-dark">Infants</p>
-                  <p className="text-xs text-dark/60">Using a cot</p>
+                  <p className="text-sm font-bold text-dark">{t.infants}</p>
+                  <p className="text-xs text-dark/60">{t.infantsSub}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
@@ -176,7 +186,7 @@ export default function SearchWidget({ lang: _lang }: { lang?: string }) {
         {/* VILLA SELECT */}
         <div className="flex w-full md:w-auto flex-1 flex-col gap-1.5 pt-4 md:pt-0 md:pl-6">
           <label className="text-xs font-bold uppercase tracking-wide text-dark/70">
-            Villa (optional)
+            {t.villaOptional}
           </label>
           <select
             value={villaId}
@@ -184,7 +194,7 @@ export default function SearchWidget({ lang: _lang }: { lang?: string }) {
             disabled={loadingVillas}
             className="w-full text-sm text-dark font-medium bg-transparent focus:outline-none cursor-pointer appearance-none disabled:opacity-50"
           >
-            <option value="">{loadingVillas ? 'Loading...' : 'Select a property'}</option>
+            <option value="">{loadingVillas ? t.loading : t.selectProperty}</option>
             {villas.map((v) => (
               <option key={v.id} value={v.id}>
                 {v.name}
@@ -200,7 +210,7 @@ export default function SearchWidget({ lang: _lang }: { lang?: string }) {
             onClick={handleSearch}
             className="w-full md:w-32 rounded-xl bg-orange px-6 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:bg-orange/90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-orange/50 active:scale-95"
           >
-            Search
+            {t.search}
           </button>
         </div>
 

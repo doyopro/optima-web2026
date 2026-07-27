@@ -92,7 +92,7 @@ export default function VillaDetailPage({ params }: Props) {
         {/* Breadcrumb */}
         <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-6 pb-2">
           <nav className="flex items-center gap-2 text-sm text-dark/50">
-            <Link href="/" className="hover:text-orange">Home</Link>
+            <Link href="/" className="hover:text-orange">{t.nav.home}</Link>
             <span>›</span>
             <Link href="/villas" className="hover:text-orange">{t.nav.villas}</Link>
             <span>›</span>
@@ -168,7 +168,7 @@ export default function VillaDetailPage({ params }: Props) {
 
               {/* Amenities */}
               <div>
-                <h2 className="text-lg font-bold text-dark mb-4">Amenities</h2>
+                <h2 className="text-lg font-bold text-dark mb-4">{t.properties.amenities}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {property.amenities.map((a) => (
                     <div key={a} className="flex items-center gap-2 text-sm text-dark/70">
@@ -261,7 +261,7 @@ export default function VillaDetailPage({ params }: Props) {
       </div>
 
       <Footer lang={lang} />
-      <WhatsAppWidget villaName={property.name} />
+      <WhatsAppWidget villaName={property.name} lang={lang} />
     </>
   )
 }

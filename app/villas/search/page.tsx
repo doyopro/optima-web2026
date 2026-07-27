@@ -49,6 +49,7 @@ function SearchResults() {
   }, [from, to, guests, villa])
 
   const t = translations[lang].properties
+  const nav = translations[lang].nav
 
   return (
     <>
@@ -60,7 +61,7 @@ function SearchResults() {
             onClick={() => router.back()}
             className="flex items-center gap-2 text-sm text-dark/60 hover:text-orange transition-colors mb-6"
           >
-            ← Back
+            ← {nav.back}
           </button>
 
           {/* Summary bar */}
@@ -100,7 +101,7 @@ function SearchResults() {
         </div>
       </div>
       <Footer lang={lang} />
-      <WhatsAppWidget />
+      <WhatsAppWidget lang={lang} />
     </>
   )
 }
