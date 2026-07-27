@@ -1,5 +1,5 @@
-import { type NextRequest } from 'next/server'
-import { MOCK_PROPERTIES } from '@/lib/mock-data'
+import { type NextRequest, NextResponse } from 'next/server'
+import { supabasePublic } from '@/lib/supabase'
 
 export async function GET(
   _request: NextRequest,
@@ -7,15 +7,44 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const property = MOCK_PROPERTIES.find((p) => p.id === id || p.slug === id)
 
-    if (!property) {
-      return Response.json({ error: 'Property not found' }, { status: 404 })
+    const { data, error } = await supabasePublic
+      .from('properties')
+      .select(
+        'id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, amenities, images',
+      )
+      .eq('id', id)
+      .maybeSingle()
+
+    if (error) {
+      throw new Error(error.message)
     }
 
-    return Response.json({ property })
+    if (!data) {
+      return NextResponse.json({ error: 'Property not found' }, { status: 404 })
+    }
+
+    const property = {
+      id: data.id,
+      name: data.name,
+      description: data.description_en || '',
+      location: data.city || data.region || data.country || 'Lanzarote',
+      bedrooms: data.bedrooms ?? 0,
+      bathrooms: data.bathrooms ?? 0,
+      guests_max: data.max_guests ?? 0,
+      price_per_night_gbp: 0,
+      rating: 0,
+      reviews_count: 0,
+      images: (data.images as string[]) ?? [],
+      amenities: (data.amenities as string[]) ?? [],
+      is_featured: true,
+      slug: data.id,
+    }
+
+    return NextResponse.json({ property })
   } catch (err) {
-    console.error('[GET /api/properties/[id]]', err)
-    return Response.json({ error: 'Failed to fetch property' }, { status: 500 })
+    const errorMessage = err instanceof Error ? err.message : String(err)
+    console.error('[GET /api/properties/[id]]', errorMessage)
+    return NextResponse.json({ error: 'Failed to fetch property' }, { status: 500 })
   }
 }
