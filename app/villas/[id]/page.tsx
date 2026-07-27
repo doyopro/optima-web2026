@@ -59,6 +59,7 @@ export default function VillaDetailPage({ params }: Props) {
   }
 
   const t = translations[lang]
+  const description = (lang === 'es' && property?.description_es) || property?.description || ''
   const today = new Date().toISOString().split('T')[0]
 
   if (loading) {
@@ -163,7 +164,7 @@ export default function VillaDetailPage({ params }: Props) {
                     {property.rating} ({property.reviews_count} {t.properties.reviews})
                   </span>
                 </div>
-                <p className="text-dark/70 leading-relaxed">{property.description}</p>
+                <p className="text-dark/70 leading-relaxed">{description}</p>
               </div>
 
               {/* Amenities */}

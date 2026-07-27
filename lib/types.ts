@@ -4,6 +4,7 @@ export type Property = {
   id: string
   name: string
   description: string
+  description_es?: string
   location: string
   bedrooms: number
   bathrooms: number

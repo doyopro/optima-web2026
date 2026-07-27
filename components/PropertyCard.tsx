@@ -12,6 +12,7 @@ export default function PropertyCard({ property, lang }: Props) {
   const t = translations[lang].properties
   const bedroomsLabel = property.bedrooms === 1 ? t.bedroom : t.bedrooms
   const bathroomsLabel = property.bathrooms === 1 ? t.bathroom : t.bathrooms
+  const description = (lang === 'es' && property.description_es) || property.description || ''
 
   return (
     <Link
@@ -45,6 +46,11 @@ export default function PropertyCard({ property, lang }: Props) {
         <h3 className="text-lg font-bold text-dark mb-2 leading-snug group-hover:text-orange transition-colors">
           {property.name}
         </h3>
+
+        {/* Description */}
+        {description && (
+          <p className="text-sm text-dark/60 leading-relaxed mb-3 line-clamp-2">{description}</p>
+        )}
 
         {/* Stats */}
         <div className="flex items-center gap-3 text-xs text-dark/60 mb-3">

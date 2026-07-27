@@ -6,7 +6,7 @@ export async function GET(_req: NextRequest) {
     const { data, error } = await supabasePublic
       .from('properties')
       .select(
-        'id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, amenities, images',
+        'id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images',
       )
 
     if (error) {
@@ -17,6 +17,7 @@ export async function GET(_req: NextRequest) {
       id: row.id,
       name: row.name,
       description: row.description_en || '',
+      description_es: row.description_es || '',
       location: row.city || row.region || row.country || 'Lanzarote',
       bedrooms: row.bedrooms ?? 0,
       bathrooms: row.bathrooms ?? 0,

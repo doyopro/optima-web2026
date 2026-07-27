@@ -11,7 +11,7 @@ export async function GET(
     const { data, error } = await supabasePublic
       .from('properties')
       .select(
-        'id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, amenities, images',
+        'id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images',
       )
       .eq('id', id)
       .maybeSingle()
@@ -28,6 +28,7 @@ export async function GET(
       id: data.id,
       name: data.name,
       description: data.description_en || '',
+      description_es: data.description_es || '',
       location: data.city || data.region || data.country || 'Lanzarote',
       bedrooms: data.bedrooms ?? 0,
       bathrooms: data.bathrooms ?? 0,
