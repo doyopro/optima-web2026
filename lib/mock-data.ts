@@ -1,0 +1,124 @@
+import { type Property } from './types'
+
+export const MOCK_PROPERTIES: Property[] = [
+  {
+    id: '1',
+    name: 'Casa Blanca',
+    slug: 'casa-blanca',
+    description:
+      'Stunning whitewashed villa with panoramic ocean views, private infinity pool, and luxury interiors. Ideal for couples and families seeking a premium Lanzarote experience.',
+    location: 'Playa Blanca',
+    bedrooms: 4,
+    bathrooms: 3,
+    guests_max: 8,
+    price_per_night_gbp: 380,
+    rating: 4.9,
+    reviews_count: 87,
+    images: [
+      'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=800&q=80',
+      'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80',
+    ],
+    amenities: ['Private Pool', 'WiFi', 'Air Conditioning', 'BBQ', 'Parking', 'Sea Views', 'Dishwasher', 'Washing Machine'],
+    is_featured: true,
+  },
+  {
+    id: '2',
+    name: 'Villa Papagayo',
+    slug: 'villa-papagayo',
+    description:
+      'Contemporary villa metres from Papagayo beach. Private heated pool, modern design, and direct access to crystal clear waters.',
+    location: 'Papagayo',
+    bedrooms: 3,
+    bathrooms: 2,
+    guests_max: 6,
+    price_per_night_gbp: 295,
+    rating: 4.8,
+    reviews_count: 112,
+    images: [
+      'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80',
+      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80',
+    ],
+    amenities: ['Private Pool', 'WiFi', 'Air Conditioning', 'Beach Access', 'Parking', 'Terrace'],
+    is_featured: true,
+  },
+  {
+    id: '3',
+    name: 'Finca del Sol',
+    slug: 'finca-del-sol',
+    description:
+      'Traditional Canarian finca surrounded by vineyards and volcanic landscapes. Peaceful retreat with private pool and authentic character.',
+    location: 'La Geria',
+    bedrooms: 2,
+    bathrooms: 2,
+    guests_max: 4,
+    price_per_night_gbp: 195,
+    rating: 4.7,
+    reviews_count: 64,
+    images: [
+      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&q=80',
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
+    ],
+    amenities: ['Private Pool', 'WiFi', 'BBQ', 'Vineyard Views', 'Parking', 'Outdoor Dining'],
+    is_featured: true,
+  },
+  {
+    id: '4',
+    name: 'Villa Timanfaya',
+    slug: 'villa-timanfaya',
+    description:
+      'Dramatic volcanic-view villa with architect-designed interiors, rooftop terrace, and luxury amenities for a truly unique stay.',
+    location: 'Puerto del Carmen',
+    bedrooms: 5,
+    bathrooms: 4,
+    guests_max: 10,
+    price_per_night_gbp: 480,
+    rating: 5.0,
+    reviews_count: 43,
+    images: [
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80',
+    ],
+    amenities: ['Private Pool', 'Hot Tub', 'WiFi', 'Air Conditioning', 'Home Cinema', 'Chef Available', 'Sea Views', 'BBQ'],
+    is_featured: false,
+  },
+  {
+    id: '5',
+    name: 'Casa Volcán',
+    slug: 'casa-volcan',
+    description:
+      'Chic modern villa with volcanic rock garden, private pool, and stunning views over the Atlantic. Perfect for a romantic retreat.',
+    location: 'Costa Teguise',
+    bedrooms: 2,
+    bathrooms: 2,
+    guests_max: 4,
+    price_per_night_gbp: 220,
+    rating: 4.6,
+    reviews_count: 58,
+    images: [
+      'https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?w=800&q=80',
+    ],
+    amenities: ['Private Pool', 'WiFi', 'Air Conditioning', 'Parking', 'Terrace', 'BBQ'],
+    is_featured: false,
+  },
+  {
+    id: '6',
+    name: 'Villa Arrecife',
+    slug: 'villa-arrecife',
+    description:
+      'Spacious family villa with large private pool, tropical garden, and easy access to Arrecife town and beaches.',
+    location: 'Arrecife',
+    bedrooms: 4,
+    bathrooms: 3,
+    guests_max: 8,
+    price_per_night_gbp: 310,
+    rating: 4.5,
+    reviews_count: 91,
+    images: [
+      'https://images.unsplash.com/photo-1601918774516-5b86e3b9f3b8?w=800&q=80',
+    ],
+    amenities: ['Private Pool', 'WiFi', 'Air Conditioning', 'Garden', 'Parking', 'Dishwasher'],
+    is_featured: false,
+  },
+]
+
+export const LOCATIONS = ['Playa Blanca', 'Papagayo', 'Puerto del Carmen', 'Costa Teguise', 'La Geria', 'Arrecife', 'Tías', 'Yaiza']
