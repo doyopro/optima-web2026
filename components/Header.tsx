@@ -1,30 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { type Language, translations, getLanguage, setLanguage } from '@/lib/i18n'
+import { translations } from '@/lib/i18n'
+import { useLanguage } from '@/lib/LanguageContext'
 
-interface Props {
-  lang?: Language
-  onLangChange?: (lang: Language) => void
-}
-
-export default function Header({ lang: externalLang, onLangChange }: Props) {
-  const [lang, setLang] = useState<Language>('en')
-
-  useEffect(() => {
-    if (externalLang) {
-      setLang(externalLang)
-    } else {
-      setLang(getLanguage())
-    }
-  }, [externalLang])
-
-  function toggleLang(next: Language) {
-    setLanguage(next)
-    setLang(next)
-    onLangChange?.(next)
-  }
+export default function Header() {
+  const { lang, setLang } = useLanguage()
 
   const nav = translations[lang].nav
 
@@ -89,7 +70,7 @@ export default function Header({ lang: externalLang, onLangChange }: Props) {
             <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
               <button
                 type="button"
-                onClick={() => toggleLang('en')}
+                onClick={() => setLang('en')}
                 className={`px-3 py-1.5 transition-colors ${
                   lang === 'en' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
                 }`}
@@ -98,7 +79,7 @@ export default function Header({ lang: externalLang, onLangChange }: Props) {
               </button>
               <button
                 type="button"
-                onClick={() => toggleLang('es')}
+                onClick={() => setLang('es')}
                 className={`px-3 py-1.5 transition-colors ${
                   lang === 'es' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
                 }`}

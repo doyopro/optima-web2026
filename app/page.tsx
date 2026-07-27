@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
-import { type Language, translations, getLanguage } from '@/lib/i18n'
+import { translations } from '@/lib/i18n'
+import { useLanguage } from '@/lib/LanguageContext'
 import SearchWidget from '@/components/SearchWidget'
 import Testimonials from '@/components/Testimonials'
 import Footer from '@/components/Footer'
@@ -13,17 +14,12 @@ import PropertySkeleton from '@/components/PropertySkeleton'
 import { type Property } from '@/lib/types'
 
 export default function Home() {
-  const [lang, setLang] = useState<Language>('en')
+  const { lang } = useLanguage()
   const [featured, setFeatured] = useState<Property[]>([])
   const [loadingFeatured, setLoadingFeatured] = useState(true)
   const [errorFeatured, setErrorFeatured] = useState<boolean>(false)
 
-  // 1. Inicialización del idioma
-  useEffect(() => {
-    setLang(getLanguage())
-  }, [])
-
-  // 2. Fetch seguro de propiedades destacadas
+  // Fetch seguro de propiedades destacadas
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
@@ -73,7 +69,7 @@ export default function Home() {
 
       {/* --- SEARCH WIDGET --- */}
       <div className="relative z-20 -mt-16 mx-auto w-full max-w-6xl px-4 sm:px-6">
-        <SearchWidget lang={lang} />
+        <SearchWidget />
       </div>
 
       {/* --- WHY CHOOSE OPTIMA (METRICS) --- */}

@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Toaster } from 'react-hot-toast'
-import { type Language, translations, getLanguage } from '@/lib/i18n'
+import { translations } from '@/lib/i18n'
+import { useLanguage } from '@/lib/LanguageContext'
 import { type Property } from '@/lib/types'
 import { LOCATIONS } from '@/lib/mock-data'
 import PropertyCard from '@/components/PropertyCard'
@@ -13,7 +14,7 @@ import WhatsAppWidget from '@/components/WhatsAppWidget'
 type SortKey = 'price_asc' | 'price_desc' | 'rating' | 'reviews'
 
 export default function VillasPage() {
-  const [lang, setLang] = useState<Language>('en')
+  const { lang } = useLanguage()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -24,10 +25,6 @@ export default function VillasPage() {
   const [bedrooms, setBedrooms] = useState('')
   const [sort, setSort] = useState<SortKey>('rating')
   const [filtersOpen, setFiltersOpen] = useState(false)
-
-  useEffect(() => {
-    setLang(getLanguage())
-  }, [])
 
   const load = useCallback(async () => {
     setLoading(true)

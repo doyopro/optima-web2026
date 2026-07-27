@@ -2,20 +2,17 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { type Language, translations, getLanguage } from '@/lib/i18n'
+import { translations } from '@/lib/i18n'
+import { useLanguage } from '@/lib/LanguageContext'
 
 interface Villa {
   id: string
   name: string
 }
 
-export default function SearchWidget({ lang: externalLang }: { lang?: Language }) {
+export default function SearchWidget() {
   const router = useRouter()
-  const [lang, setLang] = useState<Language>('en')
-
-  useEffect(() => {
-    setLang(externalLang ?? getLanguage())
-  }, [externalLang])
+  const { lang } = useLanguage()
 
   const t = translations[lang].search
 

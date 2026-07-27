@@ -5,7 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Toaster } from 'react-hot-toast'
-import { type Language, translations, getLanguage } from '@/lib/i18n'
+import { translations } from '@/lib/i18n'
+import { useLanguage } from '@/lib/LanguageContext'
 import { type Property, type Availability } from '@/lib/types'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
@@ -18,7 +19,7 @@ export default function VillaDetailPage({ params }: Props) {
   const { id } = use(params)
   const router = useRouter()
 
-  const [lang, setLang] = useState<Language>('en')
+  const { lang } = useLanguage()
   const [property, setProperty] = useState<Property | null>(null)
   const [loading, setLoading] = useState(true)
   const [imgIdx, setImgIdx] = useState(0)
@@ -28,10 +29,6 @@ export default function VillaDetailPage({ params }: Props) {
   const [checkOut, setCheckOut] = useState('')
   const [availability, setAvailability] = useState<Availability | null>(null)
   const [checking, setChecking] = useState(false)
-
-  useEffect(() => {
-    setLang(getLanguage())
-  }, [])
 
   useEffect(() => {
     fetch(`/api/properties/${id}`)

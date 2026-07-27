@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense } from 'react'
-import { type Language, translations, getLanguage } from '@/lib/i18n'
+import { translations } from '@/lib/i18n'
+import { useLanguage } from '@/lib/LanguageContext'
 import { type Property } from '@/lib/types'
 import PropertyCard from '@/components/PropertyCard'
 import PropertySkeleton from '@/components/PropertySkeleton'
@@ -13,7 +14,7 @@ import WhatsAppWidget from '@/components/WhatsAppWidget'
 function SearchResults() {
   const router = useRouter()
   const params = useSearchParams()
-  const [lang, setLang] = useState<Language>('en')
+  const { lang } = useLanguage()
   const [results, setResults] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
@@ -22,10 +23,6 @@ function SearchResults() {
   const to = params.get('to') ?? ''
   const guests = params.get('guests') ?? ''
   const villa = params.get('villa') ?? ''
-
-  useEffect(() => {
-    setLang(getLanguage())
-  }, [])
 
   useEffect(() => {
     setLoading(true)
