@@ -5,6 +5,7 @@ export type Property = {
   name: string
   description: string
   description_es?: string
+  guesty_listing_id?: string
   location: string
   bedrooms: number
   bathrooms: number

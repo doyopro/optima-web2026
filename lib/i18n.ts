@@ -145,6 +145,8 @@ export const translations = {
       totalPrice: 'Total',
       reviews: 'reviews',
       amenities: 'Amenities',
+      priceIndicative: 'Indicative price — confirmed at checkout',
+      bookNowNote: "You'll be redirected to our secure booking site to confirm dates, availability and final pricing.",
     },
     availability: {
       checking: 'Checking availability...',
@@ -329,6 +331,8 @@ export const translations = {
       totalPrice: 'Total',
       reviews: 'reseñas',
       amenities: 'Comodidades',
+      priceIndicative: 'Precio orientativo — se confirma al reservar',
+      bookNowNote: 'Serás redirigido a nuestro sitio de reservas seguro para confirmar fechas, disponibilidad y precio final.',
     },
     availability: {
       checking: 'Comprobando disponibilidad...',

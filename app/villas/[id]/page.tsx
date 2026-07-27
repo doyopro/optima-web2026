@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation'
 import { Toaster } from 'react-hot-toast'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
-import { type Property, type Availability } from '@/lib/types'
+import { type Property } from '@/lib/types'
+import { getGuestyPropertyUrl } from '@/lib/guesty'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
@@ -24,12 +25,6 @@ export default function VillaDetailPage({ params }: Props) {
   const [loading, setLoading] = useState(true)
   const [imgIdx, setImgIdx] = useState(0)
 
-  // Booking widget state
-  const [checkIn, setCheckIn] = useState('')
-  const [checkOut, setCheckOut] = useState('')
-  const [availability, setAvailability] = useState<Availability | null>(null)
-  const [checking, setChecking] = useState(false)
-
   useEffect(() => {
     fetch(`/api/properties/${id}`)
       .then((r) => r.json())
@@ -38,26 +33,8 @@ export default function VillaDetailPage({ params }: Props) {
       .finally(() => setLoading(false))
   }, [id])
 
-  async function checkAvailability() {
-    if (!property || !checkIn || !checkOut) return
-    setChecking(true)
-    setAvailability(null)
-    try {
-      const res = await fetch('/api/availability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ villa_id: property.id, check_in: checkIn, check_out: checkOut }),
-      })
-      const data = await res.json()
-      setAvailability(data)
-    } finally {
-      setChecking(false)
-    }
-  }
-
   const t = translations[lang]
   const description = (lang === 'es' && property?.description_es) || property?.description || ''
-  const today = new Date().toISOString().split('T')[0]
 
   if (loading) {
     return (
@@ -77,10 +54,7 @@ export default function VillaDetailPage({ params }: Props) {
     )
   }
 
-  const nights =
-    checkIn && checkOut
-      ? Math.max(0, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000))
-      : 0
+  const bookingUrl = getGuestyPropertyUrl(property.guesty_listing_id)
 
   return (
     <>
@@ -186,61 +160,18 @@ export default function VillaDetailPage({ params }: Props) {
                   <span className="text-dark/50 text-sm">{t.properties.perNight}</span>
                 </div>
 
-                <div className="space-y-3 mb-4">
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-1.5">
-                      {t.search.from}
-                    </label>
-                    <input
-                      type="date"
-                      min={today}
-                      value={checkIn}
-                      onChange={(e) => { setCheckIn(e.target.value); setAvailability(null) }}
-                      className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-orange focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-1.5">
-                      {t.search.to}
-                    </label>
-                    <input
-                      type="date"
-                      min={checkIn || today}
-                      value={checkOut}
-                      onChange={(e) => { setCheckOut(e.target.value); setAvailability(null) }}
-                      className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-orange focus:outline-none"
-                    />
-                  </div>
-                </div>
+                <p className="text-xs text-dark/40 mb-4">{t.properties.priceIndicative}</p>
 
-                <button
-                  type="button"
-                  onClick={checkAvailability}
-                  disabled={!checkIn || !checkOut || checking}
-                  className="w-full bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors disabled:opacity-50 mb-4 text-sm"
+                <a
+                  href={bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors text-sm"
                 >
-                  {checking ? t.availability.checking : t.properties.bookNow}
-                </button>
+                  {t.properties.bookNow}
+                </a>
 
-                {/* Availability result */}
-                {availability && (
-                  <div className={`rounded-lg p-3 text-sm text-center ${availability.available ? 'bg-green/20 text-dark' : 'bg-red-50 text-red-700'}`}>
-                    {availability.available ? (
-                      <>
-                        <p className="font-semibold mb-1">✓ {t.availability.available}</p>
-                        <p className="text-dark/60">
-                          {nights} {nights === 1 ? t.properties.night : t.properties.nights} · {t.properties.totalPrice}: <span className="font-bold text-dark">£{availability.price_total.toLocaleString()}</span>
-                        </p>
-                      </>
-                    ) : (
-                      <p>{t.availability.unavailable}</p>
-                    )}
-                  </div>
-                )}
-
-                {!checkIn || !checkOut ? (
-                  <p className="text-xs text-center text-dark/40 mt-3">{t.availability.selectDates}</p>
-                ) : null}
+                <p className="text-xs text-center text-dark/40 mt-3">{t.properties.bookNowNote}</p>
               </div>
             </div>
           </div>
