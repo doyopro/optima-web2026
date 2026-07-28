@@ -11,7 +11,7 @@ export async function GET(
     const { data, error } = await supabasePublic
       .from('properties')
       .select(
-        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images',
+        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp',
       )
       .eq('id', id)
       .maybeSingle()
@@ -34,7 +34,7 @@ export async function GET(
       bedrooms: data.bedrooms ?? 0,
       bathrooms: data.bathrooms ?? 0,
       guests_max: data.max_guests ?? 0,
-      price_per_night_gbp: 0,
+      price_per_night_gbp: data.base_price_gbp ?? 0,
       rating: 0,
       reviews_count: 0,
       images: (data.images as string[]) ?? [],

@@ -6,7 +6,7 @@ export async function GET(_req: NextRequest) {
     const { data, error } = await supabasePublic
       .from('properties')
       .select(
-        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images',
+        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp',
       )
 
     if (error) {
@@ -23,7 +23,7 @@ export async function GET(_req: NextRequest) {
       bedrooms: row.bedrooms ?? 0,
       bathrooms: row.bathrooms ?? 0,
       guests_max: row.max_guests ?? 0,
-      price_per_night_gbp: 0,
+      price_per_night_gbp: row.base_price_gbp ?? 0,
       rating: 0,
       reviews_count: 0,
       images: (row.images as string[]) ?? [],
