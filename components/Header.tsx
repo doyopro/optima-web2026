@@ -44,12 +44,9 @@ export default function Header() {
       <div className="border-b border-neutral-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-3 sm:px-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element -- static local SVG, next/image blocks SVG optimization by default */}
-            <img src="/logo.svg" alt="Optima Villas" className="h-[90px] w-[90px]" />
-            <span className="text-3xl font-bold tracking-tight text-dark">
-              Optima<span className="text-orange"> Villas</span>
-            </span>
+            <img src="/logo.svg" alt="Optima Villas" className="h-16 w-16" />
           </Link>
 
           {/* Nav */}
