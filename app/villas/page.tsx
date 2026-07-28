@@ -270,7 +270,7 @@ export default function VillasPage() {
           <div className="flex gap-8">
             {/* Sidebar filters — desktop */}
             <aside className="hidden md:block w-64 shrink-0">
-              <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-6">
+              <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
                 <h2 className="font-bold text-dark mb-5">{t.filters}</h2>
                 <FilterPanel />
               </div>
