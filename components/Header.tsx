@@ -45,7 +45,8 @@ export default function Header() {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <ButterflyIcon className="h-7 w-7 text-orange" />
+            {/* eslint-disable-next-line @next/next/no-img-element -- static local SVG, next/image blocks SVG optimization by default */}
+            <img src="/logo.svg" alt="Optima Villas" className="h-9 w-9" />
             <span className="text-2xl font-bold tracking-tight text-dark">
               Optima<span className="text-orange"> Villas</span>
             </span>
@@ -130,14 +131,6 @@ function HeartIcon({ className }: { className?: string }) {
       aria-hidden="true"
     >
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z" />
-    </svg>
-  )
-}
-
-function ButterflyIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 7c1-2.5 3-4.5 5.5-4.5C20 2.5 21.5 4 21.5 6.2c0 2.6-2.6 4.6-5.4 5.3 2.8.7 5.4 2.7 5.4 5.3 0 2.2-1.5 3.7-4 3.7C15 20.5 13 18.5 12 16c-1 2.5-3 4.5-5.5 4.5-2.5 0-4-1.5-4-3.7 0-2.6 2.6-4.6 5.4-5.3C5.1 10.8 2.5 8.8 2.5 6.2 2.5 4 4 2.5 6.5 2.5 9 2.5 11 4.5 12 7Z" />
     </svg>
   )
 }

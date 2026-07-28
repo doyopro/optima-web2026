@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
+import Image from 'next/image'
 import Link from 'next/link'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
@@ -53,7 +54,16 @@ export default function Home() {
 
       {/* --- HERO SECTION --- */}
       <section className="relative flex h-[75vh] min-h-[600px] items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 via-neutral-800 to-dark" />
+        <Image
+          src="/hero-cover.jpg"
+          alt="Lanzarote landscapes — caves, volcanoes and beaches"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        {/* Dark overlay for text legibility over the photo */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-dark/70" />
         {/* Luces de fondo premium */}
         <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_30%,rgba(226,102,32,0.15),transparent_50%),radial-gradient(circle_at_80%_70%,rgba(28,175,230,0.15),transparent_50%)]" />
 

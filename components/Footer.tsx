@@ -17,6 +17,8 @@ export default function Footer({ lang }: Props) {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static local SVG, next/image blocks SVG optimization by default */}
+              <img src="/logo.svg" alt="Optima Villas" className="h-8 w-8" />
               <span className="text-xl font-bold text-white">
                 Optima<span className="text-orange"> Villas</span>
               </span>
