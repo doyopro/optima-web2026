@@ -9,11 +9,16 @@ import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import { type Property } from '@/lib/types'
 import { getGuestyPropertyUrl } from '@/lib/guesty'
+import { getApproximateMapEmbedUrl } from '@/lib/map'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
 interface Props {
   params: Promise<{ id: string }>
+}
+
+function capitalize(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1)
 }
 
 export default function VillaDetailPage({ params }: Props) {
@@ -24,6 +29,7 @@ export default function VillaDetailPage({ params }: Props) {
   const [property, setProperty] = useState<Property | null>(null)
   const [loading, setLoading] = useState(true)
   const [imgIdx, setImgIdx] = useState(0)
+  const [galleryOpen, setGalleryOpen] = useState(false)
 
   useEffect(() => {
     fetch(`/api/properties/${id}`)
@@ -55,12 +61,16 @@ export default function VillaDetailPage({ params }: Props) {
   }
 
   const bookingUrl = getGuestyPropertyUrl(property.guesty_listing_id)
+  const mapUrl = getApproximateMapEmbedUrl(property.latitude, property.longitude)
+  const images = property.images
+  const bedroomsLabel = property.bedrooms === 1 ? t.properties.bedroom : t.properties.bedrooms
+  const bathroomsLabel = property.bathrooms === 1 ? t.properties.bathroom : t.properties.bathrooms
 
   return (
     <>
       <Toaster position="top-center" />
 
-      <div className="min-h-screen bg-cream">
+      <div className="min-h-screen bg-cream pb-28 lg:pb-0">
         {/* Breadcrumb */}
         <div className="mx-auto max-w-6xl px-4 sm:px-6 pt-6 pb-2">
           <nav className="flex items-center gap-2 text-sm text-dark/50">
@@ -73,69 +83,139 @@ export default function VillaDetailPage({ params }: Props) {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left: Gallery + Details */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Gallery */}
-              <div className="relative aspect-video rounded-2xl overflow-hidden bg-neutral-200 shadow-md">
-                <Image
-                  src={property.images[imgIdx] ?? property.images[0]}
-                  alt={property.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-                {property.images.length > 1 && (
-                  <div className="absolute bottom-3 right-3 flex gap-2">
-                    {property.images.map((_, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setImgIdx(i)}
-                        className={`h-2 w-2 rounded-full transition-colors ${i === imgIdx ? 'bg-white' : 'bg-white/50'}`}
-                      />
-                    ))}
-                  </div>
-                )}
-                {property.images.length > 1 && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setImgIdx((i) => (i - 1 + property.images.length) % property.images.length)}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center hover:bg-white transition-colors shadow"
-                    >
-                      ←
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setImgIdx((i) => (i + 1) % property.images.length)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center hover:bg-white transition-colors shadow"
-                    >
-                      →
-                    </button>
-                  </>
-                )}
-              </div>
+          {/* --- PHOTO GALLERY --- */}
 
-              {/* Title */}
+          {/* Mobile: single-image carousel */}
+          <div className="md:hidden relative aspect-video rounded-2xl overflow-hidden bg-neutral-200 shadow-md">
+            {images.length > 0 && (
+              <Image
+                src={images[imgIdx] ?? images[0]}
+                alt={property.name}
+                fill
+                className="object-cover"
+                priority
+              />
+            )}
+            {images.length > 1 && (
+              <div className="absolute bottom-3 right-3 flex gap-2">
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setImgIdx(i)}
+                    className={`h-2 w-2 rounded-full transition-colors ${i === imgIdx ? 'bg-white' : 'bg-white/50'}`}
+                  />
+                ))}
+              </div>
+            )}
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setImgIdx((i) => (i - 1 + images.length) % images.length)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center hover:bg-white transition-colors shadow"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImgIdx((i) => (i + 1) % images.length)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center hover:bg-white transition-colors shadow"
+                >
+                  →
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Desktop: mosaic */}
+          <div className="hidden md:block relative">
+            {images.length === 0 ? (
+              <div className="aspect-[21/9] rounded-2xl bg-neutral-200" />
+            ) : images.length === 1 ? (
+              <button
+                type="button"
+                onClick={() => setGalleryOpen(true)}
+                className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden block"
+              >
+                <Image src={images[0]} alt={property.name} fill className="object-cover" priority />
+              </button>
+            ) : (
+              (() => {
+                const secondaryImages = images.slice(1, 5)
+                const secondaryGridClass =
+                  secondaryImages.length === 1
+                    ? 'grid-cols-1 grid-rows-1'
+                    : secondaryImages.length === 2
+                      ? 'grid-cols-1 grid-rows-2'
+                      : secondaryImages.length === 3
+                        ? 'grid-cols-1 grid-rows-3'
+                        : 'grid-cols-2 grid-rows-2'
+
+                return (
+                  <div className="grid grid-cols-2 gap-2 h-[420px] rounded-2xl overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setGalleryOpen(true)}
+                      className="relative block h-full w-full"
+                    >
+                      <Image src={images[0]} alt={property.name} fill className="object-cover" priority />
+                    </button>
+                    <div className={`grid gap-2 h-full ${secondaryGridClass}`}>
+                      {secondaryImages.map((img, i) => (
+                        <button
+                          key={img}
+                          type="button"
+                          onClick={() => setGalleryOpen(true)}
+                          className="relative block h-full w-full"
+                        >
+                          <Image src={img} alt={`${property.name} ${i + 2}`} fill className="object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()
+            )}
+
+            {images.length > 1 && (
+              <button
+                type="button"
+                onClick={() => setGalleryOpen(true)}
+                className="absolute bottom-4 right-4 bg-white text-dark text-sm font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-neutral-50 transition-colors"
+              >
+                {t.properties.showAllPhotos} ({images.length})
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+            {/* Left: Details */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Title + key stats */}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-orange mb-1">
                   {property.location}
                 </p>
                 <h1 className="text-3xl font-bold text-dark mb-3">{property.name}</h1>
-                <div className="flex items-center gap-4 text-sm text-dark/60 mb-4">
-                  <span>{property.bedrooms} {property.bedrooms === 1 ? t.properties.bedroom : t.properties.bedrooms}</span>
-                  <span>·</span>
-                  <span>{property.bathrooms} {property.bathrooms === 1 ? t.properties.bathroom : t.properties.bathrooms}</span>
-                  <span>·</span>
+                <div className="flex flex-wrap items-center gap-3 text-sm text-dark/60 mb-4">
+                  {property.type && (
+                    <>
+                      <span className="font-medium text-dark">{capitalize(property.type)}</span>
+                      <span className="text-dark/30">·</span>
+                    </>
+                  )}
                   <span>{property.guests_max} {t.properties.guests}</span>
-                  <span>·</span>
-                  <span className="flex items-center gap-1">
-                    <span className="text-orange">★</span>
-                    {property.rating} ({property.reviews_count} {t.properties.reviews})
-                  </span>
+                  <span className="text-dark/30">·</span>
+                  <span>{property.bedrooms} {bedroomsLabel}</span>
+                  <span className="text-dark/30">·</span>
+                  <span>{property.bathrooms} {bathroomsLabel}</span>
                 </div>
+
+                {/* Description */}
                 <p className="text-dark/70 leading-relaxed">{description}</p>
+
+                {/* Tourist license */}
                 {property.vv_license && (
                   <p className="text-xs text-dark/40 mt-3">
                     {t.properties.touristLicense}: {property.vv_license}
@@ -155,11 +235,27 @@ export default function VillaDetailPage({ params }: Props) {
                   ))}
                 </div>
               </div>
+
+              {/* Location map */}
+              {mapUrl && (
+                <div>
+                  <h2 className="text-lg font-bold text-dark mb-4">{t.properties.approximateLocation}</h2>
+                  <div className="rounded-2xl overflow-hidden border border-neutral-200 h-72">
+                    <iframe
+                      title={t.properties.approximateLocation}
+                      src={mapUrl}
+                      className="w-full h-full border-0"
+                      loading="lazy"
+                    />
+                  </div>
+                  <p className="text-xs text-dark/40 mt-2">{t.properties.approximateLocationNote}</p>
+                </div>
+              )}
             </div>
 
-            {/* Right: Booking widget */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-6">
+            {/* Right: sticky booking sidebar — desktop only */}
+            <div className="hidden lg:block lg:col-span-1">
+              <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
                 <div className="flex items-baseline gap-1 mb-6">
                   <span className="text-3xl font-bold text-dark">£{property.price_per_night_gbp}</span>
                   <span className="text-dark/50 text-sm">{t.properties.perNight}</span>
@@ -193,6 +289,49 @@ export default function VillaDetailPage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Mobile: fixed bottom booking bar */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-200 px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] flex items-center justify-between gap-4">
+        <div>
+          <span className="text-lg font-bold text-dark">£{property.price_per_night_gbp}</span>
+          <span className="text-dark/50 text-xs"> {t.properties.perNight}</span>
+        </div>
+        <a
+          href={bookingUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-orange text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-orange/90 transition-colors"
+        >
+          {t.properties.bookNow}
+        </a>
+      </div>
+
+      {/* Gallery modal */}
+      {galleryOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 overflow-y-auto"
+          onClick={() => setGalleryOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setGalleryOpen(false)}
+            aria-label={t.properties.closeGallery}
+            className="fixed top-4 right-4 h-10 w-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center text-dark text-lg z-10"
+          >
+            ✕
+          </button>
+          <div
+            className="max-w-4xl mx-auto py-16 px-4 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {images.map((img, i) => (
+              <div key={img} className="relative aspect-video rounded-xl overflow-hidden">
+                <Image src={img} alt={`${property.name} ${i + 1}`} fill className="object-cover" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <Footer lang={lang} />
       <WhatsAppWidget villaName={property.name} lang={lang} />

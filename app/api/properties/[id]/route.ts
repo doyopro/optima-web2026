@@ -12,7 +12,7 @@ export async function GET(
     const { data, error } = await supabasePublic
       .from('properties')
       .select(
-        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp',
+        'id, guesty_listing_id, name, type, city, region, country, latitude, longitude, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp',
       )
       .eq('id', id)
       .maybeSingle()
@@ -35,6 +35,9 @@ export async function GET(
       description_es: es.text,
       vv_license: en.license || es.license || undefined,
       guesty_listing_id: data.guesty_listing_id || undefined,
+      type: data.type || undefined,
+      latitude: data.latitude ?? undefined,
+      longitude: data.longitude ?? undefined,
       location: data.city || data.region || data.country || 'Lanzarote',
       bedrooms: data.bedrooms ?? 0,
       bathrooms: data.bathrooms ?? 0,

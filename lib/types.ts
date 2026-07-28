@@ -7,6 +7,9 @@ export type Property = {
   description_es?: string
   vv_license?: string
   guesty_listing_id?: string
+  type?: string
+  latitude?: number
+  longitude?: number
   location: string
   bedrooms: number
   bathrooms: number
