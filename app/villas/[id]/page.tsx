@@ -136,6 +136,11 @@ export default function VillaDetailPage({ params }: Props) {
                   </span>
                 </div>
                 <p className="text-dark/70 leading-relaxed">{description}</p>
+                {property.vv_license && (
+                  <p className="text-xs text-dark/40 mt-3">
+                    {t.properties.touristLicense}: {property.vv_license}
+                  </p>
+                )}
               </div>
 
               {/* Amenities */}

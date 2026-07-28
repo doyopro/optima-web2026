@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { supabasePublic } from '@/lib/supabase'
+import { extractVvLicense } from '@/lib/property'
 
 export async function GET(
   _request: NextRequest,
@@ -24,11 +25,15 @@ export async function GET(
       return NextResponse.json({ error: 'Property not found' }, { status: 404 })
     }
 
+    const en = extractVvLicense(data.description_en || '')
+    const es = extractVvLicense(data.description_es || '')
+
     const property = {
       id: data.id,
       name: data.name,
-      description: data.description_en || '',
-      description_es: data.description_es || '',
+      description: en.text,
+      description_es: es.text,
+      vv_license: en.license || es.license || undefined,
       guesty_listing_id: data.guesty_listing_id || undefined,
       location: data.city || data.region || data.country || 'Lanzarote',
       bedrooms: data.bedrooms ?? 0,

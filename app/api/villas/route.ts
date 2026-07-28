@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { supabasePublic } from '@/lib/supabase'
+import { extractVvLicense } from '@/lib/property'
 
 export async function GET(_req: NextRequest) {
   try {
@@ -13,24 +14,30 @@ export async function GET(_req: NextRequest) {
       throw new Error(error.message)
     }
 
-    const villas = (data || []).map((row) => ({
-      id: row.id,
-      name: row.name,
-      description: row.description_en || '',
-      description_es: row.description_es || '',
-      guesty_listing_id: row.guesty_listing_id || undefined,
-      location: row.city || row.region || row.country || 'Lanzarote',
-      bedrooms: row.bedrooms ?? 0,
-      bathrooms: row.bathrooms ?? 0,
-      guests_max: row.max_guests ?? 0,
-      price_per_night_gbp: row.base_price_gbp ?? 0,
-      rating: 0,
-      reviews_count: 0,
-      images: (row.images as string[]) ?? [],
-      amenities: (row.amenities as string[]) ?? [],
-      is_featured: true,
-      slug: row.id,
-    }))
+    const villas = (data || []).map((row) => {
+      const en = extractVvLicense(row.description_en || '')
+      const es = extractVvLicense(row.description_es || '')
+
+      return {
+        id: row.id,
+        name: row.name,
+        description: en.text,
+        description_es: es.text,
+        vv_license: en.license || es.license || undefined,
+        guesty_listing_id: row.guesty_listing_id || undefined,
+        location: row.city || row.region || row.country || 'Lanzarote',
+        bedrooms: row.bedrooms ?? 0,
+        bathrooms: row.bathrooms ?? 0,
+        guests_max: row.max_guests ?? 0,
+        price_per_night_gbp: row.base_price_gbp ?? 0,
+        rating: 0,
+        reviews_count: 0,
+        images: (row.images as string[]) ?? [],
+        amenities: (row.amenities as string[]) ?? [],
+        is_featured: true,
+        slug: row.id,
+      }
+    })
 
     return NextResponse.json({ properties: villas, total: villas.length })
   } catch (error) {
