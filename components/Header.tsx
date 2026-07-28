@@ -42,12 +42,12 @@ export default function Header() {
 
       {/* Main header */}
       <div className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-3 sm:px-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element -- static local SVG, next/image blocks SVG optimization by default */}
-            <img src="/logo.svg" alt="Optima Villas" className="h-9 w-9" />
-            <span className="text-2xl font-bold tracking-tight text-dark">
+            <img src="/logo.svg" alt="Optima Villas" className="h-[90px] w-[90px]" />
+            <span className="text-3xl font-bold tracking-tight text-dark">
               Optima<span className="text-orange"> Villas</span>
             </span>
           </Link>
