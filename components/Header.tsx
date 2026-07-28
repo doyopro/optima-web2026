@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
@@ -45,8 +46,7 @@ export default function Header() {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-3 sm:px-6">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element -- static local SVG, next/image blocks SVG optimization by default */}
-            <img src="/logo.svg" alt="Optima Villas" className="h-16 w-16" />
+            <Image src="/logooptima.png" alt="Optima Villas" width={145} height={44} priority />
           </Link>
 
           {/* Nav */}

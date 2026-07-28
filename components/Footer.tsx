@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { type Language, translations } from '@/lib/i18n'
 import { SOCIAL_LINKS } from '@/lib/marketing'
@@ -17,8 +18,7 @@ export default function Footer({ lang }: Props) {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center mb-4">
-              {/* eslint-disable-next-line @next/next/no-img-element -- static local SVG, next/image blocks SVG optimization by default */}
-              <img src="/logo.svg" alt="Optima Villas" className="h-14 w-14" />
+              <Image src="/logooptima.png" alt="Optima Villas" width={112} height={34} />
             </Link>
             <p className="text-sm leading-relaxed text-neutral-400 mb-6">{f.tagline}</p>
             {/* Social */}
