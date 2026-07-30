@@ -17,15 +17,22 @@ async function getGuestyToken(): Promise<string> {
     return cachedToken.token
   }
 
+  // Guesty's OAuth2 token endpoint requires application/x-www-form-urlencoded,
+  // not JSON — a JSON body here returns 400.
+  const body = new URLSearchParams({
+    grant_type: 'client_credentials',
+    scope: 'open-api',
+    client_id: process.env.GUESTY_CLIENT_ID ?? '',
+    client_secret: process.env.GUESTY_CLIENT_SECRET ?? '',
+  })
+
   const res = await fetch('https://open-api.guesty.com/oauth2/token', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      grant_type: 'client_credentials',
-      client_id: process.env.GUESTY_CLIENT_ID,
-      client_secret: process.env.GUESTY_CLIENT_SECRET,
-      scope: 'open-api',
-    }),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+    },
+    body,
   })
 
   if (!res.ok) {
