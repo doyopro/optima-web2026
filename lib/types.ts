@@ -23,6 +23,21 @@ export type Property = {
   slug: string
 }
 
+export type BlogPost = {
+  id: string
+  slug: string
+  title: string
+  title_es?: string
+  excerpt: string
+  excerpt_es?: string
+  content?: string
+  content_es?: string
+  cover_image: string | null
+  category: string | null
+  author_name: string | null
+  published_at: string | null
+}
+
 export type Availability = {
   property_id: string
   check_in: string
