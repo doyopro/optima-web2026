@@ -53,80 +53,27 @@ export default function Home() {
       <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
 
       {/* --- HERO SECTION --- */}
-      <section className="bg-cream pt-16 pb-24 md:pt-24 md:pb-32 px-4 sm:px-6">
-        <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          {/* Text */}
-          <div className="text-center lg:text-left">
-            <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-dark sm:text-5xl lg:text-6xl">
-              {hero.title}
-            </h1>
-            <p className="mx-auto lg:mx-0 max-w-lg text-lg text-dark/70 sm:text-xl font-light leading-relaxed">
-              {hero.subtitle}
-            </p>
-          </div>
+      <section className="relative flex h-[75vh] min-h-[600px] items-center justify-center overflow-hidden">
+        <Image
+          src="/hero-cover.jpg"
+          alt="Lanzarote landscapes — caves, volcanoes and beaches"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        {/* Dark overlay for text legibility over the photo */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-dark/70" />
+        {/* Luces de fondo premium */}
+        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_30%,rgba(226,102,32,0.15),transparent_50%),radial-gradient(circle_at_80%_70%,rgba(28,175,230,0.15),transparent_50%)]" />
 
-          {/* Editorial photo collage — Lanzarote landscapes mixed with real property photos */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 lg:grid-rows-3 gap-3 lg:h-[560px]">
-            {/* Large panel — green lagoon */}
-            <div className="relative col-span-2 aspect-video lg:aspect-auto lg:col-span-2 lg:row-span-2 lg:col-start-1 lg:row-start-1 rounded-2xl overflow-hidden">
-              <Image
-                src="/lanzarote14.jpg"
-                alt="Charco de los Clicos green lagoon, Lanzarote"
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 40vw"
-                className="object-cover"
-              />
-            </div>
-
-            {/* Medium vertical — white architecture */}
-            <div className="relative aspect-square lg:aspect-auto lg:col-span-1 lg:row-span-3 lg:col-start-3 lg:row-start-1 rounded-2xl overflow-hidden">
-              <Image
-                src="/lanzarote17.jpg"
-                alt="Traditional white Lanzarote architecture detail"
-                fill
-                priority
-                sizes="(max-width: 1024px) 50vw, 15vw"
-                className="object-cover"
-              />
-            </div>
-
-            {/* Medium vertical — real property photo (Villa Sapphire) */}
-            <div className="relative aspect-square lg:aspect-auto lg:col-span-1 lg:row-span-3 lg:col-start-4 lg:row-start-1 rounded-2xl overflow-hidden">
-              <Image
-                src="https://assets.guesty.com/image/upload/v1760533272/production/5f297bd907e0840029b8001a/grmv3eeojxkbmqkloipe.jpg"
-                alt="Villa Sapphire"
-                fill
-                priority
-                sizes="(max-width: 1024px) 50vw, 15vw"
-                className="object-cover"
-              />
-            </div>
-
-            {/* Small panel — coastal aerial */}
-            <div className="relative aspect-square lg:aspect-auto lg:col-span-1 lg:row-span-1 lg:col-start-1 lg:row-start-3 rounded-2xl overflow-hidden">
-              <Image
-                src="/lanzarote19.jpg"
-                alt="Aerial view of the Lanzarote coastline"
-                fill
-                loading="lazy"
-                sizes="(max-width: 1024px) 50vw, 20vw"
-                className="object-cover"
-              />
-            </div>
-
-            {/* Small panel — real property photo (Casa Cortine) */}
-            <div className="relative aspect-square lg:aspect-auto lg:col-span-1 lg:row-span-1 lg:col-start-2 lg:row-start-3 rounded-2xl overflow-hidden">
-              <Image
-                src="https://assets.guesty.com/image/upload/v1708327411/production/5f297bd907e0840029b8001a/sci2lexkercrqilueiwf.jpg"
-                alt="Casa Cortine"
-                fill
-                loading="lazy"
-                sizes="(max-width: 1024px) 50vw, 20vw"
-                className="object-cover"
-              />
-            </div>
-          </div>
+        <div className="relative z-10 mx-auto max-w-5xl px-4 text-center animate-fade-in">
+          <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl drop-shadow-lg">
+            {hero.title}
+          </h1>
+          <p className="mx-auto max-w-2xl text-lg text-neutral-200/90 sm:text-xl font-light leading-relaxed">
+            {hero.subtitle}
+          </p>
         </div>
       </section>
 

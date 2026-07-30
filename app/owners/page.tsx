@@ -115,10 +115,10 @@ export default function OwnersPage() {
         {/* --- FOUNDER STORY --- */}
         <section className="bg-neutral-50 py-16 md:py-24 px-4 sm:px-6">
           <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-lg order-2 lg:order-1">
+            <div className="relative aspect-[938/1018] rounded-3xl overflow-hidden shadow-lg order-2 lg:order-1">
               <Image
-                src="/hero-cover.jpg"
-                alt="Lanzarote landscapes — caves, volcanoes and beaches"
+                src="/sonia-full.jpg"
+                alt={t.founder.name}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
