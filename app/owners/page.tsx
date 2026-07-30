@@ -1,0 +1,399 @@
+'use client'
+
+import { useState, type FormEvent } from 'react'
+import Image from 'next/image'
+import { translations } from '@/lib/i18n'
+import { useLanguage } from '@/lib/LanguageContext'
+import Footer from '@/components/Footer'
+import WhatsAppWidget from '@/components/WhatsAppWidget'
+
+const OWNERS_WHATSAPP_NUMBER = '34617387171'
+const TRUSTPILOT_URL = 'https://uk.trustpilot.com/review/optimavillaslanzarote.com'
+
+// Real first image per property, queried from Supabase (properties.images[0]).
+// Order matches translations[lang].owners.testimonials.items.
+const TESTIMONIAL_IMAGES = [
+  'https://assets.guesty.com/image/upload/v1713511802/production/5f297bd907e0840029b8001a/bhszzu9fohwsdgnfilyo.jpg', // Casa Miramar
+  'https://assets.guesty.com/image/upload/v1728901134/production/5f297bd907e0840029b8001a/gtlzeq9bjd6eofs3ek4v.jpg', // Villa Piedaita
+  'https://assets.guesty.com/image/upload/v1694001774/production/5f297bd907e0840029b8001a/m2whh1yajmwbvjcqs2ri.jpg', // Casa Cielo Azul
+  'https://assets.guesty.com/image/upload/v1708327411/production/5f297bd907e0840029b8001a/sci2lexkercrqilueiwf.jpg', // Casa Cortine
+]
+
+type SubmitState = 'idle' | 'submitting' | 'success' | 'error'
+
+export default function OwnersPage() {
+  const { lang } = useLanguage()
+  const t = translations[lang].owners
+
+  const [form, setForm] = useState({ name: '', email: '', phone: '', propertyLocation: '', message: '' })
+  const [submitState, setSubmitState] = useState<SubmitState>('idle')
+
+  const whatsappUrl = `https://wa.me/${OWNERS_WHATSAPP_NUMBER}?text=${encodeURIComponent(t.hero.whatsappMessage)}`
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    setSubmitState('submitting')
+    try {
+      const res = await fetch('/api/owner-enquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          property_location: form.propertyLocation,
+          message: form.message,
+        }),
+      })
+      if (!res.ok) throw new Error('Request failed')
+      setSubmitState('success')
+      setForm({ name: '', email: '', phone: '', propertyLocation: '', message: '' })
+    } catch {
+      setSubmitState('error')
+    }
+  }
+
+  return (
+    <>
+      <main className="flex min-h-screen flex-col bg-cream">
+        {/* --- HERO --- */}
+        <section className="relative flex min-h-[560px] items-center justify-center overflow-hidden px-4 py-24 sm:px-6">
+          <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 via-neutral-800 to-dark" />
+          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_30%,rgba(226,102,32,0.15),transparent_50%),radial-gradient(circle_at_80%_70%,rgba(28,175,230,0.15),transparent_50%)]" />
+
+          <div className="relative z-10 mx-auto max-w-3xl text-center">
+            <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl drop-shadow-lg">
+              {t.hero.title}
+            </h1>
+            <p className="mx-auto mb-10 max-w-2xl text-lg text-neutral-200/90 sm:text-xl font-light leading-relaxed">
+              {t.hero.subtitle}
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a
+                href="#contact"
+                className="w-full sm:w-auto rounded-xl bg-orange px-8 py-4 text-sm font-bold text-white shadow-md transition-all hover:bg-orange/90 hover:shadow-lg text-center"
+              >
+                {t.hero.ctaContact}
+              </a>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto rounded-xl border border-white/30 bg-white/10 backdrop-blur px-8 py-4 text-sm font-bold text-white transition-all hover:bg-white/20 text-center"
+              >
+                {t.hero.ctaWhatsapp}
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* --- TRUST BLOCK --- */}
+        <section className="bg-white py-16 md:py-20 px-4 sm:px-6">
+          <div className="mx-auto max-w-6xl">
+            <h2 className="text-2xl md:text-3xl font-bold text-dark text-center mb-12">{t.trust.title}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              <TrustPoint icon={<MapPinIcon className="h-7 w-7" />} title={t.trust.localKnowledge} desc={t.trust.localKnowledgeDesc} />
+              <TrustPoint icon={<ShieldIcon className="h-7 w-7" />} title={t.trust.noHiddenFees} desc={t.trust.noHiddenFeesDesc} />
+              <TrustPoint icon={<StarIcon className="h-7 w-7" />} title={t.trust.reviews} desc={t.trust.reviewsDesc} />
+              <TrustPoint icon={<HeadsetIcon className="h-7 w-7" />} title={t.trust.support} desc={t.trust.supportDesc} />
+            </div>
+          </div>
+        </section>
+
+        {/* --- FOUNDER STORY --- */}
+        <section className="bg-neutral-50 py-16 md:py-24 px-4 sm:px-6">
+          <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-lg order-2 lg:order-1">
+              <Image
+                src="/hero-cover.jpg"
+                alt="Lanzarote landscapes — caves, volcanoes and beaches"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="order-1 lg:order-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-dark mb-2">{t.founder.title}</h2>
+              <p className="text-orange font-semibold mb-1">{t.founder.name}</p>
+              <p className="text-dark/50 text-sm mb-6">{t.founder.role}</p>
+              <p className="text-dark/70 leading-relaxed whitespace-pre-line">{t.founder.text}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* --- OWNER TESTIMONIALS --- */}
+        <section className="bg-white py-16 md:py-24 px-4 sm:px-6">
+          <div className="mx-auto max-w-6xl">
+            <h2 className="text-2xl md:text-3xl font-bold text-dark text-center mb-12">{t.testimonials.title}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              {t.testimonials.items.map((item, i) => (
+                <div key={item.author} className="flex gap-4 bg-cream/60 rounded-2xl p-6 border border-neutral-100">
+                  <div className="relative h-16 w-16 shrink-0 rounded-xl overflow-hidden">
+                    <Image
+                      src={TESTIMONIAL_IMAGES[i]}
+                      alt={item.property}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-dark/80 leading-relaxed mb-1">&ldquo;{item.text}&rdquo;</p>
+                    {'translation' in item && item.translation && (
+                      <p className="text-dark/50 text-sm italic leading-relaxed mt-2 mb-1">
+                        {t.testimonials.translationLabel}: &ldquo;{item.translation}&rdquo;
+                      </p>
+                    )}
+                    <p className="text-sm font-semibold text-dark mt-2">
+                      {item.author} <span className="text-dark/40 font-normal">· {item.property}</span>
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* --- TRUSTPILOT --- */}
+        <section className="bg-neutral-50 py-14 px-4 sm:px-6">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-lg text-dark/70 mb-4">{t.trustpilot.text}</p>
+            <a
+              href={TRUSTPILOT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-bold text-orange hover:text-dark transition-colors uppercase tracking-wide"
+            >
+              {t.trustpilot.cta} <span className="text-lg">→</span>
+            </a>
+          </div>
+        </section>
+
+        {/* --- WHAT'S INCLUDED --- */}
+        <section className="bg-white py-16 md:py-24 px-4 sm:px-6">
+          <div className="mx-auto max-w-6xl">
+            <h2 className="text-2xl md:text-3xl font-bold text-dark text-center mb-12">{t.included.title}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <IncludedItem icon={<GlobeIcon className="h-6 w-6" />} title={t.included.channelDistribution} desc={t.included.channelDistributionDesc} />
+              <IncludedItem icon={<ChatIcon className="h-6 w-6" />} title={t.included.guestCommunication} desc={t.included.guestCommunicationDesc} />
+              <IncludedItem icon={<WrenchIcon className="h-6 w-6" />} title={t.included.maintenance} desc={t.included.maintenanceDesc} />
+              <IncludedItem icon={<DocCheckIcon className="h-6 w-6" />} title={t.included.compliance} desc={t.included.complianceDesc} />
+              <IncludedItem icon={<ChartIcon className="h-6 w-6" />} title={t.included.reports} desc={t.included.reportsDesc} />
+              <IncludedItem icon={<DashboardIcon className="h-6 w-6" />} title={t.included.portal} desc={t.included.portalDesc} />
+            </div>
+          </div>
+        </section>
+
+        {/* --- CONTACT FORM --- */}
+        <section id="contact" className="bg-neutral-50 py-16 md:py-24 px-4 sm:px-6 scroll-mt-6">
+          <div className="mx-auto max-w-2xl">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold text-dark mb-3">{t.contact.title}</h2>
+              <p className="text-dark/60">{t.contact.subtitle}</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-6 sm:p-8 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-1.5">
+                    {t.contact.name}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-orange focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-1.5">
+                    {t.contact.email}
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                    className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-orange focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-1.5">
+                    {t.contact.phone}
+                  </label>
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                    className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-orange focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-1.5">
+                    {t.contact.propertyLocation}
+                  </label>
+                  <input
+                    type="text"
+                    value={form.propertyLocation}
+                    onChange={(e) => setForm((f) => ({ ...f, propertyLocation: e.target.value }))}
+                    className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-orange focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-1.5">
+                  {t.contact.message}
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={form.message}
+                  onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+                  className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-orange focus:outline-none resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitState === 'submitting'}
+                className="w-full bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors disabled:opacity-50 text-sm"
+              >
+                {submitState === 'submitting' ? t.contact.submitting : t.contact.submit}
+              </button>
+
+              {submitState === 'success' && (
+                <p className="text-sm text-center text-green-700 bg-green/20 rounded-lg py-3">{t.contact.success}</p>
+              )}
+              {submitState === 'error' && (
+                <p className="text-sm text-center text-red-700 bg-red-50 rounded-lg py-3">{t.contact.error}</p>
+              )}
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <Footer lang={lang} />
+      <WhatsAppWidget lang={lang} />
+    </>
+  )
+}
+
+function TrustPoint({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+  return (
+    <div className="flex flex-col items-center text-center gap-3">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange/10 text-orange">{icon}</div>
+      <h3 className="font-bold text-dark">{title}</h3>
+      <p className="text-sm text-dark/60 leading-relaxed">{desc}</p>
+    </div>
+  )
+}
+
+function IncludedItem({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+  return (
+    <div className="flex gap-4 items-start">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue/10 text-blue">
+        {icon}
+      </div>
+      <div>
+        <h3 className="font-bold text-dark mb-1">{title}</h3>
+        <p className="text-sm text-dark/60 leading-relaxed">{desc}</p>
+      </div>
+    </div>
+  )
+}
+
+function MapPinIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z" />
+      <circle cx="12" cy="9.5" r="2.5" />
+    </svg>
+  )
+}
+
+function ShieldIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3 4 6v6c0 5 3.5 8.5 8 9 4.5-.5 8-4 8-9V6l-8-3Z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  )
+}
+
+function StarIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2.5 15 9l7 1-5.2 4.9L18.2 22 12 18.3 5.8 22l1.4-7.1L2 10l7-1 3-6.5Z" />
+    </svg>
+  )
+}
+
+function HeadsetIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 13v-1a8 8 0 0 1 16 0v1" />
+      <rect x="2.5" y="13" width="4" height="6" rx="1.5" />
+      <rect x="17.5" y="13" width="4" height="6" rx="1.5" />
+      <path d="M19.5 19v.5a3.5 3.5 0 0 1-3.5 3.5h-3" />
+    </svg>
+  )
+}
+
+function GlobeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z" />
+    </svg>
+  )
+}
+
+function ChatIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 12a8 8 0 1 1-3.4-6.5" />
+      <path d="M21 4v6h-6" transform="rotate(180 12 7)" />
+      <path d="M4 21v-3.5a1 1 0 0 1 .3-.7L7 14" />
+    </svg>
+  )
+}
+
+function WrenchIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2 2.8-2.8Z" />
+    </svg>
+  )
+}
+
+function DocCheckIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" />
+      <path d="M14 2v6h6" />
+      <path d="m9 15 2 2 4-4" />
+    </svg>
+  )
+}
+
+function ChartIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 3v18h18" />
+      <path d="M7 16v-4M12 16V8M17 16v-7" />
+    </svg>
+  )
+}
+
+function DashboardIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="9" rx="1.5" />
+      <rect x="14" y="3" width="7" height="5" rx="1.5" />
+      <rect x="14" y="12" width="7" height="9" rx="1.5" />
+      <rect x="3" y="16" width="7" height="5" rx="1.5" />
+    </svg>
+  )
+}
