@@ -60,8 +60,8 @@ export default function OwnersPage() {
         {/* --- HERO --- */}
         <section className="relative flex min-h-[560px] items-center justify-center overflow-hidden px-4 py-24 sm:px-6">
           <Image
-            src="/lanzarote16.jpg"
-            alt="Whitewashed Lanzarote house overlooking the ocean"
+            src="/lanzarote14.jpg"
+            alt="Charco de los Clicos green lagoon, Lanzarote"
             fill
             priority
             sizes="100vw"
