@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { type Language, translations } from '@/lib/i18n'
 import { type BlogPost } from '@/lib/types'
+import { resolveCoverImage } from '@/lib/blog'
 
 interface Props {
   post: BlogPost
@@ -19,6 +20,7 @@ export default function BlogPostCard({ post, lang }: Props) {
         day: 'numeric',
       })
     : null
+  const coverImage = resolveCoverImage(post.cover_image)
 
   return (
     <Link
@@ -27,9 +29,9 @@ export default function BlogPostCard({ post, lang }: Props) {
     >
       {/* Cover image */}
       <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
-        {post.cover_image && (
+        {coverImage && (
           <Image
-            src={post.cover_image}
+            src={coverImage}
             alt={title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

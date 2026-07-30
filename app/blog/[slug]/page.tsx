@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import { type BlogPost } from '@/lib/types'
+import { resolveCoverImage } from '@/lib/blog'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
@@ -58,6 +59,7 @@ export default function BlogPostPage({ params }: Props) {
         day: 'numeric',
       })
     : null
+  const coverImage = resolveCoverImage(post.cover_image)
 
   return (
     <>
@@ -76,6 +78,19 @@ export default function BlogPostPage({ params }: Props) {
         </div>
 
         <div className="mx-auto max-w-3xl px-4 sm:px-6 py-6">
+          {coverImage && (
+            <div className="relative aspect-video rounded-2xl overflow-hidden shadow-md mb-8">
+              <Image
+                src={coverImage}
+                alt={title}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover"
+              />
+            </div>
+          )}
+
           {post.category && (
             <p className="text-xs font-semibold uppercase tracking-wide text-orange mb-3">
               {post.category}
@@ -89,19 +104,6 @@ export default function BlogPostPage({ params }: Props) {
             {post.author_name && publishedDate && <span>·</span>}
             {publishedDate && <span>{t.blog.publishedOn} {publishedDate}</span>}
           </div>
-
-          {post.cover_image && (
-            <div className="relative aspect-video rounded-2xl overflow-hidden shadow-md mb-8">
-              <Image
-                src={post.cover_image}
-                alt={title}
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 768px"
-                className="object-cover"
-              />
-            </div>
-          )}
 
           <div className="space-y-4">
             {paragraphs.map((paragraph, i) => (
