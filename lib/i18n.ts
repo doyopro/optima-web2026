@@ -221,7 +221,6 @@ export const translations = {
       },
       testimonials: {
         title: 'What owners say',
-        translationLabel: 'English translation',
         items: [
           {
             author: 'Henrik Sandmark',
@@ -231,9 +230,7 @@ export const translations = {
           {
             author: 'David Sanchez',
             property: 'Villa Piedaita',
-            text: 'Recomiendo 100% a Optima Villas como gestores 360 de nuestra propiedad en Lanzarote. Te enamoran por su buen hacer y cariño en cada gestión.',
-            translation:
-              'I recommend Optima Villas 100% as full-service managers of our property in Lanzarote. Their excellent work and genuine care in every task win you over.',
+            text: 'I recommend Optima Villas 100% as full-service managers of our property in Lanzarote. Their excellent work and genuine care in every task win you over.',
           },
           {
             author: 'Sandie Johnston',
@@ -590,7 +587,6 @@ export const translations = {
       },
       testimonials: {
         title: 'Qué dicen los propietarios',
-        translationLabel: 'Traducción al español',
         items: [
           {
             author: 'Henrik Sandmark',

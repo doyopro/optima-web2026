@@ -11,15 +11,6 @@ import WhatsAppWidget from '@/components/WhatsAppWidget'
 const OWNERS_WHATSAPP_NUMBER = '34617387171'
 const TRUSTPILOT_URL = 'https://uk.trustpilot.com/review/optimavillaslanzarote.com'
 
-// Real first image per property, queried from Supabase (properties.images[0]).
-// Order matches translations[lang].owners.testimonials.items.
-const TESTIMONIAL_IMAGES = [
-  'https://assets.guesty.com/image/upload/v1713511802/production/5f297bd907e0840029b8001a/bhszzu9fohwsdgnfilyo.jpg', // Casa Miramar
-  'https://assets.guesty.com/image/upload/v1728901134/production/5f297bd907e0840029b8001a/gtlzeq9bjd6eofs3ek4v.jpg', // Villa Piedaita
-  'https://assets.guesty.com/image/upload/v1694001774/production/5f297bd907e0840029b8001a/m2whh1yajmwbvjcqs2ri.jpg', // Casa Cielo Azul
-  'https://assets.guesty.com/image/upload/v1708327411/production/5f297bd907e0840029b8001a/sci2lexkercrqilueiwf.jpg', // Casa Cortine
-]
-
 type SubmitState = 'idle' | 'submitting' | 'success' | 'error'
 
 export default function OwnersPage() {
@@ -133,32 +124,21 @@ export default function OwnersPage() {
           </div>
         </section>
 
-        {/* --- OWNER TESTIMONIALS --- */}
+        {/* --- OWNER TESTIMONIALS — discreet, text-first quote style, deliberately
+             distinct from the homepage's colored testimonial cards --- */}
         <section className="bg-white py-16 md:py-24 px-4 sm:px-6">
-          <div className="mx-auto max-w-6xl">
+          <div className="mx-auto max-w-5xl">
             <h2 className="text-2xl md:text-3xl font-bold text-dark text-center mb-12">{t.testimonials.title}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              {t.testimonials.items.map((item, i) => (
-                <div key={item.author} className="flex gap-4 bg-cream/60 rounded-2xl p-6 border border-neutral-100">
-                  <div className="relative h-16 w-16 shrink-0 rounded-xl overflow-hidden">
-                    <Image
-                      src={TESTIMONIAL_IMAGES[i]}
-                      alt={item.property}
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-dark/80 leading-relaxed mb-1">&ldquo;{item.text}&rdquo;</p>
-                    {'translation' in item && item.translation && (
-                      <p className="text-dark/50 text-sm italic leading-relaxed mt-2 mb-1">
-                        {t.testimonials.translationLabel}: &ldquo;{item.translation}&rdquo;
-                      </p>
-                    )}
-                    <p className="text-sm font-semibold text-dark mt-2">
-                      {item.author} <span className="text-dark/40 font-normal">· {item.property}</span>
-                    </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+              {t.testimonials.items.map((item) => (
+                <div key={item.author}>
+                  <span className="block text-5xl leading-none text-orange/30 font-serif mb-2" aria-hidden="true">
+                    &ldquo;
+                  </span>
+                  <p className="text-dark/80 leading-relaxed">{item.text}</p>
+                  <div className="mt-4 pt-4 border-t border-neutral-200 text-sm">
+                    <span className="font-semibold text-dark">{item.author}</span>
+                    <span className="text-dark/40"> · {item.property}</span>
                   </div>
                 </div>
               ))}
