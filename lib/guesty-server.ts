@@ -102,13 +102,8 @@ export async function getListingPricing(
   }
 
   const raw = await res.json()
-  // Guesty's docs show a single day-object schema for this endpoint but
-  // it returns one entry per date in the range — defensively handle a
-  // bare array, or a { data / days / result: [...] } wrapper, since the
-  // exact envelope isn't 100% confirmed without a live test call.
-  const days: CalendarDay[] = Array.isArray(raw)
-    ? raw
-    : (raw.data ?? raw.days ?? raw.result ?? [])
+  // Confirmed real shape via a live call: { status, message, data: { days: [...] } }.
+  const days: CalendarDay[] = raw.data?.days ?? []
 
   // checkOutDate is the departure day, not a booked night — exclude it.
   const nights = days.filter((d) => d.date < checkOutDate)
