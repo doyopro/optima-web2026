@@ -111,6 +111,50 @@ export default function Home() {
         </div>
       </section>
 
+      {/* --- DISCOVER LANZAROTE --- */}
+      <section className="bg-neutral-50 py-16 md:py-24 px-4 sm:px-6">
+        <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div className="grid grid-cols-2 gap-3 h-[420px] order-2 lg:order-1">
+            <div className="relative row-span-2 rounded-2xl overflow-hidden">
+              <Image
+                src="/lanzarote10.jpg"
+                alt={home.discover.volcanicAlt}
+                fill
+                sizes="(max-width: 1024px) 50vw, 25vw"
+                loading="lazy"
+                className="object-cover"
+              />
+            </div>
+            <div className="relative rounded-2xl overflow-hidden">
+              <Image
+                src="/lanzarote9.jpg"
+                alt={home.discover.coastAlt}
+                fill
+                sizes="(max-width: 1024px) 50vw, 25vw"
+                loading="lazy"
+                className="object-cover"
+              />
+            </div>
+            <div className="relative rounded-2xl overflow-hidden">
+              <Image
+                src="/lanzarote8.jpg"
+                alt={home.discover.architectureAlt}
+                fill
+                sizes="(max-width: 1024px) 50vw, 25vw"
+                loading="lazy"
+                className="object-cover"
+              />
+            </div>
+          </div>
+          <div className="order-1 lg:order-2">
+            <h2 className="text-3xl md:text-4xl font-bold text-dark mb-6 tracking-tight">
+              {home.discover.title}
+            </h2>
+            <p className="text-dark/70 leading-relaxed">{home.discover.text}</p>
+          </div>
+        </div>
+      </section>
+
       {/* --- FEATURED VILLAS --- */}
       <section className="bg-neutral-50 py-20 md:py-28 px-4 sm:px-6">
         <div className="mx-auto max-w-6xl">

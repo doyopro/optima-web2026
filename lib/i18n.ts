@@ -44,6 +44,13 @@ export const translations = {
             'Over a decade of delivering seamless, high-end travel experiences and unforgettable family memories since 2018.',
         },
       ],
+      discover: {
+        title: 'Discover Lanzarote',
+        text: "Lanzarote is the northernmost island in the Canaries, shaped by volcanic eruptions that gave it a landscape unlike anywhere else on earth — the work of both nature and the artist César Manrique, who dedicated his life to protecting the island from uncontrolled development. Enjoy more than 300 days of sunshine a year, with mild temperatures throughout winter (rarely dropping below 18°C) and dry summers without the humidity typical of other destinations. Volcanic sand beaches, vineyards grown in craters, and whitewashed villages by the sea — all just minutes from your villa.",
+        volcanicAlt: 'Volcanic landscape of Timanfaya, Lanzarote',
+        coastAlt: 'Turquoise cove at Playa Papagayo, Lanzarote',
+        architectureAlt: 'Traditional white Lanzarote architecture',
+      },
     },
     search: {
       from: 'From',
@@ -203,6 +210,9 @@ export const translations = {
         support: '24/7 support',
         supportDesc: 'With in-destination staff — not an external call centre.',
       },
+      gallery: {
+        ariaLabel: 'Photos of our managed properties in Lanzarote',
+      },
       founder: {
         title: 'Our story',
         name: 'Sonia Vargas',
@@ -333,6 +343,13 @@ export const translations = {
             'Más de una década ofreciendo experiencias de viaje impecables y recuerdos familiares inolvidables desde 2018.',
         },
       ],
+      discover: {
+        title: 'Descubre Lanzarote',
+        text: 'Lanzarote es la isla más al norte de Canarias, moldeada por erupciones volcánicas que le dieron un paisaje único en el mundo — obra tanto de la naturaleza como del artista César Manrique, que dedicó su vida a proteger la isla de la construcción descontrolada. Disfruta de más de 300 días de sol al año, con temperaturas suaves durante todo el invierno (rara vez baja de 18°C) y veranos secos sin la humedad típica de otros destinos. Playas de arena volcánica, viñedos cultivados en cráteres, y pueblos blancos frente al mar — todo a pocos minutos de tu villa.',
+        volcanicAlt: 'Paisaje volcánico de Timanfaya, Lanzarote',
+        coastAlt: 'Cala turquesa en Playa Papagayo, Lanzarote',
+        architectureAlt: 'Arquitectura tradicional blanca de Lanzarote',
+      },
     },
     search: {
       from: 'Desde',
@@ -491,6 +508,9 @@ export const translations = {
         reviewsDesc: 'Con huéspedes que repiten año tras año.',
         support: 'Soporte 24/7',
         supportDesc: 'Con personal en destino — no un call center externo.',
+      },
+      gallery: {
+        ariaLabel: 'Fotos de nuestras propiedades gestionadas en Lanzarote',
       },
       founder: {
         title: 'Nuestra historia',

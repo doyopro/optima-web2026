@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import Image from 'next/image'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
+import { type Property } from '@/lib/types'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
@@ -58,7 +59,15 @@ export default function OwnersPage() {
       <main className="flex min-h-screen flex-col bg-cream">
         {/* --- HERO --- */}
         <section className="relative flex min-h-[560px] items-center justify-center overflow-hidden px-4 py-24 sm:px-6">
-          <div className="absolute inset-0 bg-gradient-to-br from-neutral-900 via-neutral-800 to-dark" />
+          <Image
+            src="/lanzarote16.jpg"
+            alt="Whitewashed Lanzarote house overlooking the ocean"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-dark/75" />
           <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_30%,rgba(226,102,32,0.15),transparent_50%),radial-gradient(circle_at_80%_70%,rgba(28,175,230,0.15),transparent_50%)]" />
 
           <div className="relative z-10 mx-auto max-w-3xl text-center">
@@ -99,6 +108,9 @@ export default function OwnersPage() {
             </div>
           </div>
         </section>
+
+        {/* --- PROPERTY PHOTO STRIP --- */}
+        <PropertyPhotoStrip ariaLabel={t.gallery.ariaLabel} />
 
         {/* --- FOUNDER STORY --- */}
         <section className="bg-neutral-50 py-16 md:py-24 px-4 sm:px-6">
@@ -155,14 +167,23 @@ export default function OwnersPage() {
         </section>
 
         {/* --- TRUSTPILOT --- */}
-        <section className="bg-neutral-50 py-14 px-4 sm:px-6">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-lg text-dark/70 mb-4">{t.trustpilot.text}</p>
+        <section className="relative py-20 px-4 sm:px-6 overflow-hidden">
+          <Image
+            src="/lanzarote14.jpg"
+            alt="Volcanic coastline and green lagoon at El Golfo, Lanzarote"
+            fill
+            loading="lazy"
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-dark/70" />
+          <div className="relative mx-auto max-w-3xl text-center">
+            <p className="text-lg text-white/90 mb-4">{t.trustpilot.text}</p>
             <a
               href={TRUSTPILOT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-bold text-orange hover:text-dark transition-colors uppercase tracking-wide"
+              className="inline-flex items-center gap-2 text-sm font-bold text-orange hover:text-white transition-colors uppercase tracking-wide"
             >
               {t.trustpilot.cta} <span className="text-lg">→</span>
             </a>
@@ -277,6 +298,48 @@ export default function OwnersPage() {
       <Footer lang={lang} />
       <WhatsAppWidget lang={lang} />
     </>
+  )
+}
+
+const PHOTO_STRIP_COUNT = 14
+
+function PropertyPhotoStrip({ ariaLabel }: { ariaLabel: string }) {
+  const [images, setImages] = useState<string[]>([])
+
+  useEffect(() => {
+    fetch('/api/villas')
+      .then((r) => r.json())
+      .then((data) => {
+        const properties = (data.properties as Property[]) ?? []
+        const withPhotos = properties.filter((p) => p.images?.length)
+
+        // Shuffle so the strip draws from different properties, not just the first N.
+        const shuffled = [...withPhotos]
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        }
+
+        setImages(shuffled.slice(0, PHOTO_STRIP_COUNT).map((p) => p.images[0]))
+      })
+      .catch(() => setImages([]))
+  }, [])
+
+  if (images.length === 0) return null
+
+  // Duplicate the list so the marquee loop is seamless.
+  const strip = [...images, ...images]
+
+  return (
+    <section className="bg-white py-10 overflow-hidden" aria-label={ariaLabel}>
+      <div className="flex w-max animate-marquee gap-4 px-4">
+        {strip.map((src, i) => (
+          <div key={i} className="relative h-40 w-60 sm:h-48 sm:w-72 shrink-0 rounded-2xl overflow-hidden">
+            <Image src={src} alt="" fill sizes="288px" loading="lazy" className="object-cover" />
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
