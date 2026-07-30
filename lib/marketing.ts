@@ -3,7 +3,5 @@
 
 export const SOCIAL_LINKS = {
   facebook: 'https://facebook.com/optimavillas',
-  instagram: 'https://instagram.com/optimavillas',
-  linkedin: 'https://linkedin.com/company/optimavillas',
   whatsapp: 'https://wa.me/4648944',
 }
