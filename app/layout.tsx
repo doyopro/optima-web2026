@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import Header from "@/components/Header";
 import { LanguageProvider } from "@/lib/LanguageContext";
 import "./globals.css";
@@ -28,6 +29,7 @@ export default function RootLayout({
           <Header />
           {children}
         </LanguageProvider>
+        <Analytics />
       </body>
     </html>
   );
