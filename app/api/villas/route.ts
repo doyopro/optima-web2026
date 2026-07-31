@@ -1,9 +1,20 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { supabasePublic } from '@/lib/supabase'
+import { supabaseServer } from '@/lib/supabase-server'
 import { extractVvLicense } from '@/lib/property'
+import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
 
-export async function GET(_req: NextRequest) {
+// Same blocking statuses established for the villa-detail-page availability
+// check: confirmed/reserved/closed hold the calendar, canceled/declined/
+// expired/inquiry don't.
+const BLOCKING_STATUSES = ['confirmed', 'reserved', 'closed']
+
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url)
+    const checkIn = searchParams.get('checkIn')
+    const checkOut = searchParams.get('checkOut')
+
     const { data, error } = await supabasePublic
       .from('properties')
       .select(
@@ -14,7 +25,7 @@ export async function GET(_req: NextRequest) {
       throw new Error(error.message)
     }
 
-    const villas = (data || []).map((row) => {
+    let villas = (data || []).map((row) => {
       const en = extractVvLicense(row.description_en || '')
       const es = extractVvLicense(row.description_es || '')
 
@@ -38,6 +49,37 @@ export async function GET(_req: NextRequest) {
         slug: row.id,
       }
     })
+
+    // Only filter by availability when both dates are present — default
+    // browsing (no dates) must stay exactly as fast/unfiltered as before.
+    if (checkIn && checkOut) {
+      const propertyIds = villas.map((v) => v.id)
+
+      const { data: overlapping, error: reservationsError } = await supabaseServer
+        .from('reservations')
+        .select('property_id, check_in, check_out')
+        .in('property_id', propertyIds)
+        .in('status', BLOCKING_STATUSES)
+        .lt('check_in', checkOut)
+        .gt('check_out', checkIn)
+
+      if (reservationsError) {
+        throw new Error(reservationsError.message)
+      }
+
+      const rangesByProperty = new Map<string, BookedRange[]>()
+      for (const r of overlapping ?? []) {
+        const ranges = rangesByProperty.get(r.property_id) ?? []
+        ranges.push({ checkIn: r.check_in, checkOut: r.check_out })
+        rangesByProperty.set(r.property_id, ranges)
+      }
+
+      villas = villas.filter((v) => {
+        const ranges = rangesByProperty.get(v.id)
+        if (!ranges) return true
+        return !rangeOverlapsBooking(checkIn, checkOut, ranges)
+      })
+    }
 
     return NextResponse.json({ properties: villas, total: villas.length })
   } catch (error) {

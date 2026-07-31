@@ -46,6 +46,8 @@ function VillasPageContent() {
   const [guests, setGuests] = useState(() => searchParams.get('guests') ?? '')
   const [bathrooms, setBathrooms] = useState('')
   const [villaId, setVillaId] = useState(() => searchParams.get('villa') ?? '')
+  const checkIn = searchParams.get('from') ?? ''
+  const checkOut = searchParams.get('to') ?? ''
   const [amenities, setAmenities] = useState<string[]>([])
   const [sort, setSort] = useState<SortKey>('rating')
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -57,7 +59,8 @@ function VillasPageContent() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/villas')
+      const availabilityParams = checkIn && checkOut ? `?checkIn=${checkIn}&checkOut=${checkOut}` : ''
+      const res = await fetch(`/api/villas${availabilityParams}`)
       const data = await res.json()
       let props: Property[] = data.properties ?? []
 
@@ -79,7 +82,7 @@ function VillasPageContent() {
     } finally {
       setLoading(false)
     }
-  }, [location, minPrice, maxPrice, bedrooms, guests, bathrooms, villaId, amenities])
+  }, [location, minPrice, maxPrice, bedrooms, guests, bathrooms, villaId, amenities, checkIn, checkOut])
 
   useEffect(() => {
     load()
