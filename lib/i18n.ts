@@ -153,6 +153,9 @@ export const translations = {
       messageVilla: "Hi, I'm interested in information about the villa: {name}",
     },
     properties: {
+      // Real distinct properties.city values (active properties only,
+      // confirmed via live query) — place names, so EN/ES text is identical.
+      locations: ['Playa Blanca', 'Montaña Roja', 'Tías', 'Puerto Del Carmen', 'Yaiza', 'Costa de Papagayo'],
       featured: 'Featured Villas',
       featuredSub: 'Handpicked properties for an unforgettable Lanzarote stay.',
       viewAll: 'View all villas',
@@ -603,6 +606,7 @@ export const translations = {
       messageVilla: 'Hola, me interesa información sobre la villa: {name}',
     },
     properties: {
+      locations: ['Playa Blanca', 'Montaña Roja', 'Tías', 'Puerto Del Carmen', 'Yaiza', 'Costa de Papagayo'],
       featured: 'Villas Destacadas',
       featuredSub: 'Propiedades seleccionadas para una estancia inolvidable en Lanzarote.',
       viewAll: 'Ver todas las villas',

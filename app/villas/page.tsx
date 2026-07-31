@@ -6,7 +6,6 @@ import { Toaster } from 'react-hot-toast'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import { type Property } from '@/lib/types'
-import { LOCATIONS } from '@/lib/mock-data'
 import PropertyCard from '@/components/PropertyCard'
 import PropertySkeleton from '@/components/PropertySkeleton'
 import Footer from '@/components/Footer'
@@ -128,7 +127,7 @@ function VillasPageContent() {
           className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm bg-white focus:border-orange focus:outline-none"
         >
           <option value="">{t.allLocations}</option>
-          {LOCATIONS.map((l) => (
+          {t.locations.map((l) => (
             <option key={l} value={l}>{l}</option>
           ))}
         </select>

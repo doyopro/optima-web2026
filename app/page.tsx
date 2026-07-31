@@ -65,15 +65,16 @@ export default function Home() {
       {/* --- HERO SECTION --- */}
       <section className="relative flex h-[75vh] min-h-[600px] items-center justify-center overflow-hidden">
         <Image
-          src="/hero-cover.jpg"
-          alt="Lanzarote landscapes — caves, volcanoes and beaches"
+          src="/portada2.jpg"
+          alt="Optima Villas — Lanzarote landscapes and our villas"
           fill
           priority
           sizes="100vw"
           className="object-cover"
         />
-        {/* Dark overlay for text legibility over the photo */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-dark/70" />
+        {/* Dark overlay for text legibility — slightly stronger than before,
+            this collage image is busier/lighter than the previous single photo */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-dark/75" />
         {/* Luces de fondo premium */}
         <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_20%_30%,rgba(226,102,32,0.15),transparent_50%),radial-gradient(circle_at_80%_70%,rgba(28,175,230,0.15),transparent_50%)]" />
 

@@ -120,5 +120,3 @@ export const MOCK_PROPERTIES: Property[] = [
     is_featured: false,
   },
 ]
-
-export const LOCATIONS = ['Playa Blanca', 'Papagayo', 'Puerto del Carmen', 'Costa Teguise', 'La Geria', 'Arrecife', 'Tías', 'Yaiza']
