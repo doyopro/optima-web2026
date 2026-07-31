@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { Suspense, useEffect, useState, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Toaster } from 'react-hot-toast'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
@@ -24,17 +25,27 @@ const AMENITY_FILTERS = [
 ]
 
 export default function VillasPage() {
+  return (
+    <Suspense fallback={null}>
+      <VillasPageContent />
+    </Suspense>
+  )
+}
+
+function VillasPageContent() {
   const { lang } = useLanguage()
+  const searchParams = useSearchParams()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Filters
+  // Filters — seeded from the search widget's query params (from, to, guests, villa)
   const [location, setLocation] = useState('')
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
   const [bedrooms, setBedrooms] = useState('')
-  const [guests, setGuests] = useState('')
+  const [guests, setGuests] = useState(() => searchParams.get('guests') ?? '')
   const [bathrooms, setBathrooms] = useState('')
+  const [villaId, setVillaId] = useState(() => searchParams.get('villa') ?? '')
   const [amenities, setAmenities] = useState<string[]>([])
   const [sort, setSort] = useState<SortKey>('rating')
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -57,6 +68,7 @@ export default function VillasPage() {
       if (bedrooms) props = props.filter((p) => (p.bedrooms ?? 0) >= Number(bedrooms))
       if (guests) props = props.filter((p) => (p.guests_max ?? 0) >= Number(guests))
       if (bathrooms) props = props.filter((p) => (p.bathrooms ?? 0) >= Number(bathrooms))
+      if (villaId) props = props.filter((p) => p.id === villaId)
       if (amenities.length) {
         props = props.filter((p) => amenities.every((a) => (p.amenities ?? []).includes(a)))
       }
@@ -67,7 +79,7 @@ export default function VillasPage() {
     } finally {
       setLoading(false)
     }
-  }, [location, minPrice, maxPrice, bedrooms, guests, bathrooms, amenities])
+  }, [location, minPrice, maxPrice, bedrooms, guests, bathrooms, villaId, amenities])
 
   useEffect(() => {
     load()
@@ -80,6 +92,7 @@ export default function VillasPage() {
     setBedrooms('')
     setGuests('')
     setBathrooms('')
+    setVillaId('')
     setAmenities([])
   }
 

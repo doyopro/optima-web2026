@@ -64,7 +64,7 @@ export default function SearchWidget() {
     if (toDate) params.set('to', toDate)
     if (totalGuests > 1) params.set('guests', String(totalGuests))
     if (villaId) params.set('villa', villaId)
-    router.push(`/villas/search?${params}`)
+    router.push(`/villas?${params}`)
   }
 
   return (
