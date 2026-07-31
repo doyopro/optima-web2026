@@ -10,6 +10,7 @@ import { useLanguage } from '@/lib/LanguageContext'
 import { type Property } from '@/lib/types'
 import { getGuestyPropertyUrl } from '@/lib/guesty'
 import { getApproximateMapEmbedUrl } from '@/lib/map'
+import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
@@ -31,12 +32,25 @@ export default function VillaDetailPage({ params }: Props) {
   const [imgIdx, setImgIdx] = useState(0)
   const [galleryOpen, setGalleryOpen] = useState(false)
 
+  const [bookedRanges, setBookedRanges] = useState<BookedRange[]>([])
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
+
   useEffect(() => {
     fetch(`/api/properties/${id}`)
       .then((r) => r.json())
       .then((d) => setProperty(d.property ?? null))
       .catch(() => setProperty(null))
       .finally(() => setLoading(false))
+  }, [id])
+
+  // Availability comes from our own reservations data, not Guesty pricing —
+  // this must keep working even while Guesty pricing is rate-limited.
+  useEffect(() => {
+    fetch(`/api/availability?propertyId=${encodeURIComponent(id)}`)
+      .then((r) => r.json())
+      .then((d) => setBookedRanges(d.bookedRanges ?? []))
+      .catch(() => setBookedRanges([]))
   }, [id])
 
   const t = translations[lang]
@@ -65,6 +79,15 @@ export default function VillaDetailPage({ params }: Props) {
   const images = property.images
   const bedroomsLabel = property.bedrooms === 1 ? t.properties.bedroom : t.properties.bedrooms
   const bathroomsLabel = property.bathrooms === 1 ? t.properties.bathroom : t.properties.bathrooms
+
+  const datesSelected = Boolean(fromDate && toDate)
+  const datesBlocked = datesSelected && rangeOverlapsBooking(fromDate, toDate, bookedRanges)
+  const canContinue = datesSelected && !datesBlocked
+
+  function goToCheckout() {
+    if (!canContinue) return
+    router.push(`/villas/${id}/checkout?from=${fromDate}&to=${toDate}`)
+  }
 
   return (
     <>
@@ -223,6 +246,40 @@ export default function VillaDetailPage({ params }: Props) {
                 )}
               </div>
 
+              {/* Availability — mobile only (desktop has it in the sticky sidebar) */}
+              <div className="lg:hidden bg-white rounded-2xl shadow-sm border border-neutral-100 p-5">
+                <h2 className="text-lg font-bold text-dark mb-4">{t.availability.checkAvailability}</h2>
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-semibold uppercase tracking-wide text-dark/50">
+                      {t.availability.checkIn}
+                    </label>
+                    <input
+                      type="date"
+                      value={fromDate}
+                      min={new Date().toISOString().slice(0, 10)}
+                      onChange={(e) => setFromDate(e.target.value)}
+                      className="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm focus:border-orange focus:outline-none"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-semibold uppercase tracking-wide text-dark/50">
+                      {t.availability.checkOut}
+                    </label>
+                    <input
+                      type="date"
+                      value={toDate}
+                      min={fromDate || new Date().toISOString().slice(0, 10)}
+                      onChange={(e) => setToDate(e.target.value)}
+                      className="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm focus:border-orange focus:outline-none"
+                    />
+                  </div>
+                </div>
+                {datesBlocked && (
+                  <p className="text-xs text-red-600">{t.availability.datesUnavailable}</p>
+                )}
+              </div>
+
               {/* Amenities */}
               <div>
                 <h2 className="text-lg font-bold text-dark mb-4">{t.properties.amenities}</h2>
@@ -263,14 +320,55 @@ export default function VillaDetailPage({ params }: Props) {
 
                 <p className="text-xs text-dark/40 mb-4">{t.properties.priceIndicative}</p>
 
-                <a
-                  href={bookingUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors text-sm"
-                >
-                  {t.properties.bookNow}
-                </a>
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-semibold uppercase tracking-wide text-dark/50">
+                      {t.availability.checkIn}
+                    </label>
+                    <input
+                      type="date"
+                      value={fromDate}
+                      min={new Date().toISOString().slice(0, 10)}
+                      onChange={(e) => setFromDate(e.target.value)}
+                      className="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm focus:border-orange focus:outline-none"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-semibold uppercase tracking-wide text-dark/50">
+                      {t.availability.checkOut}
+                    </label>
+                    <input
+                      type="date"
+                      value={toDate}
+                      min={fromDate || new Date().toISOString().slice(0, 10)}
+                      onChange={(e) => setToDate(e.target.value)}
+                      className="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm focus:border-orange focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {datesBlocked && (
+                  <p className="text-xs text-red-600 mb-3">{t.availability.datesUnavailable}</p>
+                )}
+
+                {canContinue ? (
+                  <button
+                    type="button"
+                    onClick={goToCheckout}
+                    className="block w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors text-sm"
+                  >
+                    {t.availability.proceedToBook}
+                  </button>
+                ) : (
+                  <a
+                    href={bookingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors text-sm"
+                  >
+                    {t.properties.bookNow}
+                  </a>
+                )}
 
                 <p className="text-xs text-center text-dark/40 mt-3">{t.properties.bookNowNote}</p>
               </div>
@@ -296,14 +394,24 @@ export default function VillaDetailPage({ params }: Props) {
           <span className="text-lg font-bold text-dark">£{property.price_per_night_gbp}</span>
           <span className="text-dark/50 text-xs"> {t.properties.perNight}</span>
         </div>
-        <a
-          href={bookingUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-orange text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-orange/90 transition-colors"
-        >
-          {t.properties.bookNow}
-        </a>
+        {canContinue ? (
+          <button
+            type="button"
+            onClick={goToCheckout}
+            className="bg-orange text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-orange/90 transition-colors"
+          >
+            {t.availability.proceedToBook}
+          </button>
+        ) : (
+          <a
+            href={bookingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-orange text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-orange/90 transition-colors"
+          >
+            {t.properties.bookNow}
+          </a>
+        )}
       </div>
 
       {/* Gallery modal */}

@@ -213,6 +213,11 @@ export const translations = {
       available: 'Available for your dates',
       unavailable: 'Not available for selected dates',
       selectDates: 'Select dates to check availability',
+      checkAvailability: 'Check availability',
+      checkIn: 'Check-in',
+      checkOut: 'Check-out',
+      datesUnavailable: "These dates aren't available — this villa is already booked for part of that range.",
+      proceedToBook: 'Continue',
     },
     errors: {
       generic: 'Something went wrong. Please try again.',
@@ -658,6 +663,11 @@ export const translations = {
       available: 'Disponible para tus fechas',
       unavailable: 'No disponible para las fechas seleccionadas',
       selectDates: 'Selecciona fechas para comprobar disponibilidad',
+      checkAvailability: 'Comprobar disponibilidad',
+      checkIn: 'Entrada',
+      checkOut: 'Salida',
+      datesUnavailable: 'Esas fechas no están disponibles — esta villa ya tiene una reserva que se solapa con ese rango.',
+      proceedToBook: 'Continuar',
     },
     errors: {
       generic: 'Algo salió mal. Por favor inténtalo de nuevo.',
