@@ -15,6 +15,14 @@ import PropertyCard from '@/components/PropertyCard'
 import PropertySkeleton from '@/components/PropertySkeleton'
 import { type Property } from '@/lib/types'
 
+// Curated picks for the homepage — chosen deliberately, not derived from
+// is_featured (every property currently has that flag set to true).
+const FEATURED_PROPERTY_IDS = [
+  '252fd3ee-bef2-41b2-b55a-d30a4e55efd8', // Villa Valhalla
+  'bbaf4612-dead-4449-9853-5a438068af65', // Casa Piscina
+  '0e7b2121-21fd-4e05-aa2e-4538e6083e5b', // Casa Azul
+]
+
 export default function Home() {
   const { lang } = useLanguage()
   const [featured, setFeatured] = useState<Property[]>([])
@@ -29,9 +37,10 @@ export default function Home() {
         if (!response.ok) throw new Error('Failed to fetch')
 
         const data = await response.json()
-        const featuredProperties = (data.properties as Property[])
-          .filter((p) => p.is_featured)
-          .slice(0, 3)
+        const byId = new Map((data.properties as Property[]).map((p) => [p.id, p]))
+        const featuredProperties = FEATURED_PROPERTY_IDS.map((id) => byId.get(id)).filter(
+          (p): p is Property => Boolean(p),
+        )
 
         setFeatured(featuredProperties)
       } catch (error) {

@@ -120,6 +120,14 @@ export default function OwnersPage() {
               <p className="text-orange font-semibold mb-1">{t.founder.name}</p>
               <p className="text-dark/50 text-sm mb-6">{t.founder.role}</p>
               <p className="text-dark/70 leading-relaxed whitespace-pre-line">{t.founder.text}</p>
+              <a
+                href="https://optimaestate.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 mt-5 text-sm font-medium text-dark/50 hover:text-orange transition-colors underline underline-offset-2"
+              >
+                {t.founder.optimaEstateCta} <span aria-hidden="true">↗</span>
+              </a>
             </div>
           </div>
         </section>

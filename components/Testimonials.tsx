@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { type Language, translations } from '@/lib/i18n'
 import TestimonialCard from './TestimonialCard'
+import ReviewBadges from './ReviewBadges'
 
 interface Props {
   lang: Language
@@ -120,6 +121,8 @@ export default function Testimonials({ lang }: Props) {
             {t.trustpilotCta} <span className="text-lg">→</span>
           </a>
         </div>
+
+        <ReviewBadges lang={lang} />
       </div>
     </section>
   )

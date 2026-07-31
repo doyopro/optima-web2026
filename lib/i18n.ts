@@ -84,6 +84,11 @@ export const translations = {
       next: 'Next',
       trustpilotCta: 'See more reviews on Trustpilot',
     },
+    reviewBadges: {
+      trustScore: 'TrustScore',
+      rating: 'rating',
+      reviews: 'reviews',
+    },
     testimonialsData: [
       {
         rating: 5,
@@ -255,6 +260,7 @@ export const translations = {
         name: 'Sonia Vargas',
         role: 'Founder, Óptima Villas',
         text: "Sonia Vargas first arrived in Lanzarote in 1986, and was captivated by its volcanic landscapes and serene way of life. After more than a decade building an international career in the fashion world — working with top-tier designers and travelling between the fashion weeks of Paris, Milan, New York and London — she decided to settle permanently on the island in 2001. She began getting involved in real estate development in some of what are today Lanzarote's most recognised areas, closely participating in the construction and marketing of new developments. In 2003 she founded what is today the Óptima group, with a clear goal: to do things with professionalism and integrity, in an industry not always known for that. More than 20 years later, that same standard still guides how we manage every property entrusted to us.",
+        optimaEstateCta: 'Visit Optima Estate by Optima Group',
       },
       testimonials: {
         title: 'What owners say',
@@ -528,6 +534,11 @@ export const translations = {
       next: 'Siguiente',
       trustpilotCta: 'Ver más reseñas en Trustpilot',
     },
+    reviewBadges: {
+      trustScore: 'TrustScore',
+      rating: 'valoración',
+      reviews: 'reseñas',
+    },
     testimonialsData: [
       {
         rating: 5,
@@ -699,6 +710,7 @@ export const translations = {
         name: 'Sonia Vargas',
         role: 'Fundadora, Óptima Villas',
         text: 'Sonia Vargas llegó por primera vez a Lanzarote en 1986, y quedó cautivada por sus paisajes volcánicos y su estilo de vida sereno. Después de más de una década construyendo una carrera internacional en el mundo de la moda —trabajando con diseñadores de primer nivel y viajando entre las semanas de la moda de París, Milán, Nueva York y Londres— decidió instalarse de forma permanente en la isla en 2001. Empezó a involucrarse en el desarrollo inmobiliario de algunas de las zonas hoy más reconocidas de Lanzarote, participando de cerca en la construcción y comercialización de nuevas urbanizaciones. En 2003 fundó lo que hoy es el grupo Óptima, con un objetivo claro: hacer las cosas con profesionalismo e integridad, en un sector no siempre conocido por eso. Más de 20 años después, ese mismo criterio sigue guiando cómo gestionamos cada propiedad que nos confían.',
+        optimaEstateCta: 'Visita Optima Estate, del Grupo Optima',
       },
       testimonials: {
         title: 'Qué dicen los propietarios',
