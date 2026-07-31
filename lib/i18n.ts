@@ -30,7 +30,7 @@ export const translations = {
             'Our guests consistently choose to return to Optima Villas for their Lanzarote holidays, trusting our premium standards year after year.',
         },
         {
-          value: '210+',
+          value: '79',
           label: 'Premium Properties',
           description:
             'A handpicked portfolio of luxury villas featuring private pools, stunning views, and prime locations across the island.',
@@ -39,7 +39,7 @@ export const translations = {
           value: '10,000+',
           label: 'Happy Stays',
           description:
-            'Over a decade of delivering seamless, high-end travel experiences and unforgettable family memories since 2018.',
+            'Over two decades of delivering seamless, high-end travel experiences and unforgettable family memories since 2003.',
         },
       ],
       discover: {
@@ -480,7 +480,7 @@ export const translations = {
             'Nuestros huéspedes eligen volver a Optima Villas para sus vacaciones en Lanzarote, confiando en nuestros estándares premium año tras año.',
         },
         {
-          value: '210+',
+          value: '79',
           label: 'Propiedades Premium',
           description:
             'Una selección de villas de lujo con piscina privada, vistas espectaculares y ubicaciones privilegiadas en toda la isla.',
@@ -489,7 +489,7 @@ export const translations = {
           value: '10.000+',
           label: 'Estancias felices',
           description:
-            'Más de una década ofreciendo experiencias de viaje impecables y recuerdos familiares inolvidables desde 2018.',
+            'Más de dos décadas ofreciendo experiencias de viaje impecables y recuerdos familiares inolvidables desde 2003.',
         },
       ],
       discover: {
