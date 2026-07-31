@@ -4,7 +4,7 @@ import { use, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Toaster } from 'react-hot-toast'
-import { translations } from '@/lib/i18n'
+import { translations, getBlogCategoryLabel } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import { type BlogPost } from '@/lib/types'
 import { resolveCoverImage } from '@/lib/blog'
@@ -93,7 +93,7 @@ export default function BlogPostPage({ params }: Props) {
 
           {post.category && (
             <p className="text-xs font-semibold uppercase tracking-wide text-orange mb-3">
-              {post.category}
+              {getBlogCategoryLabel(post.category, lang)}
             </p>
           )}
 

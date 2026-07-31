@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { type Language, translations } from '@/lib/i18n'
+import { type Language, translations, getBlogCategoryLabel } from '@/lib/i18n'
 import { type BlogPost } from '@/lib/types'
 import { resolveCoverImage } from '@/lib/blog'
 
@@ -40,7 +40,7 @@ export default function BlogPostCard({ post, lang }: Props) {
         )}
         {post.category && (
           <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide text-orange shadow">
-            {post.category}
+            {getBlogCategoryLabel(post.category, lang)}
           </div>
         )}
       </div>

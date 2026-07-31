@@ -8,6 +8,8 @@ interface Props {
   lang: Language
 }
 
+const TRUSTPILOT_URL = 'https://uk.trustpilot.com/review/optimavillaslanzarote.com'
+
 export default function Testimonials({ lang }: Props) {
   const t = translations[lang].testimonials
   const testimonialsData = translations[lang].testimonialsData
@@ -49,47 +51,47 @@ export default function Testimonials({ lang }: Props) {
   return (
     <section className="py-16 md:py-24 px-4 sm:px-6">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-12 flex items-start justify-between gap-8">
-          <div className="max-w-xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">{t.title}</h2>
-            <p className="text-dark/60 leading-relaxed">{t.description}</p>
-          </div>
-          <div className="hidden md:flex items-center gap-2 mt-2 shrink-0">
-            <button
-              type="button"
-              onClick={() => scrollByPage(-1)}
-              aria-label={t.previous}
-              className="h-10 w-10 rounded-full border border-neutral-200 flex items-center justify-center text-dark hover:border-orange hover:text-orange transition-colors"
-            >
-              ←
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollByPage(1)}
-              aria-label={t.next}
-              className="h-10 w-10 rounded-full border border-neutral-200 flex items-center justify-center text-dark hover:border-orange hover:text-orange transition-colors"
-            >
-              →
-            </button>
-          </div>
+        <div className="mb-10 max-w-xl">
+          <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">{t.title}</h2>
+          <p className="text-dark/60 leading-relaxed">{t.description}</p>
         </div>
 
-        <div
-          ref={trackRef}
-          onScroll={handleScroll}
-          className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {testimonialsData.map((testimonial, i) => (
-            <div
-              key={i}
-              ref={(el) => {
-                cardRefs.current[i] = el
-              }}
-              className="snap-start shrink-0 w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
-            >
-              <TestimonialCard {...testimonial} seeMoreLabel={t.seeMore} />
-            </div>
-          ))}
+        {/* Carousel — side arrows, vertically centered, sit at the track edges */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => scrollByPage(-1)}
+            aria-label={t.previous}
+            className="absolute left-1 sm:-left-4 top-1/2 -translate-y-1/2 z-10 h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-white/95 backdrop-blur-sm shadow-md border border-neutral-200 flex items-center justify-center text-dark hover:border-orange hover:text-orange transition-colors"
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollByPage(1)}
+            aria-label={t.next}
+            className="absolute right-1 sm:-right-4 top-1/2 -translate-y-1/2 z-10 h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-white/95 backdrop-blur-sm shadow-md border border-neutral-200 flex items-center justify-center text-dark hover:border-orange hover:text-orange transition-colors"
+          >
+            →
+          </button>
+
+          <div
+            ref={trackRef}
+            onScroll={handleScroll}
+            className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {testimonialsData.map((testimonial, i) => (
+              <div
+                key={i}
+                ref={(el) => {
+                  cardRefs.current[i] = el
+                }}
+                className="snap-start shrink-0 w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+              >
+                <TestimonialCard {...testimonial} seeMoreLabel={t.seeMore} seeLessLabel={t.seeLess} />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Dots — mobile & desktop, one per testimonial */}
@@ -105,6 +107,18 @@ export default function Testimonials({ lang }: Props) {
               }`}
             />
           ))}
+        </div>
+
+        {/* Trustpilot CTA */}
+        <div className="text-center mt-8">
+          <a
+            href={TRUSTPILOT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-bold text-orange hover:text-dark transition-colors uppercase tracking-wide"
+          >
+            {t.trustpilotCta} <span className="text-lg">→</span>
+          </a>
         </div>
       </div>
     </section>

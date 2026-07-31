@@ -79,12 +79,13 @@ export const translations = {
       description:
         "Don't just take our word for it — hear from our happy guests who made unforgettable memories in Lanzarote.",
       seeMore: 'See more',
+      seeLess: 'See less',
       previous: 'Previous',
       next: 'Next',
+      trustpilotCta: 'See more reviews on Trustpilot',
     },
     testimonialsData: [
       {
-        bgColor: 'blue' as const,
         rating: 5,
         title: 'Stunning Villa & Impeccable Service',
         text: 'We had a wonderful stay. The villa was clean, spacious, and perfectly located. The booking system was seamless, and the local team was incredibly supportive throughout our entire holiday in Lanzarote.',
@@ -92,7 +93,6 @@ export const translations = {
         date: 'July 2025',
       },
       {
-        bgColor: 'yellow' as const,
         rating: 5,
         title: 'Highly Recommended!',
         text: 'Beautiful property, exactly as described on the website. The live booking details and professional photos made everything so easy. Outstanding customer care from the Optima Villas team.',
@@ -100,7 +100,6 @@ export const translations = {
         date: 'August 2025',
       },
       {
-        bgColor: 'green' as const,
         rating: 5,
         title: 'Perfect Family Holiday',
         text: 'Excellent service and a beautiful, high-quality villa. Everything from check-in to check-out went smoothly. Having the updated rates and property details beforehand gave us total peace of mind.',
@@ -108,7 +107,6 @@ export const translations = {
         date: 'September 2025',
       },
       {
-        bgColor: 'blue' as const,
         rating: 5,
         title: 'Fast Response When It Mattered',
         text: "We had a water issue partway through our stay at Villa Rose, and Optima moved us to another villa within hours. It could have ruined the trip, but their customer service turned it around completely.",
@@ -116,7 +114,6 @@ export const translations = {
         date: '2025',
       },
       {
-        bgColor: 'yellow' as const,
         rating: 5,
         title: 'Second Stay, Just as Smooth',
         text: "This was our second time booking with Optima, and communication was clear from start to finish. Check-in was easy, and they'd even left a welcome pack ready for us despite our late arrival.",
@@ -124,7 +121,6 @@ export const translations = {
         date: '2025',
       },
       {
-        bgColor: 'green' as const,
         rating: 5,
         title: 'Excellent Customer Service',
         text: "We ran into a water problem at Villa Rose during our stay, but the team responded straight away and had it sorted quickly. Genuinely excellent customer service when it counted.",
@@ -132,7 +128,6 @@ export const translations = {
         date: '2025',
       },
       {
-        bgColor: 'blue' as const,
         rating: 5,
         title: 'A Lovely Stay at Villa Luar',
         text: "Such a lovely stay at Villa Luar — thank you to the team for recommending it to us, it suited us perfectly. We'd happily recommend Optima Villas to anyone looking to book in Lanzarote.",
@@ -140,7 +135,6 @@ export const translations = {
         date: '2024',
       },
       {
-        bgColor: 'yellow' as const,
         rating: 5,
         title: 'Quiet, Convenient, and Helpful',
         text: "A wonderfully quiet area just a short trip from Playa Blanca. Whenever we had a question, the Optima staff got back to us quickly and were genuinely helpful every time.",
@@ -529,12 +523,13 @@ export const translations = {
       description:
         'No te fíes sólo de nuestra palabra — escucha a nuestros felices huéspedes que vivieron momentos inolvidables en Lanzarote.',
       seeMore: 'Ver más',
+      seeLess: 'Ver menos',
       previous: 'Anterior',
       next: 'Siguiente',
+      trustpilotCta: 'Ver más reseñas en Trustpilot',
     },
     testimonialsData: [
       {
-        bgColor: 'blue' as const,
         rating: 5,
         title: 'Villa espectacular y servicio impecable',
         text: 'Tuvimos una estancia maravillosa. La villa estaba limpia, era espaciosa y estaba perfectamente ubicada. El sistema de reservas fue muy sencillo y el equipo local nos apoyó en todo momento durante nuestras vacaciones en Lanzarote.',
@@ -542,7 +537,6 @@ export const translations = {
         date: 'Julio 2025',
       },
       {
-        bgColor: 'yellow' as const,
         rating: 5,
         title: '¡Muy recomendable!',
         text: 'Propiedad preciosa, exactamente como se describía en la web. Los detalles de la reserva en tiempo real y las fotos profesionales lo hicieron todo muy fácil. Atención al cliente excepcional por parte del equipo de Optima Villas.',
@@ -550,7 +544,6 @@ export const translations = {
         date: 'Agosto 2025',
       },
       {
-        bgColor: 'green' as const,
         rating: 5,
         title: 'Vacaciones familiares perfectas',
         text: 'Excelente servicio y una villa preciosa y de gran calidad. Todo fue sobre ruedas desde el check-in hasta el check-out. Tener las tarifas y los detalles de la propiedad actualizados de antemano nos dio total tranquilidad.',
@@ -558,7 +551,6 @@ export const translations = {
         date: 'Septiembre 2025',
       },
       {
-        bgColor: 'blue' as const,
         rating: 5,
         title: 'Respuesta rápida cuando más importaba',
         text: 'Tuvimos un problema de agua a mitad de nuestra estancia en Villa Rose, y Optima nos trasladó a otra villa en cuestión de horas. Podría haber arruinado el viaje, pero su atención al cliente lo solucionó por completo.',
@@ -566,7 +558,6 @@ export const translations = {
         date: '2025',
       },
       {
-        bgColor: 'yellow' as const,
         rating: 5,
         title: 'Segunda estancia, igual de perfecta',
         text: 'Era la segunda vez que reservábamos con Optima, y la comunicación fue clara de principio a fin. El check-in fue sencillo, e incluso nos habían dejado preparado un kit de bienvenida a pesar de nuestra llegada tardía.',
@@ -574,7 +565,6 @@ export const translations = {
         date: '2025',
       },
       {
-        bgColor: 'green' as const,
         rating: 5,
         title: 'Atención al cliente excelente',
         text: 'Tuvimos un problema de agua en Villa Rose durante nuestra estancia, pero el equipo respondió de inmediato y lo resolvió rápidamente. Una atención al cliente realmente excelente cuando más lo necesitábamos.',
@@ -582,7 +572,6 @@ export const translations = {
         date: '2025',
       },
       {
-        bgColor: 'blue' as const,
         rating: 5,
         title: 'Una estancia preciosa en Villa Luar',
         text: 'Una estancia preciosa en Villa Luar — gracias al equipo por recomendárnosla, nos vino perfecta. Recomendaríamos Optima Villas sin dudarlo a cualquiera que busque reservar en Lanzarote.',
@@ -590,7 +579,6 @@ export const translations = {
         date: '2024',
       },
       {
-        bgColor: 'yellow' as const,
         rating: 5,
         title: 'Tranquilo, bien situado y con gran ayuda',
         text: 'Una zona maravillosamente tranquila y a poca distancia de Playa Blanca. Cada vez que teníamos una duda, el equipo de Optima respondía rápido y siempre con mucha amabilidad.',
@@ -912,4 +900,22 @@ export function getLanguage(): Language {
 
 export function setLanguage(lang: Language): void {
   localStorage.setItem('lang', lang)
+}
+
+// blog_posts.category is a single, Spanish-only column (no category_en/es
+// split like the rest of that table) — confirmed against live data, the 5
+// distinct values in use are the keys below. This maps the raw stored value
+// to a display label per language without touching the schema.
+const BLOG_CATEGORY_LABELS: Record<string, { en: string; es: string }> = {
+  Playas: { en: 'Beaches', es: 'Playas' },
+  Turismo: { en: 'Tourism', es: 'Turismo' },
+  'Isla y cultura': { en: 'Island & Culture', es: 'Isla y cultura' },
+  Gastronomía: { en: 'Gastronomy', es: 'Gastronomía' },
+  Cultura: { en: 'Culture', es: 'Cultura' },
+}
+
+export function getBlogCategoryLabel(category: string | null | undefined, lang: Language): string {
+  if (!category) return ''
+  const entry = BLOG_CATEGORY_LABELS[category]
+  return entry ? entry[lang] : category
 }
