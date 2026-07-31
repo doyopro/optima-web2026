@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { supabasePublic } from '@/lib/supabase'
 import { supabaseServer } from '@/lib/supabase-server'
 import { extractVvLicense } from '@/lib/property'
 import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
@@ -15,11 +14,18 @@ export async function GET(req: NextRequest) {
     const checkIn = searchParams.get('checkIn')
     const checkOut = searchParams.get('checkOut')
 
-    const { data, error } = await supabasePublic
+    // owner_name isn't in the anon role's granted columns (needed here for
+    // the SunBeach sort demotion), so this uses the service-role client —
+    // safe since it's server-side only and nothing secret is exposed to
+    // the client beyond what was already public.
+    // Service role bypasses RLS entirely, so the "active only" restriction
+    // the anon client got for free from RLS has to be applied explicitly here.
+    const { data, error } = await supabaseServer
       .from('properties')
       .select(
-        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp',
+        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp, owner_name',
       )
+      .eq('status', 'active')
 
     if (error) {
       throw new Error(error.message)
@@ -47,6 +53,7 @@ export async function GET(req: NextRequest) {
         amenities: (row.amenities as string[]) ?? [],
         is_featured: true,
         slug: row.id,
+        owner_name: row.owner_name ?? null,
       }
     })
 

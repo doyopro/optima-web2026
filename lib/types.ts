@@ -21,6 +21,7 @@ export type Property = {
   amenities: string[]
   is_featured: boolean
   slug: string
+  owner_name?: string | null
 }
 
 export type BlogPost = {

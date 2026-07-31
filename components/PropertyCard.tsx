@@ -36,7 +36,7 @@ export default function PropertyCard({ property, lang }: Props) {
         </div>
 
         {/* Content */}
-        <div className="px-5 pt-5">
+        <div className="px-5 py-5">
           {/* Location */}
           <p className="text-xs font-semibold uppercase tracking-wide text-orange mb-1">
             {property.location}
@@ -53,19 +53,12 @@ export default function PropertyCard({ property, lang }: Props) {
           )}
 
           {/* Stats */}
-          <div className="flex items-center gap-3 text-xs text-dark/60 mb-3">
+          <div className="flex items-center gap-3 text-xs text-dark/60">
             <span>{property.bedrooms} {bedroomsLabel}</span>
             <span className="text-dark/30">·</span>
             <span>{property.bathrooms} {bathroomsLabel}</span>
             <span className="text-dark/30">·</span>
             <span>{property.guests_max} {t.guests}</span>
-          </div>
-
-          {/* Rating */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-orange text-sm">★</span>
-            <span className="text-sm font-semibold text-dark">{property.rating.toFixed(1)}</span>
-            <span className="text-xs text-dark/50">({property.reviews_count})</span>
           </div>
         </div>
       </Link>

@@ -100,6 +100,13 @@ function VillasPageContent() {
   }
 
   const sorted = [...properties].sort((a, b) => {
+    // SunBeach-managed properties are pushed to the end regardless of the
+    // chosen sort — but sorted by that same chosen key among themselves,
+    // not just dumped in arbitrary order.
+    const aIsSunBeach = a.owner_name === 'SunBeach Holidays'
+    const bIsSunBeach = b.owner_name === 'SunBeach Holidays'
+    if (aIsSunBeach !== bIsSunBeach) return aIsSunBeach ? 1 : -1
+
     if (sort === 'price_asc') return a.price_per_night_gbp - b.price_per_night_gbp
     if (sort === 'price_desc') return b.price_per_night_gbp - a.price_per_night_gbp
     if (sort === 'rating') return b.rating - a.rating
