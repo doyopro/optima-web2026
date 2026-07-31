@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import SearchWidget from '@/components/SearchWidget'
+import Faq from '@/components/Faq'
 import Testimonials from '@/components/Testimonials'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
@@ -200,6 +201,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* --- FAQ --- */}
+      <Faq lang={lang} />
 
       {/* --- TESTIMONIALS & FOOTER --- */}
       <Testimonials lang={lang} />

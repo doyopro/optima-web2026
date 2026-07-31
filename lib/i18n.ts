@@ -8,8 +8,6 @@ export const translations = {
       owners: 'Owners',
       blog: 'Blog',
       manageBooking: 'Manage your booking',
-      help: 'Help & Support',
-      login: 'Login',
       back: 'Back',
       callForEnquiries: 'Call for enquiries 9am–17:30pm',
       wishlist: 'Wishlist',
@@ -387,6 +385,17 @@ export const translations = {
         "Our team will be in touch with check-in instructions closer to your arrival date. If you have any questions in the meantime, we're just a message away.",
       backToVillas: 'Browse more villas',
     },
+    manageBookingPage: {
+      title: 'Manage your booking',
+      subtitle:
+        "We don't have online account access yet — our team handles every booking change personally.",
+      text: 'To amend dates, add guests, ask about your balance or anything else about an existing booking, get in touch directly and we\'ll sort it out.',
+      whatsappCta: 'Message us on WhatsApp',
+      whatsappMessage: "Hi, I'd like help managing my booking",
+      emailLabel: 'Email',
+      phoneLabel: 'Phone',
+      backHome: 'Back to home',
+    },
     footer: {
       tagline: 'Exceptional holiday villas in Lanzarote since 2010.',
       company: 'Company',
@@ -406,6 +415,36 @@ export const translations = {
       address: 'Lanzarote, Canary Islands, Spain',
       copyright: 'Optima Villas. All rights reserved.',
     },
+    faq: {
+      title: 'Frequently asked questions',
+      subtitle: 'Quick answers to the questions we hear most.',
+      items: [
+        {
+          q: 'What time is check-in and check-out?',
+          a: 'Check-in is from 4:00 PM and check-out is by 10:00 AM, so the villa can be prepared for the next guests. Early check-in or late check-out may be possible on request, depending on availability.',
+        },
+        {
+          q: 'Is cleaning included during my stay?',
+          a: 'Yes — every villa is professionally cleaned before you arrive, and a welcome pack with essentials is provided on check-in. Cleaning frequency during longer stays depends on the villa; ask us and we\'ll confirm the details for your booking.',
+        },
+        {
+          q: 'What is your cancellation policy?',
+          a: 'Cancellation terms depend on the rate booked and are confirmed at the time of booking. Contact us with your booking reference and we\'ll explain exactly what applies to your reservation.',
+        },
+        {
+          q: 'How does payment work?',
+          a: 'Most bookings can be secured with a deposit, with the balance due before arrival — this is shown at checkout. We accept payment by card; get in touch if you have questions about a specific booking.',
+        },
+        {
+          q: 'Can I book directly with you instead of online?',
+          a: 'Yes, our team is happy to help you book by phone, WhatsApp or email if you\'d rather not use the website.',
+        },
+        {
+          q: 'How do I contact support?',
+          a: 'Message us on WhatsApp, call us, or email — see the Manage your Booking page or the footer for our current phone number and email address.',
+        },
+      ],
+    },
   },
   es: {
     nav: {
@@ -414,8 +453,6 @@ export const translations = {
       owners: 'Propietarios',
       blog: 'Blog',
       manageBooking: 'Gestiona tu reserva',
-      help: 'Ayuda y soporte',
-      login: 'Entrar',
       back: 'Atrás',
       callForEnquiries: 'Llámanos de 9:00 a 17:30h',
       wishlist: 'Favoritos',
@@ -793,6 +830,17 @@ export const translations = {
         'Nuestro equipo se pondrá en contacto contigo con las instrucciones de check-in cerca de tu fecha de llegada. Si tienes alguna duda mientras tanto, estamos a un mensaje de distancia.',
       backToVillas: 'Ver más villas',
     },
+    manageBookingPage: {
+      title: 'Gestiona tu reserva',
+      subtitle:
+        'Todavía no tenemos acceso a cuentas online — nuestro equipo gestiona personalmente cada cambio de reserva.',
+      text: 'Para modificar fechas, añadir huéspedes, preguntar por tu saldo pendiente o cualquier otra cosa sobre una reserva existente, contáctanos directamente y lo resolvemos.',
+      whatsappCta: 'Escríbenos por WhatsApp',
+      whatsappMessage: 'Hola, necesito ayuda para gestionar mi reserva',
+      emailLabel: 'Email',
+      phoneLabel: 'Teléfono',
+      backHome: 'Volver al inicio',
+    },
     footer: {
       tagline: 'Villas vacacionales excepcionales en Lanzarote desde 2010.',
       company: 'Empresa',
@@ -811,6 +859,36 @@ export const translations = {
       email: 'info@optimavillas.com',
       address: 'Lanzarote, Islas Canarias, España',
       copyright: 'Optima Villas. Todos los derechos reservados.',
+    },
+    faq: {
+      title: 'Preguntas frecuentes',
+      subtitle: 'Respuestas rápidas a las preguntas que más recibimos.',
+      items: [
+        {
+          q: '¿A qué hora son el check-in y el check-out?',
+          a: 'El check-in es a partir de las 16:00 y el check-out antes de las 10:00, para que podamos preparar la villa para los siguientes huéspedes. El check-in anticipado o el check-out tardío pueden ser posibles bajo petición, según disponibilidad.',
+        },
+        {
+          q: '¿La limpieza está incluida durante mi estancia?',
+          a: 'Sí — todas las villas se limpian profesionalmente antes de tu llegada, y se proporciona un kit de bienvenida con lo esencial al hacer el check-in. La frecuencia de limpieza durante estancias más largas depende de la villa; pregúntanos y te confirmamos los detalles de tu reserva.',
+        },
+        {
+          q: '¿Cuál es vuestra política de cancelación?',
+          a: 'Las condiciones de cancelación dependen de la tarifa reservada y se confirman en el momento de la reserva. Contáctanos con tu número de reserva y te explicamos exactamente qué aplica a tu caso.',
+        },
+        {
+          q: '¿Cómo funciona el pago?',
+          a: 'La mayoría de reservas pueden confirmarse con un depósito, con el resto a pagar antes de la llegada — esto se muestra en el checkout. Aceptamos pago con tarjeta; contáctanos si tienes dudas sobre una reserva concreta.',
+        },
+        {
+          q: '¿Puedo reservar directamente con vosotros en lugar de online?',
+          a: 'Sí, nuestro equipo estará encantado de ayudarte a reservar por teléfono, WhatsApp o email si prefieres no usar la web.',
+        },
+        {
+          q: '¿Cómo contacto con soporte?',
+          a: 'Escríbenos por WhatsApp, llámanos o envíanos un email — consulta la página Gestiona tu Reserva o el pie de página para ver nuestro teléfono y email actuales.',
+        },
+      ],
     },
   },
 } as const

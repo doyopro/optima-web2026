@@ -32,10 +32,6 @@ export default function Header() {
             <Link href="/manage-booking" className="hover:text-orange transition-colors">
               {nav.manageBooking}
             </Link>
-            <span aria-hidden className="text-dark/30">•</span>
-            <Link href="/help" className="hover:text-orange transition-colors">
-              {nav.help}
-            </Link>
           </nav>
           <p className="hidden items-center gap-2 sm:flex">
             <span>{nav.callForEnquiries}</span>
@@ -99,13 +95,6 @@ export default function Header() {
             >
               <HeartIcon className="h-6 w-6" />
             </button>
-
-            <Link
-              href="/login"
-              className="hidden md:inline-block rounded-full bg-orange px-6 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange/90"
-            >
-              {nav.login}
-            </Link>
 
             {/* Hamburger — mobile only */}
             <button
@@ -177,14 +166,6 @@ export default function Header() {
                   ES
                 </button>
               </div>
-
-              <Link
-                href="/login"
-                onClick={closeMobileMenu}
-                className="block w-full text-center rounded-full bg-orange px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-orange/90"
-              >
-                {nav.login}
-              </Link>
             </div>
           </div>
         </div>
