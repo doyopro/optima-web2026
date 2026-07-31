@@ -1,22 +1,59 @@
 // Server-only. Reads GUESTY_CLIENT_ID / GUESTY_CLIENT_SECRET — never import
 // this file from a 'use client' component, only from route handlers.
 
+import { supabaseServer } from './supabase-server'
+
 const GUESTY_API_BASE = 'https://open-api.guesty.com/v1'
 
-interface CachedToken {
-  token: string
-  expiresAt: number
+// Thrown when Guesty itself rate-limits the OAuth token request (429), so
+// callers can distinguish "Guesty is throttling us" from other failures and
+// fall back gracefully (e.g. the external Guesty booking link).
+export class GuestyRateLimitError extends Error {
+  constructor() {
+    super('Guesty OAuth token request was rate limited (429)')
+    this.name = 'GuestyRateLimitError'
+  }
 }
 
-// Module-level cache: survives across requests within the same server
-// instance/lambda, so we don't re-authenticate with Guesty on every call.
-let cachedToken: CachedToken | null = null
+// Refresh a few minutes before Guesty's own ~1h expiry to avoid edge-of-window failures.
+const TOKEN_TTL_MS = 55 * 60 * 1000
+const REFRESH_MARGIN_MS = 5 * 60 * 1000
 
-async function getGuestyToken(): Promise<string> {
-  if (cachedToken && Date.now() < cachedToken.expiresAt) {
-    return cachedToken.token
+interface StoredToken {
+  access_token: string
+  expires_at: string
+}
+
+async function getStoredToken(): Promise<StoredToken | null> {
+  const { data, error } = await supabaseServer
+    .from('guesty_oauth_token')
+    .select('access_token, expires_at')
+    .eq('id', 1)
+    .maybeSingle()
+
+  if (error) {
+    console.error('[guesty-server] failed to read cached token', error.message)
+    return null
   }
+  return data
+}
 
+async function storeToken(token: string, expiresAt: number): Promise<void> {
+  const { error } = await supabaseServer.from('guesty_oauth_token').upsert({
+    id: 1,
+    access_token: token,
+    fetched_at: new Date().toISOString(),
+    expires_at: new Date(expiresAt).toISOString(),
+  })
+
+  if (error) {
+    // Non-fatal: we still have a valid token in hand for this request, we
+    // just won't have persisted it for the next invocation to reuse.
+    console.error('[guesty-server] failed to persist token', error.message)
+  }
+}
+
+async function fetchNewGuestyToken(): Promise<string> {
   // Guesty's OAuth2 token endpoint requires application/x-www-form-urlencoded,
   // not JSON — a JSON body here returns 400.
   const body = new URLSearchParams({
@@ -35,6 +72,10 @@ async function getGuestyToken(): Promise<string> {
     body,
   })
 
+  if (res.status === 429) {
+    throw new GuestyRateLimitError()
+  }
+
   if (!res.ok) {
     throw new Error(`Guesty OAuth token request failed: ${res.status}`)
   }
@@ -45,10 +86,18 @@ async function getGuestyToken(): Promise<string> {
     throw new Error('Guesty OAuth response had no access_token')
   }
 
-  // Guesty client_credentials tokens last ~24h; cache for 50 min to stay
-  // well within that while still refreshing periodically.
-  cachedToken = { token, expiresAt: Date.now() + 50 * 60 * 1000 }
+  const expiresAt = Date.now() + TOKEN_TTL_MS
+  await storeToken(token, expiresAt)
   return token
+}
+
+async function getGuestyToken(): Promise<string> {
+  const stored = await getStoredToken()
+  if (stored && Date.now() < new Date(stored.expires_at).getTime() - REFRESH_MARGIN_MS) {
+    return stored.access_token
+  }
+
+  return fetchNewGuestyToken()
 }
 
 async function guestyFetch(path: string, init?: RequestInit): Promise<Response> {

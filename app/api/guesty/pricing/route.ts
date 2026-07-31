@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { getListingPricing } from '@/lib/guesty-server'
+import { getListingPricing, GuestyRateLimitError } from '@/lib/guesty-server'
 
 export async function GET(req: NextRequest) {
   try {
@@ -23,6 +23,14 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(pricing)
   } catch (err) {
+    if (err instanceof GuestyRateLimitError) {
+      console.error('[GET /api/guesty/pricing] rate limited by Guesty')
+      return NextResponse.json(
+        { error: 'rate_limited', details: 'Guesty pricing is temporarily unavailable, please use the Book Now link.' },
+        { status: 429 },
+      )
+    }
+
     const errorMessage = err instanceof Error ? err.message : String(err)
     console.error('[GET /api/guesty/pricing]', errorMessage)
     return NextResponse.json({ error: 'Failed to fetch pricing', details: errorMessage }, { status: 500 })
