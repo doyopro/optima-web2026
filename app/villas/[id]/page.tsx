@@ -11,8 +11,18 @@ import { type Property } from '@/lib/types'
 import { getGuestyPropertyUrl } from '@/lib/guesty'
 import { getApproximateMapEmbedUrl } from '@/lib/map'
 import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
+import DateRangePicker from '@/components/DateRangePicker'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
+
+function formatShortDate(value: string, lang: string): string {
+  if (!value) return ''
+  const [y, m, d] = value.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', {
+    day: 'numeric',
+    month: 'short',
+  })
+}
 
 interface Props {
   params: Promise<{ id: string }>
@@ -87,6 +97,11 @@ export default function VillaDetailPage({ params }: Props) {
   function goToCheckout() {
     if (!canContinue) return
     router.push(`/villas/${id}/checkout?from=${fromDate}&to=${toDate}`)
+  }
+
+  function handleDateChange(from: string, to: string) {
+    setFromDate(from)
+    setToDate(to)
   }
 
   return (
@@ -248,35 +263,24 @@ export default function VillaDetailPage({ params }: Props) {
 
               {/* Availability — mobile only (desktop has it in the sticky sidebar) */}
               <div className="lg:hidden bg-white rounded-2xl shadow-sm border border-neutral-100 p-5">
-                <h2 className="text-lg font-bold text-dark mb-4">{t.availability.checkAvailability}</h2>
-                <div className="grid grid-cols-2 gap-3 mb-3">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold uppercase tracking-wide text-dark/50">
-                      {t.availability.checkIn}
-                    </label>
-                    <input
-                      type="date"
-                      value={fromDate}
-                      min={new Date().toISOString().slice(0, 10)}
-                      onChange={(e) => setFromDate(e.target.value)}
-                      className="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm focus:border-orange focus:outline-none"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold uppercase tracking-wide text-dark/50">
-                      {t.availability.checkOut}
-                    </label>
-                    <input
-                      type="date"
-                      value={toDate}
-                      min={fromDate || new Date().toISOString().slice(0, 10)}
-                      onChange={(e) => setToDate(e.target.value)}
-                      className="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm focus:border-orange focus:outline-none"
-                    />
-                  </div>
+                <h2 className="text-lg font-bold text-dark mb-1">{t.availability.checkAvailability}</h2>
+                {datesSelected && (
+                  <p className="text-sm text-dark/60 mb-3">
+                    {t.availability.checkIn} {formatShortDate(fromDate, lang)} · {t.availability.checkOut}{' '}
+                    {formatShortDate(toDate, lang)}
+                  </p>
+                )}
+                <div className="flex justify-center overflow-x-auto">
+                  <DateRangePicker
+                    lang={lang}
+                    bookedRanges={bookedRanges}
+                    from={fromDate}
+                    to={toDate}
+                    onChange={handleDateChange}
+                  />
                 </div>
                 {datesBlocked && (
-                  <p className="text-xs text-red-600">{t.availability.datesUnavailable}</p>
+                  <p className="text-xs text-red-600 mt-2">{t.availability.datesUnavailable}</p>
                 )}
               </div>
 
@@ -318,33 +322,21 @@ export default function VillaDetailPage({ params }: Props) {
                   <span className="text-dark/50 text-sm">{t.properties.perNight}</span>
                 </div>
 
-                <p className="text-xs text-dark/40 mb-4">{t.properties.priceIndicative}</p>
+                <p className="text-xs text-dark/40 mb-3">{t.properties.priceIndicative}</p>
 
-                <div className="grid grid-cols-2 gap-2 mb-3">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold uppercase tracking-wide text-dark/50">
-                      {t.availability.checkIn}
-                    </label>
-                    <input
-                      type="date"
-                      value={fromDate}
-                      min={new Date().toISOString().slice(0, 10)}
-                      onChange={(e) => setFromDate(e.target.value)}
-                      className="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm focus:border-orange focus:outline-none"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs font-semibold uppercase tracking-wide text-dark/50">
-                      {t.availability.checkOut}
-                    </label>
-                    <input
-                      type="date"
-                      value={toDate}
-                      min={fromDate || new Date().toISOString().slice(0, 10)}
-                      onChange={(e) => setToDate(e.target.value)}
-                      className="w-full rounded-lg border border-neutral-200 px-2 py-1.5 text-sm focus:border-orange focus:outline-none"
-                    />
-                  </div>
+                {datesSelected && (
+                  <p className="text-xs font-semibold text-dark mb-2">
+                    {formatShortDate(fromDate, lang)} → {formatShortDate(toDate, lang)}
+                  </p>
+                )}
+                <div className="flex justify-center mb-3">
+                  <DateRangePicker
+                    lang={lang}
+                    bookedRanges={bookedRanges}
+                    from={fromDate}
+                    to={toDate}
+                    onChange={handleDateChange}
+                  />
                 </div>
 
                 {datesBlocked && (
