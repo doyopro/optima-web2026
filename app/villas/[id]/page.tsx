@@ -4,6 +4,7 @@ import { use, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Check } from 'lucide-react'
 import { Toaster } from 'react-hot-toast'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
@@ -290,7 +291,7 @@ export default function VillaDetailPage({ params }: Props) {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {property.amenities.map((a) => (
                     <div key={a} className="flex items-center gap-2 text-sm text-dark/70">
-                      <span className="text-green">✓</span>
+                      <Check className="h-4 w-4 shrink-0 text-green" strokeWidth={2.5} aria-hidden="true" />
                       {a}
                     </div>
                   ))}

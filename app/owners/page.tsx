@@ -2,11 +2,13 @@
 
 import { useEffect, useState, type FormEvent } from 'react'
 import Image from 'next/image'
+import { Share2, MessageCircle, Wrench, FileCheck2, BarChart3, LayoutDashboard, ArrowUpRight } from 'lucide-react'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import { type Property } from '@/lib/types'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
+import ReviewBadges from '@/components/ReviewBadges'
 
 const OWNERS_WHATSAPP_NUMBER = '34617387171'
 const TRUSTPILOT_URL = 'https://uk.trustpilot.com/review/optimavillaslanzarote.com'
@@ -126,7 +128,7 @@ export default function OwnersPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 mt-5 text-sm font-medium text-dark/50 hover:text-orange transition-colors underline underline-offset-2"
               >
-                {t.founder.optimaEstateCta} <span aria-hidden="true">↗</span>
+                {t.founder.optimaEstateCta} <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -151,6 +153,7 @@ export default function OwnersPage() {
                 </div>
               ))}
             </div>
+            <ReviewBadges lang={lang} />
           </div>
         </section>
 
@@ -183,12 +186,12 @@ export default function OwnersPage() {
           <div className="mx-auto max-w-6xl">
             <h2 className="text-2xl md:text-3xl font-bold text-dark text-center mb-12">{t.included.title}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              <IncludedItem icon={<GlobeIcon className="h-6 w-6" />} title={t.included.channelDistribution} desc={t.included.channelDistributionDesc} />
-              <IncludedItem icon={<ChatIcon className="h-6 w-6" />} title={t.included.guestCommunication} desc={t.included.guestCommunicationDesc} />
-              <IncludedItem icon={<WrenchIcon className="h-6 w-6" />} title={t.included.maintenance} desc={t.included.maintenanceDesc} />
-              <IncludedItem icon={<DocCheckIcon className="h-6 w-6" />} title={t.included.compliance} desc={t.included.complianceDesc} />
-              <IncludedItem icon={<ChartIcon className="h-6 w-6" />} title={t.included.reports} desc={t.included.reportsDesc} />
-              <IncludedItem icon={<DashboardIcon className="h-6 w-6" />} title={t.included.portal} desc={t.included.portalDesc} />
+              <IncludedItem icon={<Share2 className="h-6 w-6" strokeWidth={1.8} />} title={t.included.channelDistribution} desc={t.included.channelDistributionDesc} />
+              <IncludedItem icon={<MessageCircle className="h-6 w-6" strokeWidth={1.8} />} title={t.included.guestCommunication} desc={t.included.guestCommunicationDesc} />
+              <IncludedItem icon={<Wrench className="h-6 w-6" strokeWidth={1.8} />} title={t.included.maintenance} desc={t.included.maintenanceDesc} />
+              <IncludedItem icon={<FileCheck2 className="h-6 w-6" strokeWidth={1.8} />} title={t.included.compliance} desc={t.included.complianceDesc} />
+              <IncludedItem icon={<BarChart3 className="h-6 w-6" strokeWidth={1.8} />} title={t.included.reports} desc={t.included.reportsDesc} />
+              <IncludedItem icon={<LayoutDashboard className="h-6 w-6" strokeWidth={1.8} />} title={t.included.portal} desc={t.included.portalDesc} />
             </div>
           </div>
         </section>
@@ -392,59 +395,3 @@ function HeadsetIcon({ className }: { className?: string }) {
   )
 }
 
-function GlobeIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z" />
-    </svg>
-  )
-}
-
-function ChatIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M21 12a8 8 0 1 1-3.4-6.5" />
-      <path d="M21 4v6h-6" transform="rotate(180 12 7)" />
-      <path d="M4 21v-3.5a1 1 0 0 1 .3-.7L7 14" />
-    </svg>
-  )
-}
-
-function WrenchIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2 2.8-2.8Z" />
-    </svg>
-  )
-}
-
-function DocCheckIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" />
-      <path d="M14 2v6h6" />
-      <path d="m9 15 2 2 4-4" />
-    </svg>
-  )
-}
-
-function ChartIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3 3v18h18" />
-      <path d="M7 16v-4M12 16V8M17 16v-7" />
-    </svg>
-  )
-}
-
-function DashboardIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="3" width="7" height="9" rx="1.5" />
-      <rect x="14" y="3" width="7" height="5" rx="1.5" />
-      <rect x="14" y="12" width="7" height="9" rx="1.5" />
-      <rect x="3" y="16" width="7" height="5" rx="1.5" />
-    </svg>
-  )
-}

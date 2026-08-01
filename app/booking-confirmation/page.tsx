@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { Check } from 'lucide-react'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import Footer from '@/components/Footer'
@@ -46,8 +47,8 @@ export default function BookingConfirmationPage() {
           </div>
 
           <div className="text-center mb-10">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green/20 text-green text-3xl">
-              ✓
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green/20 text-green">
+              <Check className="h-8 w-8" strokeWidth={2.5} aria-hidden="true" />
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-dark mb-2">{t.title}</h1>
             <p className="text-dark/60">{t.subtitle}</p>
