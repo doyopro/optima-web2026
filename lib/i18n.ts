@@ -928,6 +928,7 @@ const BLOG_CATEGORY_LABELS: Record<string, { en: string; es: string }> = {
   'Isla y cultura': { en: 'Island & Culture', es: 'Isla y cultura' },
   Gastronomía: { en: 'Gastronomy', es: 'Gastronomía' },
   Cultura: { en: 'Culture', es: 'Cultura' },
+  Actividades: { en: 'Activities', es: 'Actividades' },
 }
 
 export function getBlogCategoryLabel(category: string | null | undefined, lang: Language): string {
