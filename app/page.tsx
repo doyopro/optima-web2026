@@ -212,11 +212,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- FAQ --- */}
-      <Faq lang={lang} />
-
-      {/* --- TESTIMONIALS & FOOTER --- */}
+      {/* --- TESTIMONIALS --- */}
       <Testimonials lang={lang} />
+
+      {/* --- FAQ & FOOTER --- */}
+      <Faq lang={lang} />
       <Footer lang={lang} />
       <WhatsAppWidget lang={lang} />
     </main>
