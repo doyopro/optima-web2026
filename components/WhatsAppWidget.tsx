@@ -7,7 +7,7 @@ interface Props {
   lang?: Language
 }
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '34648944000'
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '34617387171'
 
 export default function WhatsAppWidget({ villaName, lang = 'en' }: Props) {
   const t = translations[lang].whatsapp

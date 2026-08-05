@@ -6,7 +6,7 @@ import { useLanguage } from '@/lib/LanguageContext'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '34648944000'
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '34617387171'
 
 export default function ManageBookingPage() {
   const { lang } = useLanguage()
@@ -42,8 +42,8 @@ export default function ManageBookingPage() {
                 <p className="text-xs font-semibold uppercase tracking-wide text-dark/40 mb-1">
                   {t.emailLabel}
                 </p>
-                <a href={`mailto:${footer.email}`} className="font-medium text-dark hover:text-orange transition-colors">
-                  {footer.email}
+                <a href={`mailto:${t.email}`} className="font-medium text-dark hover:text-orange transition-colors">
+                  {t.email}
                 </a>
               </div>
               <div>

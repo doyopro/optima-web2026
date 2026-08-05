@@ -25,7 +25,7 @@ interface PricingResult {
   nightlyAverage: number
 }
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '34648944000'
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '34617387171'
 
 function formatDate(dateStr: string, lang: string): string {
   return new Date(dateStr).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', {

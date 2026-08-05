@@ -395,12 +395,12 @@ export const translations = {
     },
     manageBookingPage: {
       title: 'Manage your booking',
-      subtitle:
-        "We don't have online account access yet — our team handles every booking change personally.",
+      subtitle: 'Our team handles every booking change personally.',
       text: 'To amend dates, add guests, ask about your balance or anything else about an existing booking, get in touch directly and we\'ll sort it out.',
       whatsappCta: 'Message us on WhatsApp',
       whatsappMessage: "Hi, I'd like help managing my booking",
       emailLabel: 'Email',
+      email: 'enquiries@optimavillas.com',
       phoneLabel: 'Phone',
       backHome: 'Back to home',
     },
@@ -846,12 +846,12 @@ export const translations = {
     },
     manageBookingPage: {
       title: 'Gestiona tu reserva',
-      subtitle:
-        'Todavía no tenemos acceso a cuentas online — nuestro equipo gestiona personalmente cada cambio de reserva.',
+      subtitle: 'Nuestro equipo gestiona personalmente cada cambio de reserva.',
       text: 'Para modificar fechas, añadir huéspedes, preguntar por tu saldo pendiente o cualquier otra cosa sobre una reserva existente, contáctanos directamente y lo resolvemos.',
       whatsappCta: 'Escríbenos por WhatsApp',
       whatsappMessage: 'Hola, necesito ayuda para gestionar mi reserva',
       emailLabel: 'Email',
+      email: 'enquiries@optimavillas.com',
       phoneLabel: 'Teléfono',
       backHome: 'Volver al inicio',
     },
