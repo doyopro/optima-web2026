@@ -38,7 +38,6 @@ function VillasPageContent() {
   const [loading, setLoading] = useState(true)
 
   // Filters — seeded from the search widget's query params (from, to, guests, villa)
-  const [location, setLocation] = useState('')
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
   const [bedrooms, setBedrooms] = useState('')
@@ -64,7 +63,6 @@ function VillasPageContent() {
       let props: Property[] = data.properties ?? []
 
       // Client-side filtering (Guesty doesn't support our filter params)
-      if (location) props = props.filter((p) => p.location.toLowerCase().includes(location.toLowerCase()))
       if (minPrice) props = props.filter((p) => (p.price_per_night_gbp ?? 0) >= Number(minPrice))
       if (maxPrice) props = props.filter((p) => (p.price_per_night_gbp ?? 0) <= Number(maxPrice))
       if (bedrooms) props = props.filter((p) => (p.bedrooms ?? 0) >= Number(bedrooms))
@@ -81,14 +79,13 @@ function VillasPageContent() {
     } finally {
       setLoading(false)
     }
-  }, [location, minPrice, maxPrice, bedrooms, guests, bathrooms, villaId, amenities, checkIn, checkOut])
+  }, [minPrice, maxPrice, bedrooms, guests, bathrooms, villaId, amenities, checkIn, checkOut])
 
   useEffect(() => {
     load()
   }, [load])
 
   function reset() {
-    setLocation('')
     setMinPrice('')
     setMaxPrice('')
     setBedrooms('')
@@ -116,23 +113,6 @@ function VillasPageContent() {
 
   const FilterPanel = () => (
     <div className="space-y-6">
-      {/* Location */}
-      <div>
-        <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-2">
-          {t.location}
-        </label>
-        <select
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm bg-white focus:border-orange focus:outline-none"
-        >
-          <option value="">{t.allLocations}</option>
-          {t.locations.map((l) => (
-            <option key={l} value={l}>{l}</option>
-          ))}
-        </select>
-      </div>
-
       {/* Price */}
       <div>
         <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-2">

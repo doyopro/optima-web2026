@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { Check } from 'lucide-react'
 import { Toaster } from 'react-hot-toast'
@@ -10,11 +11,13 @@ import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import { type Property } from '@/lib/types'
 import { getGuestyPropertyUrl } from '@/lib/guesty'
-import { getApproximateMapEmbedUrl } from '@/lib/map'
 import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
 import DateRangePicker from '@/components/DateRangePicker'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
+
+// Leaflet touches `window` at module load — must stay out of the SSR pass.
+const ApproximateAreaMap = dynamic(() => import('@/components/ApproximateAreaMap'), { ssr: false })
 
 function formatShortDate(value: string, lang: string): string {
   if (!value) return ''
@@ -86,7 +89,6 @@ export default function VillaDetailPage({ params }: Props) {
   }
 
   const bookingUrl = getGuestyPropertyUrl(property.guesty_listing_id)
-  const mapUrl = getApproximateMapEmbedUrl(property.latitude, property.longitude)
   const images = property.images
   const bedroomsLabel = property.bedrooms === 1 ? t.properties.bedroom : t.properties.bedrooms
   const bathroomsLabel = property.bathrooms === 1 ? t.properties.bathroom : t.properties.bathrooms
@@ -298,17 +300,13 @@ export default function VillaDetailPage({ params }: Props) {
                 </div>
               </div>
 
-              {/* Location map */}
-              {mapUrl && (
+              {/* Location map — shaded circle over the general area, never an
+                  exact pin on the building */}
+              {property.latitude != null && property.longitude != null && (
                 <div>
                   <h2 className="text-lg font-bold text-dark mb-4">{t.properties.approximateLocation}</h2>
                   <div className="rounded-2xl overflow-hidden border border-neutral-200 h-72">
-                    <iframe
-                      title={t.properties.approximateLocation}
-                      src={mapUrl}
-                      className="w-full h-full border-0"
-                      loading="lazy"
-                    />
+                    <ApproximateAreaMap latitude={property.latitude} longitude={property.longitude} />
                   </div>
                   <p className="text-xs text-dark/40 mt-2">{t.properties.approximateLocationNote}</p>
                 </div>
