@@ -4,10 +4,24 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
+import DateRangePicker from '@/components/DateRangePicker'
 
 interface Villa {
   id: string
   name: string
+}
+
+// Displayed date format is fully controlled here via lang, not the
+// browser/OS locale — the whole reason for moving off native <input
+// type="date"> in the first place (its placeholder/format leaks the
+// visitor's OS locale regardless of our own EN/ES toggle).
+function formatShortDate(value: string, lang: string): string {
+  if (!value) return ''
+  const [y, m, d] = value.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', {
+    day: 'numeric',
+    month: 'short',
+  })
 }
 
 export default function SearchWidget() {
@@ -17,6 +31,7 @@ export default function SearchWidget() {
   const t = translations[lang].search
 
   const [isGuestOpen, setIsGuestOpen] = useState(false)
+  const [isDateOpen, setIsDateOpen] = useState(false)
   const [adults, setAdults] = useState(2)
   const [children, setChildren] = useState(0)
   const [infants, setInfants] = useState(0)
@@ -27,16 +42,26 @@ export default function SearchWidget() {
   const [loadingVillas, setLoadingVillas] = useState(true)
 
   const guestDropdownRef = useRef<HTMLDivElement>(null)
+  const dateDropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (guestDropdownRef.current && !guestDropdownRef.current.contains(event.target as Node)) {
         setIsGuestOpen(false)
       }
+      if (dateDropdownRef.current && !dateDropdownRef.current.contains(event.target as Node)) {
+        setIsDateOpen(false)
+      }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  function handleDateChange(from: string, to: string) {
+    setFromDate(from)
+    setToDate(to)
+    if (from && to) setIsDateOpen(false)
+  }
 
   useEffect(() => {
     fetch('/api/villas')
@@ -68,30 +93,43 @@ export default function SearchWidget() {
   }
 
   return (
-    <div className="rounded-2xl bg-white shadow-xl border border-neutral-100 p-4 sm:p-6">
+    <div className="rounded-md bg-white shadow-md border border-neutral-200 p-4 sm:p-6">
       <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 divide-y md:divide-y-0 md:divide-x divide-neutral-200">
 
         {/* DATES */}
-        <div className="flex w-full md:w-auto flex-1 gap-4">
-          <div className="flex w-full flex-col gap-1.5">
-            <label className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.from}</label>
-            <input
-              type="date"
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-              className="w-full text-sm text-dark font-medium bg-transparent focus:outline-none cursor-pointer"
-            />
-          </div>
-          <div className="flex w-full flex-col gap-1.5">
-            <label className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.to}</label>
-            <input
-              type="date"
-              value={toDate}
-              min={fromDate}
-              onChange={(e) => setToDate(e.target.value)}
-              className="w-full text-sm text-dark font-medium bg-transparent focus:outline-none cursor-pointer"
-            />
-          </div>
+        <div className="relative flex w-full md:w-auto flex-1 gap-4" ref={dateDropdownRef}>
+          <button
+            type="button"
+            onClick={() => setIsDateOpen(!isDateOpen)}
+            className="flex w-full flex-col gap-1.5 text-left"
+          >
+            <span className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.from}</span>
+            <span className="text-sm text-dark font-medium">
+              {fromDate ? formatShortDate(fromDate, lang) : t.addDates}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsDateOpen(!isDateOpen)}
+            className="flex w-full flex-col gap-1.5 text-left"
+          >
+            <span className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.to}</span>
+            <span className="text-sm text-dark font-medium">
+              {toDate ? formatShortDate(toDate, lang) : t.addDates}
+            </span>
+          </button>
+
+          {isDateOpen && (
+            <div className="absolute top-full left-0 mt-4 rounded-md bg-white p-4 shadow-lg border border-neutral-200 z-50 overflow-x-auto max-w-[calc(100vw-2rem)]">
+              <DateRangePicker
+                lang={lang}
+                bookedRanges={[]}
+                from={fromDate}
+                to={toDate}
+                onChange={handleDateChange}
+              />
+            </div>
+          )}
         </div>
 
         {/* GUESTS POPOVER */}
@@ -110,7 +148,7 @@ export default function SearchWidget() {
           </button>
 
           {isGuestOpen && (
-            <div className="absolute top-full left-0 mt-4 w-72 rounded-xl bg-white p-5 shadow-2xl border border-neutral-100 z-50">
+            <div className="absolute top-full left-0 mt-4 w-72 rounded-md bg-white p-5 shadow-lg border border-neutral-200 z-50">
               {/* Adults */}
               <div className="flex items-center justify-between py-3 border-b border-neutral-100">
                 <div>
@@ -205,7 +243,7 @@ export default function SearchWidget() {
           <button
             type="button"
             onClick={handleSearch}
-            className="w-full md:w-32 rounded-xl bg-orange px-6 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:bg-orange/90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-orange/50 active:scale-95"
+            className="w-full md:w-32 rounded-md bg-orange px-6 py-3.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-orange/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange/50 active:scale-95"
           >
             {t.search}
           </button>

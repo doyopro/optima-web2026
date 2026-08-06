@@ -51,8 +51,8 @@ export const translations = {
       },
     },
     search: {
-      from: 'From',
-      to: 'To',
+      from: 'Arrival',
+      to: 'Departure',
       guests: 'Guests',
       villa: 'Villa',
       allVillas: 'All villas',
@@ -73,6 +73,7 @@ export const translations = {
       guestWordPlural: 'Guests',
       infantWord: 'Infant',
       infantWordPlural: 'Infants',
+      addDates: 'Add dates',
     },
     testimonials: {
       title: 'What our guests say',
@@ -504,8 +505,8 @@ export const translations = {
       },
     },
     search: {
-      from: 'Desde',
-      to: 'Hasta',
+      from: 'Llegada',
+      to: 'Salida',
       guests: 'Huéspedes',
       villa: 'Villa',
       allVillas: 'Todas las villas',
@@ -526,6 +527,7 @@ export const translations = {
       guestWordPlural: 'Huéspedes',
       infantWord: 'Bebé',
       infantWordPlural: 'Bebés',
+      addDates: 'Añadir fechas',
     },
     testimonials: {
       title: 'Qué dicen nuestros huéspedes',
