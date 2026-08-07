@@ -240,6 +240,18 @@ export interface GuestyReservation {
  * Called from app/api/stripe/webhook/route.ts on a confirmed
  * `payment_intent.succeeded` event only — never from the client, and never
  * before Stripe has actually confirmed payment.
+ *
+ * Root cause of a real failed beta test (confirmed live): this legacy
+ * `/v1/reservations` endpoint enforces the listing's minNights/maxNights
+ * itself and rejects a too-short stay with 422 "minNights or maxNights
+ * terms not applicable" — a real 6-night test against a 7-night-minimum
+ * listing correctly failed. (Note: `ignoreTerms`/`ignoreCalendar`/
+ * `ignoreBlocks` are NOT valid fields on this legacy endpoint — that's
+ * documented for the newer v1/reservations-v3 endpoint instead; sending
+ * them here causes its own 400 "should not exist" error, confirmed live.)
+ * The actual fix is validating stay length client-side before payment —
+ * see app/villas/[id]/checkout/page.tsx's stayTooShort check, which now
+ * blocks payment entirely for a stay shorter than the listing's minimum.
  */
 export async function createGuestyReservation(
   input: CreateReservationInput,
@@ -259,7 +271,8 @@ export async function createGuestyReservation(
   })
 
   if (!res.ok) {
-    throw new Error(`Guesty reservation creation failed: ${res.status}`)
+    const body = await res.text()
+    throw new Error(`Guesty reservation creation failed: ${res.status} — ${body}`)
   }
 
   const data = await res.json()

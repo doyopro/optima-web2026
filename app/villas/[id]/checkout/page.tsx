@@ -24,6 +24,7 @@ interface PricingResult {
   nights: number
   totalPrice: number
   nightlyAverage: number
+  minNights: number
 }
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '34617387171'
@@ -135,6 +136,13 @@ function CheckoutContent({ params }: Props) {
       : `Hi, I'd like to book ${property.name} from ${checkIn} to ${checkOut}`,
   )}`
 
+  // Confirmed real cause of a failed beta test: Guesty rejects reservation
+  // creation outright (422 "minNights or maxNights terms not applicable")
+  // for a stay shorter than the listing's minimum — but nothing here
+  // checked that before now, so a guest could pay via Stripe for a stay
+  // Guesty would then refuse to book. Block payment before that can happen.
+  const stayTooShort = Boolean(pricing?.available && pricing.minNights > 0 && pricing.nights < pricing.minNights)
+
   const paymentOptions = pricing ? getPaymentOptions(checkIn, pricing.totalPrice) : null
   const amountDueToday =
     paymentOptions == null
@@ -221,6 +229,10 @@ function CheckoutContent({ params }: Props) {
                   <p className="text-sm text-red-600">{t.checkout.pricingError}</p>
                 ) : !pricing || !pricing.available ? (
                   <p className="text-sm text-red-600">{t.checkout.unavailable}</p>
+                ) : stayTooShort ? (
+                  <p className="text-sm text-red-600">
+                    {t.checkout.minStayNotMet.replace('{min}', String(pricing.minNights)).replace('{nights}', String(pricing.nights))}
+                  </p>
                 ) : (
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between text-dark/70">
@@ -356,14 +368,20 @@ function CheckoutContent({ params }: Props) {
                   </div>
                 )}
 
-                {pricing?.available && paymentOptions && (
+                {pricing?.available && paymentOptions && !stayTooShort && (
                   <div className="flex items-baseline justify-between mt-5 mb-4">
                     <span className="text-sm text-dark/60">{t.checkout.amountToPay}</span>
                     <span className="text-2xl font-bold text-dark">£{amountDueToday.toFixed(0)}</span>
                   </div>
                 )}
 
-                {!paymentSucceeded && pricing?.available && paymentOptions && property.guesty_listing_id && (
+                {stayTooShort && (
+                  <p className="text-sm text-red-600 mt-4">
+                    {t.checkout.minStayNotMet.replace('{min}', String(pricing?.minNights ?? '')).replace('{nights}', String(pricing?.nights ?? ''))}
+                  </p>
+                )}
+
+                {!paymentSucceeded && !stayTooShort && pricing?.available && paymentOptions && property.guesty_listing_id && (
                   <StripeCheckoutForm
                     lang={lang}
                     disabled={!guestName || !guestEmail}
