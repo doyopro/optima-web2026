@@ -12,6 +12,7 @@ import { useLanguage } from '@/lib/LanguageContext'
 import { type Property } from '@/lib/types'
 import { getGuestyPropertyUrl } from '@/lib/guesty'
 import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
+import { filterDifferentiatorAmenities, parseHighlights } from '@/lib/property'
 import DateRangePicker from '@/components/DateRangePicker'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
@@ -69,6 +70,15 @@ export default function VillaDetailPage({ params }: Props) {
 
   const t = translations[lang]
   const description = (lang === 'es' && property?.description_es) || property?.description || ''
+  // Highlights/Overview/The Space are only populated for a handful of
+  // properties right now (a separate sync task) — Overview falls back to
+  // the existing description so the page is never blank; Highlights/The
+  // Space simply don't render when there's no real data yet, rather than
+  // faking a list out of unstructured prose.
+  const highlights = parseHighlights((lang === 'es' && property?.highlights_es) || property?.highlights)
+  const overview = (lang === 'es' && property?.overview_es) || property?.overview || description
+  const theSpace = (lang === 'es' && property?.the_space_es) || property?.the_space || ''
+  const differentiatorAmenities = filterDifferentiatorAmenities(property?.amenities ?? [])
 
   if (loading) {
     return (
@@ -253,9 +263,6 @@ export default function VillaDetailPage({ params }: Props) {
                   <span>{property.bathrooms} {bathroomsLabel}</span>
                 </div>
 
-                {/* Description */}
-                <p className="text-dark/70 leading-relaxed">{description}</p>
-
                 {/* Tourist license */}
                 {property.vv_license && (
                   <p className="text-xs text-dark/40 mt-3">
@@ -263,6 +270,42 @@ export default function VillaDetailPage({ params }: Props) {
                   </p>
                 )}
               </div>
+
+              {/* Highlights — only renders once real highlights_en/es data
+                  exists for this property (Casa Amorosa today, more to
+                  follow via a separate sync task) */}
+              {highlights.length > 0 && (
+                <div>
+                  <h2 className="text-lg font-bold text-dark mb-3">{t.properties.highlights}</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {highlights.map((h, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1.5 bg-orange/10 text-dark text-sm font-medium px-3 py-1.5 rounded-full"
+                      >
+                        <Check className="h-3.5 w-3.5 shrink-0 text-orange" strokeWidth={2.5} aria-hidden="true" />
+                        {h}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Overview — real overview_en/es where synced, falling back
+                  to description_en/es so this section is never blank */}
+              <div>
+                <h2 className="text-lg font-bold text-dark mb-3">{t.properties.overview}</h2>
+                <p className="text-dark/70 leading-relaxed whitespace-pre-line">{overview}</p>
+              </div>
+
+              {/* The Space — only renders once real the_space_en/es data
+                  exists (empty for every property today) */}
+              {theSpace && (
+                <div>
+                  <h2 className="text-lg font-bold text-dark mb-3">{t.properties.theSpace}</h2>
+                  <p className="text-dark/70 leading-relaxed whitespace-pre-line">{theSpace}</p>
+                </div>
+              )}
 
               {/* Availability — mobile only (desktop has it in the sticky sidebar) */}
               <div className="lg:hidden bg-white rounded-2xl shadow-sm border border-neutral-100 p-5">
@@ -287,18 +330,23 @@ export default function VillaDetailPage({ params }: Props) {
                 )}
               </div>
 
-              {/* Amenities */}
-              <div>
-                <h2 className="text-lg font-bold text-dark mb-4">{t.properties.amenities}</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {property.amenities.map((a) => (
-                    <div key={a} className="flex items-center gap-2 text-sm text-dark/70">
-                      <Check className="h-4 w-4 shrink-0 text-green" strokeWidth={2.5} aria-hidden="true" />
-                      {a}
-                    </div>
-                  ))}
+              {/* Amenities — genuine differentiators only (air con, sea
+                  view, pool table, etc.), not standard/expected items
+                  already implied by The Space (bed linens, kitchen basics,
+                  hot water...) */}
+              {differentiatorAmenities.length > 0 && (
+                <div>
+                  <h2 className="text-lg font-bold text-dark mb-4">{t.properties.amenities}</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {differentiatorAmenities.map((a) => (
+                      <div key={a} className="flex items-center gap-2 text-sm text-dark/70">
+                        <Check className="h-4 w-4 shrink-0 text-green" strokeWidth={2.5} aria-hidden="true" />
+                        {a}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Location map — shaded circle over the general area, never an
                   exact pin on the building */}
@@ -316,7 +364,8 @@ export default function VillaDetailPage({ params }: Props) {
             {/* Right: sticky booking sidebar — desktop only */}
             <div className="hidden lg:block lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
-                <div className="flex items-baseline gap-1 mb-6">
+                <div className="flex items-baseline gap-1.5 mb-6">
+                  <span className="text-dark/50 text-sm">{t.properties.fromPrice}</span>
                   <span className="text-3xl font-bold text-dark">£{property.price_per_night_gbp}</span>
                   <span className="text-dark/50 text-sm">{t.properties.perNight}</span>
                 </div>
@@ -382,6 +431,7 @@ export default function VillaDetailPage({ params }: Props) {
       {/* Mobile: fixed bottom booking bar */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-200 px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] flex items-center justify-between gap-4">
         <div>
+          <span className="text-dark/50 text-xs">{t.properties.fromPrice} </span>
           <span className="text-lg font-bold text-dark">£{property.price_per_night_gbp}</span>
           <span className="text-dark/50 text-xs"> {t.properties.perNight}</span>
         </div>

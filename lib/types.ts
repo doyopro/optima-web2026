@@ -5,6 +5,12 @@ export type Property = {
   name: string
   description: string
   description_es?: string
+  overview?: string
+  overview_es?: string
+  highlights?: string
+  highlights_es?: string
+  the_space?: string
+  the_space_es?: string
   vv_license?: string
   guesty_listing_id?: string
   type?: string
