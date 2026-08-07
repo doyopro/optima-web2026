@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { type Language, translations } from '@/lib/i18n'
@@ -40,9 +41,13 @@ function PayButton({ lang, booking, disabled, onSuccess }: Props) {
   const t = translations[lang].checkout
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Owned here (rather than by the parent checkout page) so it sits
+  // literally immediately above the Pay button, not separated by any other
+  // form section — the last thing a guest does before paying.
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   async function handlePay() {
-    if (!stripe || !elements) return
+    if (!stripe || !elements || !agreedToTerms) return
     setSubmitting(true)
     setError(null)
 
@@ -89,10 +94,34 @@ function PayButton({ lang, booking, disabled, onSuccess }: Props) {
         <CardElement options={{ style: { base: { fontSize: '14px' } } }} />
       </div>
       {error && <p className="text-xs text-red-600">{error}</p>}
+
+      {/* Terms checkbox — immediately above Pay, nothing else in between.
+          Sized and boxed deliberately larger/higher-contrast than a normal
+          inline checkbox so it reads as a required final step, not a
+          throwaway fine-print line. */}
+      <label
+        className={`flex items-start gap-3 rounded-xl border-2 p-3 cursor-pointer transition-colors ${
+          agreedToTerms ? 'border-orange bg-orange/5' : 'border-neutral-300 bg-neutral-50'
+        }`}
+      >
+        <input
+          type="checkbox"
+          checked={agreedToTerms}
+          onChange={(e) => setAgreedToTerms(e.target.checked)}
+          className="mt-0.5 h-5 w-5 shrink-0 rounded border-neutral-400 text-orange focus:ring-orange focus:ring-2"
+        />
+        <span className="text-sm font-medium text-dark leading-snug">
+          {t.agreeToTermsPrefix}{' '}
+          <Link href="/terms" target="_blank" className="text-orange underline hover:no-underline">
+            {t.agreeToTermsLink}
+          </Link>
+        </span>
+      </label>
+
       <button
         type="button"
         onClick={handlePay}
-        disabled={disabled || submitting || !stripe}
+        disabled={disabled || submitting || !stripe || !agreedToTerms}
         className="w-full bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {submitting ? t.processingPayment : t.payNow}

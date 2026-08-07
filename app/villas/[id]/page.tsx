@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { use, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -10,7 +10,6 @@ import { Toaster } from 'react-hot-toast'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import { type Property } from '@/lib/types'
-import { getGuestyPropertyUrl } from '@/lib/guesty'
 import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
 import { filterDifferentiatorAmenities, parseHighlights } from '@/lib/property'
 import DateRangePicker from '@/components/DateRangePicker'
@@ -50,6 +49,9 @@ export default function VillaDetailPage({ params }: Props) {
   const [bookedRanges, setBookedRanges] = useState<BookedRange[]>([])
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
+  const [showDatePrompt, setShowDatePrompt] = useState(false)
+  const mobileDatePickerRef = useRef<HTMLDivElement>(null)
+  const desktopDatePickerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     fetch(`/api/properties/${id}`)
@@ -98,7 +100,6 @@ export default function VillaDetailPage({ params }: Props) {
     )
   }
 
-  const bookingUrl = getGuestyPropertyUrl(property.guesty_listing_id)
   const images = property.images
   const bedroomsLabel = property.bedrooms === 1 ? t.properties.bedroom : t.properties.bedrooms
   const bathroomsLabel = property.bathrooms === 1 ? t.properties.bathroom : t.properties.bathrooms
@@ -115,6 +116,26 @@ export default function VillaDetailPage({ params }: Props) {
   function handleDateChange(from: string, to: string) {
     setFromDate(from)
     setToDate(to)
+    if (from && to) setShowDatePrompt(false)
+  }
+
+  // "Book Now" never leaves the site for the primary booking action anymore
+  // — if dates aren't picked yet (or the picked dates are blocked), this
+  // scrolls to and highlights whichever date picker is actually visible at
+  // the current viewport width (mobile's inline picker vs. desktop's sticky
+  // sidebar one) instead of jumping straight to Guesty's external booking
+  // engine. The external link only remains as a genuine-error fallback on
+  // the checkout page itself.
+  function handleBookNowClick() {
+    if (canContinue) {
+      goToCheckout()
+      return
+    }
+    setShowDatePrompt(true)
+    const target = [mobileDatePickerRef.current, desktopDatePickerRef.current].find(
+      (el) => el && el.offsetParent !== null,
+    )
+    target?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
   return (
@@ -308,13 +329,21 @@ export default function VillaDetailPage({ params }: Props) {
               )}
 
               {/* Availability — mobile only (desktop has it in the sticky sidebar) */}
-              <div className="lg:hidden bg-white rounded-2xl shadow-sm border border-neutral-100 p-5">
+              <div
+                ref={mobileDatePickerRef}
+                className={`lg:hidden bg-white rounded-2xl shadow-sm border p-5 transition-colors ${
+                  showDatePrompt && !datesSelected ? 'border-orange ring-2 ring-orange/30' : 'border-neutral-100'
+                }`}
+              >
                 <h2 className="text-lg font-bold text-dark mb-1">{t.availability.checkAvailability}</h2>
                 {datesSelected && (
                   <p className="text-sm text-dark/60 mb-3">
                     {t.availability.checkIn} {formatShortDate(fromDate, lang)} · {t.availability.checkOut}{' '}
                     {formatShortDate(toDate, lang)}
                   </p>
+                )}
+                {showDatePrompt && !datesSelected && (
+                  <p className="text-sm font-medium text-orange mb-3">{t.availability.selectDatesPrompt}</p>
                 )}
                 <div className="flex justify-center overflow-x-auto">
                   <DateRangePicker
@@ -377,7 +406,15 @@ export default function VillaDetailPage({ params }: Props) {
                     {formatShortDate(fromDate, lang)} → {formatShortDate(toDate, lang)}
                   </p>
                 )}
-                <div className="flex justify-center mb-3">
+                {showDatePrompt && !datesSelected && (
+                  <p className="text-xs font-medium text-orange mb-2">{t.availability.selectDatesPrompt}</p>
+                )}
+                <div
+                  ref={desktopDatePickerRef}
+                  className={`flex justify-center mb-3 rounded-xl transition-shadow ${
+                    showDatePrompt && !datesSelected ? 'ring-2 ring-orange/30' : ''
+                  }`}
+                >
                   <DateRangePicker
                     lang={lang}
                     bookedRanges={bookedRanges}
@@ -391,24 +428,13 @@ export default function VillaDetailPage({ params }: Props) {
                   <p className="text-xs text-red-600 mb-3">{t.availability.datesUnavailable}</p>
                 )}
 
-                {canContinue ? (
-                  <button
-                    type="button"
-                    onClick={goToCheckout}
-                    className="block w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors text-sm"
-                  >
-                    {t.availability.proceedToBook}
-                  </button>
-                ) : (
-                  <a
-                    href={bookingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors text-sm"
-                  >
-                    {t.properties.bookNow}
-                  </a>
-                )}
+                <button
+                  type="button"
+                  onClick={handleBookNowClick}
+                  className="block w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors text-sm"
+                >
+                  {canContinue ? t.availability.proceedToBook : t.properties.bookNow}
+                </button>
 
                 <p className="text-xs text-center text-dark/40 mt-3">{t.properties.bookNowNote}</p>
               </div>
@@ -435,24 +461,13 @@ export default function VillaDetailPage({ params }: Props) {
           <span className="text-lg font-bold text-dark">£{property.price_per_night_gbp}</span>
           <span className="text-dark/50 text-xs"> {t.properties.perNight}</span>
         </div>
-        {canContinue ? (
-          <button
-            type="button"
-            onClick={goToCheckout}
-            className="bg-orange text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-orange/90 transition-colors"
-          >
-            {t.availability.proceedToBook}
-          </button>
-        ) : (
-          <a
-            href={bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-orange text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-orange/90 transition-colors"
-          >
-            {t.properties.bookNow}
-          </a>
-        )}
+        <button
+          type="button"
+          onClick={handleBookNowClick}
+          className="bg-orange text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-orange/90 transition-colors"
+        >
+          {canContinue ? t.availability.proceedToBook : t.properties.bookNow}
+        </button>
       </div>
 
       {/* Gallery modal */}

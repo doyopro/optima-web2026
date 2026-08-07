@@ -10,6 +10,8 @@ import { useLanguage } from '@/lib/LanguageContext'
 import { type Property } from '@/lib/types'
 import { getGuestyPropertyUrl } from '@/lib/guesty'
 import { getPaymentOptions } from '@/lib/booking'
+import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
+import DateRangePicker from '@/components/DateRangePicker'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 import StripeCheckoutForm from '@/components/StripeCheckoutForm'
@@ -44,9 +46,17 @@ function CheckoutContent({ params }: Props) {
   const searchParams = useSearchParams()
   const { lang } = useLanguage()
 
-  const checkIn = searchParams.get('from') ?? ''
-  const checkOut = searchParams.get('to') ?? ''
+  const initialCheckIn = searchParams.get('from') ?? ''
+  const initialCheckOut = searchParams.get('to') ?? ''
   const guests = searchParams.get('guests') ?? '2'
+
+  // Editable in place (task: let guests fix dates without leaving
+  // checkout) rather than fixed values read once from the URL — every
+  // downstream check (pricing, availability, minStay) re-runs off this
+  // state, not the original query params.
+  const [checkIn, setCheckIn] = useState(initialCheckIn)
+  const [checkOut, setCheckOut] = useState(initialCheckOut)
+  const [bookedRanges, setBookedRanges] = useState<BookedRange[]>([])
 
   const [property, setProperty] = useState<Property | null>(null)
   const [loadingProperty, setLoadingProperty] = useState(true)
@@ -60,7 +70,6 @@ function CheckoutContent({ params }: Props) {
   const [guestEmail, setGuestEmail] = useState('')
   const [guestPhone, setGuestPhone] = useState('')
   const [paymentSucceeded, setPaymentSucceeded] = useState(false)
-  const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   useEffect(() => {
     fetch(`/api/properties/${id}`)
@@ -68,6 +77,16 @@ function CheckoutContent({ params }: Props) {
       .then((d) => setProperty(d.property ?? null))
       .catch(() => setProperty(null))
       .finally(() => setLoadingProperty(false))
+  }, [id])
+
+  // Same source as the villa detail page's own picker — our reservations
+  // data, not Guesty pricing, so it keeps working even if Guesty pricing is
+  // rate-limited.
+  useEffect(() => {
+    fetch(`/api/availability?propertyId=${encodeURIComponent(id)}`)
+      .then((r) => r.json())
+      .then((d) => setBookedRanges(d.bookedRanges ?? []))
+      .catch(() => setBookedRanges([]))
   }, [id])
 
   useEffect(() => {
@@ -85,48 +104,41 @@ function CheckoutContent({ params }: Props) {
       .finally(() => setLoadingPricing(false))
   }, [property?.guesty_listing_id, checkIn, checkOut])
 
-  const t = translations[lang]
+  function handleDateChange(from: string, to: string) {
+    setCheckIn(from)
+    setCheckOut(to)
+    router.replace(`/villas/${id}/checkout?from=${from}&to=${to}&guests=${guests}`, { scroll: false })
+  }
 
-  const testModeBanner = (
-    <div className="sticky top-0 z-50 bg-amber-400 text-amber-950 text-center text-xs sm:text-sm font-bold py-2 px-4">
-      {t.checkout.testModeBanner}
-    </div>
-  )
+  const datesBlocked = Boolean(checkIn && checkOut && rangeOverlapsBooking(checkIn, checkOut, bookedRanges))
+
+  const t = translations[lang]
 
   if (loadingProperty) {
     return (
-      <>
-        {testModeBanner}
-        <div className="min-h-screen bg-cream flex items-center justify-center">
-          <div className="animate-pulse text-dark/40 text-lg">{t.checkout.loading}</div>
-        </div>
-      </>
+      <div className="min-h-screen bg-cream flex items-center justify-center">
+        <div className="animate-pulse text-dark/40 text-lg">{t.checkout.loading}</div>
+      </div>
     )
   }
 
   if (!property) {
     return (
-      <>
-        {testModeBanner}
-        <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4">
-          <p className="text-2xl">🏡</p>
-          <p className="font-semibold text-dark">{t.checkout.notFound}</p>
-          <Link href="/villas" className="text-orange underline text-sm">{t.properties.viewAll}</Link>
-        </div>
-      </>
+      <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4">
+        <p className="text-2xl">🏡</p>
+        <p className="font-semibold text-dark">{t.checkout.notFound}</p>
+        <Link href="/villas" className="text-orange underline text-sm">{t.properties.viewAll}</Link>
+      </div>
     )
   }
 
   if (!checkIn || !checkOut) {
     return (
-      <>
-        {testModeBanner}
-        <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4 text-center px-4">
-          <p className="text-2xl">📅</p>
-          <p className="font-semibold text-dark">{t.checkout.missingDates}</p>
-          <Link href={`/villas/${id}`} className="text-orange underline text-sm">{t.checkout.backToVilla}</Link>
-        </div>
-      </>
+      <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4 text-center px-4">
+        <p className="text-2xl">📅</p>
+        <p className="font-semibold text-dark">{t.checkout.missingDates}</p>
+        <Link href={`/villas/${id}`} className="text-orange underline text-sm">{t.checkout.backToVilla}</Link>
+      </div>
     )
   }
 
@@ -156,12 +168,11 @@ function CheckoutContent({ params }: Props) {
     <>
       <Toaster position="top-center" />
 
-      {/* BETA TEST MODE banner — always visible on this page, including
-          for anyone who reaches it by guessing the URL. This checkout is
-          internal-testing-only; the site's real "Book Now" buttons still
-          point at Guesty's live booking engine. */}
-      {testModeBanner}
-
+      {/* Visible TEST MODE banner removed to preview the final production
+          look — Stripe itself is still running in test mode (see
+          lib/stripe-server.ts / components/StripeCheckoutForm.tsx, both
+          untouched: they still hard-refuse to load anything that isn't a
+          sk_test_/pk_test_ key). This is a visual-only change. */}
       <div className="min-h-screen bg-cream">
         {/* Breadcrumb */}
         <div className="mx-auto max-w-5xl px-4 sm:px-6 pt-6 pb-2">
@@ -206,19 +217,28 @@ function CheckoutContent({ params }: Props) {
                 </div>
               </div>
 
-              {/* Stay details */}
+              {/* Stay details — dates are editable here directly (reuses
+                  the same date-range picker as the villa page) so a guest
+                  who picked the wrong dates doesn't have to leave checkout
+                  to fix them; every check below (pricing, availability,
+                  minStay) re-runs against whatever's selected here. */}
               <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-5">
-                <h3 className="font-bold text-dark mb-4">{t.checkout.stayDetails}</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-dark/40 mb-1">{t.checkout.checkIn}</p>
-                    <p className="text-dark font-medium">{formatDate(checkIn, lang)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-dark/40 mb-1">{t.checkout.checkOut}</p>
-                    <p className="text-dark font-medium">{formatDate(checkOut, lang)}</p>
-                  </div>
+                <h3 className="font-bold text-dark mb-1">{t.checkout.stayDetails}</h3>
+                <p className="text-sm text-dark/60 mb-3">
+                  {t.checkout.checkIn} {formatDate(checkIn, lang)} · {t.checkout.checkOut} {formatDate(checkOut, lang)}
+                </p>
+                <div className="flex justify-center overflow-x-auto">
+                  <DateRangePicker
+                    lang={lang}
+                    bookedRanges={bookedRanges}
+                    from={checkIn}
+                    to={checkOut}
+                    onChange={handleDateChange}
+                  />
                 </div>
+                {datesBlocked && (
+                  <p className="text-xs text-red-600 mt-2">{t.availability.datesUnavailable}</p>
+                )}
               </div>
 
               {/* Pricing */}
@@ -248,8 +268,10 @@ function CheckoutContent({ params }: Props) {
                 )}
               </div>
 
-              {/* Payment option */}
-              {paymentOptions && pricing?.available && (
+              {/* Payment option — hidden entirely (not just the pay button)
+                  when minStay isn't met, so the whole payment area reads
+                  as consistently blocked rather than partially normal. */}
+              {paymentOptions && pricing?.available && !stayTooShort && (
                 <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-5">
                   <h3 className="font-bold text-dark mb-4">{t.checkout.paymentOption}</h3>
                   <div className="space-y-3">
@@ -348,24 +370,6 @@ function CheckoutContent({ params }: Props) {
                   </div>
                 </div>
               </div>
-
-              {/* Terms agreement — required before payment can be submitted */}
-              <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-5">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={agreedToTerms}
-                    onChange={(e) => setAgreedToTerms(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-orange focus:ring-orange"
-                  />
-                  <span className="text-sm text-dark/70 leading-relaxed">
-                    {t.checkout.agreeToTermsPrefix}{' '}
-                    <Link href="/terms" target="_blank" className="text-orange underline hover:no-underline">
-                      {t.checkout.agreeToTermsLink}
-                    </Link>
-                  </span>
-                </label>
-              </div>
             </div>
 
             {/* Right: payment placeholder — sticky on desktop */}
@@ -373,17 +377,13 @@ function CheckoutContent({ params }: Props) {
               <div className="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6 sticky top-6">
                 <h3 className="font-bold text-dark mb-1">{t.checkout.paymentSectionTitle}</h3>
 
-                {paymentSucceeded ? (
+                {paymentSucceeded && (
                   <div className="mt-4 rounded-xl border-2 border-emerald-200 bg-emerald-50 p-5 text-center">
                     <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
                       ✓
                     </div>
                     <p className="font-semibold text-dark text-sm mb-1">{t.checkout.testPaymentSucceeded}</p>
                     <p className="text-xs text-dark/50 leading-relaxed">{t.checkout.testPaymentSucceededDesc}</p>
-                  </div>
-                ) : (
-                  <div className="mt-4 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 p-3 text-center">
-                    <p className="text-xs font-semibold text-amber-800">{t.checkout.testModeBanner}</p>
                   </div>
                 )}
 
@@ -403,7 +403,7 @@ function CheckoutContent({ params }: Props) {
                 {!paymentSucceeded && !stayTooShort && pricing?.available && paymentOptions && property.guesty_listing_id && (
                   <StripeCheckoutForm
                     lang={lang}
-                    disabled={!guestName || !guestEmail || !agreedToTerms}
+                    disabled={!guestName || !guestEmail}
                     booking={{
                       amountGbp: amountDueToday,
                       propertyId: id,
@@ -420,17 +420,27 @@ function CheckoutContent({ params }: Props) {
                   />
                 )}
 
-                <p className="text-xs text-dark/40 mt-4 leading-relaxed">{t.checkout.contactToBookNote}</p>
+                {/* "Book via our booking partner" is a genuine-error fallback
+                    only — pricing failed to load, dates are unavailable, or
+                    minStay isn't met. It must never show up as a visible
+                    alternative during a normal, working checkout. */}
+                {!paymentSucceeded && (pricingError || stayTooShort || (pricing && !pricing.available)) && (
+                  <>
+                    <p className="text-xs text-dark/40 mt-4 leading-relaxed">{t.checkout.contactToBookNote}</p>
+                    <div className="flex flex-col gap-2 mt-3">
+                      <a
+                        href={bookingUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block w-full text-center border border-orange text-orange font-semibold py-2.5 rounded-lg hover:bg-orange/5 transition-colors text-sm"
+                      >
+                        {t.checkout.goToGuesty}
+                      </a>
+                    </div>
+                  </>
+                )}
 
                 <div className="flex flex-col gap-2 mt-3">
-                  <a
-                    href={bookingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full text-center border border-orange text-orange font-semibold py-2.5 rounded-lg hover:bg-orange/5 transition-colors text-sm"
-                  >
-                    {t.checkout.goToGuesty}
-                  </a>
                   <a
                     href={whatsappUrl}
                     target="_blank"
