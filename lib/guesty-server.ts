@@ -15,8 +15,18 @@ export class GuestyRateLimitError extends Error {
   }
 }
 
-// Refresh a few minutes before Guesty's own ~1h expiry to avoid edge-of-window failures.
-const TOKEN_TTL_MS = 55 * 60 * 1000
+// Guesty's OAuth token actually lasts 24h (confirmed live: the token
+// response's own expires_in is 86400 seconds) — this was previously
+// hardcoded to a wrong ~1h assumption, which refreshed the token roughly
+// 24x more often than necessary. That's very likely what was tripping
+// Guesty's own OAuth rate limit and causing intermittent pricing lookup
+// failures on genuinely available dates: every request that landed on an
+// (incorrectly) "expired" cached token triggered a fresh OAuth call, and a
+// burst of those (e.g. several villa pages/checkouts loading pricing
+// around the same time) could exceed Guesty's issuance rate limit even
+// though the previously-issued token was still perfectly valid. Used only
+// as a fallback if Guesty's response is ever missing expires_in.
+const FALLBACK_TOKEN_TTL_MS = 55 * 60 * 1000
 const REFRESH_MARGIN_MS = 5 * 60 * 1000
 
 interface StoredToken {
@@ -86,7 +96,8 @@ async function fetchNewGuestyToken(): Promise<string> {
     throw new Error('Guesty OAuth response had no access_token')
   }
 
-  const expiresAt = Date.now() + TOKEN_TTL_MS
+  const expiresInMs = typeof data.expires_in === 'number' ? data.expires_in * 1000 : FALLBACK_TOKEN_TTL_MS
+  const expiresAt = Date.now() + expiresInMs
   await storeToken(token, expiresAt)
   return token
 }
