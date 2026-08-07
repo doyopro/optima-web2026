@@ -346,6 +346,8 @@ export const translations = {
       unavailable: 'Sorry, these dates are no longer available for this villa.',
       pricingError: "We couldn't retrieve live pricing right now. Please try again shortly.",
       minStayNotMet: 'This villa requires a minimum stay of {min} nights — your selected dates are only {nights} nights. Please choose a longer stay.',
+      agreeToTermsPrefix: 'I agree to the',
+      agreeToTermsLink: 'Terms and Conditions',
       backToVilla: 'Back to villa',
       stayDetails: 'Stay details',
       checkIn: 'Check-in',
@@ -408,6 +410,53 @@ export const translations = {
       email: 'enquiries@optimavillas.com',
       phoneLabel: 'Phone',
       backHome: 'Back to home',
+    },
+    termsPage: {
+      title: 'Terms and Conditions',
+      intro: 'Please read these terms carefully before booking. By completing a booking with Óptima Villas, you agree to the terms set out below.',
+      backHome: 'Back to home',
+      sections: [
+        {
+          heading: 'Cancellation Policy',
+          body: 'If you cancel your booking 45 days or more before your arrival date, we will retain 20% of the total booking cost or the amount already paid, whichever is less, and refund the remainder within 30 days. If you cancel less than 45 days before arrival, we will retain 100% of the total cost and no refund will be given.\n\nCancellation takes effect on the day we receive your email. If you do not receive a response from us within 24 hours, please assume your message did not reach us and contact us again. Cancellation requests must be sent to enquiries@optimavillas.com.\n\nIf we have to cancel your booking, you will receive a full refund and we accept no further liability — we strongly recommend all guests take out their own travel insurance.\n\nIf a card payment fails, you will have 48 hours to resolve the issue, after which the booking will be deemed cancelled.',
+        },
+        {
+          heading: 'Complaints and Disputes',
+          body: 'We will do our best to resolve any complaints raised during or after your stay, although we are under no obligation to do so. Compensation or relocation to alternative accommodation will only be considered where the property is uninhabitable due to unforeseen circumstances beyond our control. We cannot guarantee that alternative accommodation from our own portfolio will be available.',
+        },
+        {
+          heading: 'Property Damage',
+          body: 'We cover accidental damage to the property up to £200. This does not include damage caused deliberately or staining caused by sun cream or similar products. Any damage must be reported to your local representative immediately.',
+        },
+        {
+          heading: 'Insurance',
+          body: 'All guests must have comprehensive travel insurance that covers personal injury and death, as well as costs relating to cancellation such as flights, transfers, car hire and alternative accommodation.',
+        },
+        {
+          heading: 'Personal Injury',
+          body: 'We accept no liability for claims relating to personal injury sustained on the property. Safety features such as pool depth markers are provided for guidance only and do not imply any liability on our part. If anything on the property seems unsafe, please contact the house manager immediately.',
+        },
+        {
+          heading: 'Changes',
+          body: 'We will do our best to accommodate any changes you request to your booking. If we are unable to do so and you choose to cancel as a result, our standard cancellation policy will apply.',
+        },
+        {
+          heading: 'Loss of Amenities',
+          body: 'Loss of water or electricity supply is sometimes beyond our control. Where this happens, we will help you find alternative accommodation, although the cost of this will be your responsibility — this can usually be reclaimed through your travel insurance.',
+        },
+        {
+          heading: 'Accommodation Description',
+          body: 'We describe every property as accurately as possible, but furnishings and fixtures may differ slightly from those shown in photographs. We accept no liability for any misdescription.',
+        },
+        {
+          heading: 'Third Party Nuisance',
+          body: 'We are not responsible for nuisance caused by third parties, including building works, other guests, noise or traffic.',
+        },
+        {
+          heading: 'Data Protection',
+          body: 'We collect personal data including your name, contact details and, where relevant, payment information, in order to process and manage your booking. Payments are processed directly and securely by Stripe — we do not store your card details on our own systems.\n\nYou have the right to request access to, or deletion of, the personal data we hold about you at any time by contacting us at enquiries@optimavillas.com.',
+        },
+      ],
     },
     footer: {
       tagline: 'Exceptional holiday villas in Lanzarote since 2010.',
@@ -804,6 +853,8 @@ export const translations = {
       unavailable: 'Lo sentimos, estas fechas ya no están disponibles para esta villa.',
       pricingError: 'No hemos podido obtener el precio en tiempo real. Inténtalo de nuevo en unos minutos.',
       minStayNotMet: 'Esta villa requiere una estancia mínima de {min} noches — las fechas seleccionadas son solo {nights} noches. Por favor, elige una estancia más larga.',
+      agreeToTermsPrefix: 'Acepto los',
+      agreeToTermsLink: 'Términos y Condiciones',
       backToVilla: 'Volver a la villa',
       stayDetails: 'Detalles de la estancia',
       checkIn: 'Entrada',
@@ -866,6 +917,53 @@ export const translations = {
       email: 'enquiries@optimavillas.com',
       phoneLabel: 'Teléfono',
       backHome: 'Volver al inicio',
+    },
+    termsPage: {
+      title: 'Términos y Condiciones',
+      intro: 'Por favor, lee atentamente estos términos antes de reservar. Al completar una reserva con Óptima Villas, aceptas los términos que se indican a continuación.',
+      backHome: 'Volver al inicio',
+      sections: [
+        {
+          heading: 'Política de Cancelación',
+          body: 'Si cancelas tu reserva 45 días o más antes de la fecha de llegada, retendremos el 20% del coste total de la reserva o el importe ya abonado, lo que sea menor, y te reembolsaremos el resto en un plazo de 30 días. Si cancelas con menos de 45 días de antelación a la llegada, retendremos el 100% del coste total y no se realizará ningún reembolso.\n\nLa cancelación surte efecto el día en que recibimos tu email. Si no recibes respuesta por nuestra parte en un plazo de 24 horas, por favor asume que tu mensaje no nos ha llegado y contáctanos de nuevo. Las solicitudes de cancelación deben enviarse a enquiries@optimavillas.com.\n\nSi somos nosotros quienes debemos cancelar tu reserva, recibirás un reembolso completo y no asumiremos ninguna responsabilidad adicional — recomendamos encarecidamente a todos los huéspedes contratar su propio seguro de viaje.\n\nSi un pago con tarjeta no se completa correctamente, dispondrás de 48 horas para resolver la incidencia, transcurridas las cuales la reserva se considerará cancelada.',
+        },
+        {
+          heading: 'Quejas y Disputas',
+          body: 'Haremos todo lo posible por resolver cualquier queja planteada durante o después de tu estancia, aunque no estamos obligados a ello. Solo se considerará una compensación o el traslado a otro alojamiento cuando la propiedad no sea habitable debido a circunstancias imprevistas fuera de nuestro control. No podemos garantizar la disponibilidad de alojamiento alternativo dentro de nuestra propia cartera de propiedades.',
+        },
+        {
+          heading: 'Daños en la Propiedad',
+          body: 'Cubrimos los daños accidentales en la propiedad hasta un máximo de 200 £. Esto no incluye daños causados deliberadamente ni manchas provocadas por crema solar o productos similares. Cualquier daño debe comunicarse de inmediato a tu representante local.',
+        },
+        {
+          heading: 'Seguro',
+          body: 'Todos los huéspedes deben contar con un seguro de viaje completo que cubra lesiones personales y fallecimiento, así como los costes relacionados con una cancelación, como vuelos, traslados, alquiler de coche y alojamiento alternativo.',
+        },
+        {
+          heading: 'Lesiones Personales',
+          body: 'No aceptamos responsabilidad alguna por reclamaciones relacionadas con lesiones personales sufridas en la propiedad. Elementos de seguridad como los marcadores de profundidad de la piscina se proporcionan únicamente a modo orientativo y no implican responsabilidad alguna por nuestra parte. Si algo en la propiedad te parece inseguro, contacta de inmediato con el gestor de la villa.',
+        },
+        {
+          heading: 'Cambios',
+          body: 'Haremos todo lo posible por atender cualquier cambio que solicites en tu reserva. Si no pudiéramos hacerlo y decides cancelar como consecuencia, se aplicará nuestra política de cancelación estándar.',
+        },
+        {
+          heading: 'Pérdida de Suministros',
+          body: 'La pérdida del suministro de agua o electricidad a veces escapa a nuestro control. En caso de que esto ocurra, te ayudaremos a encontrar alojamiento alternativo, si bien el coste correrá de tu cuenta — este importe normalmente puede reclamarse a través de tu seguro de viaje.',
+        },
+        {
+          heading: 'Descripción del Alojamiento',
+          body: 'Describimos cada propiedad con la mayor precisión posible, aunque el mobiliario y los elementos fijos pueden diferir ligeramente de los mostrados en las fotografías. No aceptamos responsabilidad alguna por posibles errores en la descripción.',
+        },
+        {
+          heading: 'Molestias Causadas por Terceros',
+          body: 'No somos responsables de las molestias causadas por terceros, incluyendo obras de construcción, otros huéspedes, ruido o tráfico.',
+        },
+        {
+          heading: 'Protección de Datos',
+          body: 'Recopilamos datos personales, incluyendo tu nombre, datos de contacto y, cuando corresponda, información de pago, con el fin de procesar y gestionar tu reserva. Los pagos son procesados de forma directa y segura por Stripe — no almacenamos los datos de tu tarjeta en nuestros propios sistemas.\n\nTienes derecho a solicitar acceso a, o la eliminación de, los datos personales que conservamos sobre ti en cualquier momento, contactando con nosotros en enquiries@optimavillas.com.',
+        },
+      ],
     },
     footer: {
       tagline: 'Villas vacacionales excepcionales en Lanzarote desde 2010.',

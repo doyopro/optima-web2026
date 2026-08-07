@@ -60,6 +60,7 @@ function CheckoutContent({ params }: Props) {
   const [guestEmail, setGuestEmail] = useState('')
   const [guestPhone, setGuestPhone] = useState('')
   const [paymentSucceeded, setPaymentSucceeded] = useState(false)
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   useEffect(() => {
     fetch(`/api/properties/${id}`)
@@ -347,6 +348,24 @@ function CheckoutContent({ params }: Props) {
                   </div>
                 </div>
               </div>
+
+              {/* Terms agreement — required before payment can be submitted */}
+              <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-5">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-orange focus:ring-orange"
+                  />
+                  <span className="text-sm text-dark/70 leading-relaxed">
+                    {t.checkout.agreeToTermsPrefix}{' '}
+                    <Link href="/terms" target="_blank" className="text-orange underline hover:no-underline">
+                      {t.checkout.agreeToTermsLink}
+                    </Link>
+                  </span>
+                </label>
+              </div>
             </div>
 
             {/* Right: payment placeholder — sticky on desktop */}
@@ -384,7 +403,7 @@ function CheckoutContent({ params }: Props) {
                 {!paymentSucceeded && !stayTooShort && pricing?.available && paymentOptions && property.guesty_listing_id && (
                   <StripeCheckoutForm
                     lang={lang}
-                    disabled={!guestName || !guestEmail}
+                    disabled={!guestName || !guestEmail || !agreedToTerms}
                     booking={{
                       amountGbp: amountDueToday,
                       propertyId: id,
