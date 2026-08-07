@@ -220,6 +220,12 @@ export interface CreateReservationInput {
   checkInDate: string
   checkOutDate: string
   guest: GuestyGuestInput
+  // Guesty's reservation source is case-sensitive and drives which
+  // automations fire (confirmed: "Direct" is an existing source in this
+  // account, wired to the "Booking (Direct)" automation — 11 messages).
+  // Typing it any other way (e.g. "direct") creates a distinct, unrelated
+  // source in Guesty and would silently skip that automation.
+  source: string
 }
 
 export interface GuestyReservation {
@@ -231,17 +237,9 @@ export interface GuestyReservation {
 /**
  * Creates a real reservation in Guesty (POST /v1/reservations).
  *
- * ⚠️ NOT WIRED UP ANYWHERE YET. This function exists and is ready to use,
- * but nothing in the current checkout flow calls it — there's no real
- * payment happening yet (see app/villas/[id]/checkout/page.tsx's payment
- * step, which is a disabled placeholder).
- *
- * Once Stripe is connected: call this function from the Stripe webhook
- * handler (e.g. app/api/stripe/webhook/route.ts, on a successful
- * `payment_intent.succeeded` / `checkout.session.completed` event) —
- * NOT from the client, and NOT before payment has actually been
- * confirmed by Stripe. That webhook handler doesn't exist yet; this is
- * the function it should call once it does.
+ * Called from app/api/stripe/webhook/route.ts on a confirmed
+ * `payment_intent.succeeded` event only — never from the client, and never
+ * before Stripe has actually confirmed payment.
  */
 export async function createGuestyReservation(
   input: CreateReservationInput,
@@ -256,6 +254,7 @@ export async function createGuestyReservation(
       checkOutDateLocalized: input.checkOutDate,
       status: 'reserved',
       guestId,
+      source: input.source,
     }),
   })
 

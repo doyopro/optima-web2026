@@ -12,6 +12,7 @@ import { getGuestyPropertyUrl } from '@/lib/guesty'
 import { getPaymentOptions } from '@/lib/booking'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
+import StripeCheckoutForm from '@/components/StripeCheckoutForm'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -57,6 +58,7 @@ function CheckoutContent({ params }: Props) {
   const [guestName, setGuestName] = useState('')
   const [guestEmail, setGuestEmail] = useState('')
   const [guestPhone, setGuestPhone] = useState('')
+  const [paymentSucceeded, setPaymentSucceeded] = useState(false)
 
   useEffect(() => {
     fetch(`/api/properties/${id}`)
@@ -83,31 +85,46 @@ function CheckoutContent({ params }: Props) {
 
   const t = translations[lang]
 
+  const testModeBanner = (
+    <div className="sticky top-0 z-50 bg-amber-400 text-amber-950 text-center text-xs sm:text-sm font-bold py-2 px-4">
+      {t.checkout.testModeBanner}
+    </div>
+  )
+
   if (loadingProperty) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <div className="animate-pulse text-dark/40 text-lg">{t.checkout.loading}</div>
-      </div>
+      <>
+        {testModeBanner}
+        <div className="min-h-screen bg-cream flex items-center justify-center">
+          <div className="animate-pulse text-dark/40 text-lg">{t.checkout.loading}</div>
+        </div>
+      </>
     )
   }
 
   if (!property) {
     return (
-      <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4">
-        <p className="text-2xl">🏡</p>
-        <p className="font-semibold text-dark">{t.checkout.notFound}</p>
-        <Link href="/villas" className="text-orange underline text-sm">{t.properties.viewAll}</Link>
-      </div>
+      <>
+        {testModeBanner}
+        <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4">
+          <p className="text-2xl">🏡</p>
+          <p className="font-semibold text-dark">{t.checkout.notFound}</p>
+          <Link href="/villas" className="text-orange underline text-sm">{t.properties.viewAll}</Link>
+        </div>
+      </>
     )
   }
 
   if (!checkIn || !checkOut) {
     return (
-      <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4 text-center px-4">
-        <p className="text-2xl">📅</p>
-        <p className="font-semibold text-dark">{t.checkout.missingDates}</p>
-        <Link href={`/villas/${id}`} className="text-orange underline text-sm">{t.checkout.backToVilla}</Link>
-      </div>
+      <>
+        {testModeBanner}
+        <div className="min-h-screen bg-cream flex flex-col items-center justify-center gap-4 text-center px-4">
+          <p className="text-2xl">📅</p>
+          <p className="font-semibold text-dark">{t.checkout.missingDates}</p>
+          <Link href={`/villas/${id}`} className="text-orange underline text-sm">{t.checkout.backToVilla}</Link>
+        </div>
+      </>
     )
   }
 
@@ -129,6 +146,12 @@ function CheckoutContent({ params }: Props) {
   return (
     <>
       <Toaster position="top-center" />
+
+      {/* BETA TEST MODE banner — always visible on this page, including
+          for anyone who reaches it by guessing the URL. This checkout is
+          internal-testing-only; the site's real "Book Now" buttons still
+          point at Guesty's live booking engine. */}
+      {testModeBanner}
 
       <div className="min-h-screen bg-cream">
         {/* Breadcrumb */}
@@ -319,13 +342,19 @@ function CheckoutContent({ params }: Props) {
               <div className="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6 sticky top-6">
                 <h3 className="font-bold text-dark mb-1">{t.checkout.paymentSectionTitle}</h3>
 
-                <div className="mt-4 rounded-xl border-2 border-dashed border-neutral-200 bg-neutral-50 p-5 text-center">
-                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-orange/10 text-orange">
-                    🔒
+                {paymentSucceeded ? (
+                  <div className="mt-4 rounded-xl border-2 border-emerald-200 bg-emerald-50 p-5 text-center">
+                    <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
+                      ✓
+                    </div>
+                    <p className="font-semibold text-dark text-sm mb-1">{t.checkout.testPaymentSucceeded}</p>
+                    <p className="text-xs text-dark/50 leading-relaxed">{t.checkout.testPaymentSucceededDesc}</p>
                   </div>
-                  <p className="font-semibold text-dark text-sm mb-1">{t.checkout.paymentComingSoon}</p>
-                  <p className="text-xs text-dark/50 leading-relaxed">{t.checkout.paymentComingSoonDesc}</p>
-                </div>
+                ) : (
+                  <div className="mt-4 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 p-3 text-center">
+                    <p className="text-xs font-semibold text-amber-800">{t.checkout.testModeBanner}</p>
+                  </div>
+                )}
 
                 {pricing?.available && paymentOptions && (
                   <div className="flex items-baseline justify-between mt-5 mb-4">
@@ -334,13 +363,25 @@ function CheckoutContent({ params }: Props) {
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  disabled
-                  className="w-full bg-neutral-300 text-white font-semibold py-3 rounded-lg cursor-not-allowed text-sm"
-                >
-                  {t.checkout.notYetAvailable}
-                </button>
+                {!paymentSucceeded && pricing?.available && paymentOptions && property.guesty_listing_id && (
+                  <StripeCheckoutForm
+                    lang={lang}
+                    disabled={!guestName || !guestEmail}
+                    booking={{
+                      amountGbp: amountDueToday,
+                      propertyId: id,
+                      guestyListingId: property.guesty_listing_id,
+                      checkIn,
+                      checkOut,
+                      paymentChoice,
+                      guestName,
+                      guestEmail,
+                      guestPhone,
+                      totalPrice: pricing.totalPrice,
+                    }}
+                    onSuccess={() => setPaymentSucceeded(true)}
+                  />
+                )}
 
                 <p className="text-xs text-dark/40 mt-4 leading-relaxed">{t.checkout.contactToBookNote}</p>
 
