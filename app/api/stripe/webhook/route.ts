@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { stripeServer, stripeConfigured } from '@/lib/stripe-server'
-import { createGuestyReservation } from '@/lib/guesty-server'
+import { createGuestyReservation, registerGuestyPayment } from '@/lib/guesty-server'
 
 // BETA — internal testing only. This is the ONLY place a Guesty reservation
 // is ever created from the beta checkout: server-side, only after Stripe
@@ -67,6 +67,28 @@ export async function POST(req: NextRequest) {
       reservation.id,
       reservation.confirmationCode,
     )
+
+    try {
+      // amount_received is in pence (Stripe minor units for GBP) — Guesty
+      // expects major currency units.
+      await registerGuestyPayment({
+        reservationId: reservation.id,
+        amount: paymentIntent.amount_received / 100,
+        note: `Stripe PaymentIntent ${paymentIntent.id}`,
+      })
+      console.log('[POST /api/stripe/webhook] BETA payment registered in Guesty', reservation.id)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      // The reservation itself was created successfully — a failure here
+      // means it exists in Guesty but is still tagged "Not paid" and the
+      // paid-gated automation won't fire, which needs a human to notice
+      // and register the payment manually. Logged loudly, not swallowed.
+      console.error('[POST /api/stripe/webhook] GUESTY PAYMENT REGISTRATION FAILED after reservation was created', {
+        reservationId: reservation.id,
+        paymentIntentId: paymentIntent.id,
+        error: message,
+      })
+    }
 
     return NextResponse.json({ received: true, reservationId: reservation.id })
   } catch (err) {

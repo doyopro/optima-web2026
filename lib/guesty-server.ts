@@ -282,3 +282,48 @@ export async function createGuestyReservation(
     status: data.status as string,
   }
 }
+
+export interface RegisterPaymentInput {
+  reservationId: string
+  // Major currency units (e.g. GBP pounds, not pence) — convert from
+  // Stripe's PaymentIntent.amount_received (minor units) before calling.
+  amount: number
+  note?: string
+}
+
+/**
+ * Records an already-collected external payment against an existing
+ * reservation (POST /v1/reservations/{id}/payments), confirmed via
+ * Guesty's Open API docs — "Recording an External Guest Payment/Refund"
+ * (https://open-api-docs.guesty.com/docs/recording-external-guest-payments).
+ *
+ * This is a separate step from createGuestyReservation: creating a
+ * reservation does NOT register a payment against it in Guesty's data
+ * model, so without this call the reservation sits tagged "Not paid" and
+ * payment-gated automations (e.g. this account's "Booking (Direct)" guest
+ * messages) never fire even though the guest was actually charged via
+ * Stripe.
+ *
+ * paymentMethod.method is one of Guesty's "record external payment" enum
+ * values (RECORDED_CASH, BANK_TRANSFER, CHECK, CREDIT, CREDIT_NOTE, DEBIT,
+ * ECHECK, VOUCHER, OTHER) — confirmed these, not "STRIPE", are the valid
+ * values here; "STRIPE" only applies to Guesty's own integrated payment
+ * processor flow, which this beta doesn't use. CREDIT is the closest
+ * semantic match for a card payment collected outside Guesty.
+ */
+export async function registerGuestyPayment(input: RegisterPaymentInput): Promise<void> {
+  const res = await guestyFetch(`/reservations/${input.reservationId}/payments`, {
+    method: 'POST',
+    body: JSON.stringify({
+      paymentMethod: { method: 'CREDIT' },
+      amount: input.amount,
+      paidAt: new Date().toISOString(),
+      note: input.note,
+    }),
+  })
+
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(`Guesty payment registration failed: ${res.status} — ${body}`)
+  }
+}
