@@ -9,7 +9,6 @@ export const translations = {
       blog: 'Blog',
       manageBooking: 'Manage your booking',
       back: 'Back',
-      callForEnquiries: 'Call for enquiries 9am–5pm',
       wishlist: 'Wishlist',
     },
     hero: {
@@ -518,7 +517,6 @@ export const translations = {
       blog: 'Blog',
       manageBooking: 'Gestiona tu reserva',
       back: 'Atrás',
-      callForEnquiries: 'Llámanos de 9:00 a 17:00h',
       wishlist: 'Favoritos',
     },
     hero: {

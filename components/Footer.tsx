@@ -80,16 +80,19 @@ export default function Footer({ lang }: Props) {
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <a href={`tel:${f.phone.replace(/\s/g, '')}`} className="hover:text-orange transition-colors">
-                  {f.phone}
-                </a>
-              </li>
-              <li>
                 <a href={`mailto:${f.email}`} className="hover:text-orange transition-colors">
                   {f.email}
                 </a>
               </li>
               <li className="text-neutral-400">{f.address}</li>
+              <li>
+                <a
+                  href={`tel:${f.phone.replace(/\s/g, '')}`}
+                  className="text-xs text-neutral-500 hover:text-orange transition-colors"
+                >
+                  {f.phone}
+                </a>
+              </li>
             </ul>
           </div>
         </div>

@@ -29,19 +29,12 @@ export default function Header() {
     <header className="w-full">
       {/* Top bar */}
       <div className="bg-neutral-100 text-dark/70 text-xs sm:text-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center px-4 py-2 sm:px-6">
           <nav className="flex items-center gap-3">
             <Link href="/manage-booking" className="hover:text-orange transition-colors">
               {nav.manageBooking}
             </Link>
           </nav>
-          <p className="hidden items-center gap-2 sm:flex">
-            <span>{nav.callForEnquiries}</span>
-            <PhoneIcon className="h-4 w-4 text-orange" />
-            <a href="tel:+442034111999" className="font-semibold text-dark hover:text-orange transition-colors">
-              +44 (0)20 34 111 999
-            </a>
-          </p>
         </div>
       </div>
 
@@ -217,14 +210,6 @@ export default function Header() {
         </div>
       )}
     </header>
-  )
-}
-
-function PhoneIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M6.62 10.79a15.53 15.53 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.24 1.02l-2.2 2.2Z" />
-    </svg>
   )
 }
 
