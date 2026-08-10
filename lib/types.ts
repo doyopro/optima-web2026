@@ -28,6 +28,7 @@ export type Property = {
   is_featured: boolean
   slug: string
   owner_name?: string | null
+  is_tina_partner?: boolean
 }
 
 export type BlogPost = {

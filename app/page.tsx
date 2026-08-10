@@ -17,8 +17,15 @@ import { type Property } from '@/lib/types'
 
 // Curated picks for the homepage — chosen deliberately, not derived from
 // is_featured (every property currently has that flag set to true).
+// Featured Villas is a brand/trust surface: only genuine Optima-owned
+// properties belong here, never Tina/SunBeach partner-managed ones (unlike
+// /villas, which lists partner properties too, just demoted to the end —
+// guests can still book them there). Villa Valhalla was previously listed
+// here despite is_tina_partner = true; swapped for Casa Amorosa. The
+// is_tina_partner filter below is a second, defensive line against this
+// list ever including a partner property again.
 const FEATURED_PROPERTY_IDS = [
-  '252fd3ee-bef2-41b2-b55a-d30a4e55efd8', // Villa Valhalla
+  '03fd7cce-a54d-422c-a07e-3a21d9027ceb', // Casa Amorosa
   'bbaf4612-dead-4449-9853-5a438068af65', // Casa Piscina
   '0e7b2121-21fd-4e05-aa2e-4538e6083e5b', // Casa Azul
 ]
@@ -38,9 +45,9 @@ export default function Home() {
 
         const data = await response.json()
         const byId = new Map((data.properties as Property[]).map((p) => [p.id, p]))
-        const featuredProperties = FEATURED_PROPERTY_IDS.map((id) => byId.get(id)).filter(
-          (p): p is Property => Boolean(p),
-        )
+        const featuredProperties = FEATURED_PROPERTY_IDS.map((id) => byId.get(id))
+          .filter((p): p is Property => Boolean(p))
+          .filter((p) => !p.is_tina_partner)
 
         setFeatured(featuredProperties)
       } catch (error) {

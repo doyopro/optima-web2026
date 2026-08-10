@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await supabaseServer
       .from('properties')
       .select(
-        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp, owner_name',
+        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp, owner_name, is_tina_partner',
       )
       .eq('status', 'active')
 
@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
         is_featured: true,
         slug: row.id,
         owner_name: row.owner_name ?? null,
+        is_tina_partner: row.is_tina_partner ?? false,
       }
     })
 
