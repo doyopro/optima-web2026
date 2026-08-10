@@ -9,6 +9,7 @@ export const translations = {
       blog: 'Blog',
       manageBooking: 'Manage your booking',
       back: 'Back',
+      callForEnquiries: 'Call for enquiries 9am–5pm',
       wishlist: 'Wishlist',
     },
     hero: {
@@ -474,6 +475,7 @@ export const translations = {
         terms: 'Terms & Conditions',
       },
       phone: '+44 (0)20 34 111 999',
+      phoneCountryLabel: '(UK)',
       email: 'info@optimavillas.com',
       address: 'Lanzarote, Canary Islands, Spain',
       copyright: 'Optima Villas. All rights reserved.',
@@ -517,6 +519,7 @@ export const translations = {
       blog: 'Blog',
       manageBooking: 'Gestiona tu reserva',
       back: 'Atrás',
+      callForEnquiries: 'Llámanos de 9:00 a 17:00h',
       wishlist: 'Favoritos',
     },
     hero: {
@@ -982,6 +985,7 @@ export const translations = {
         terms: 'Términos y condiciones',
       },
       phone: '+44 (0)20 34 111 999',
+      phoneCountryLabel: '(Reino Unido)',
       email: 'info@optimavillas.com',
       address: 'Lanzarote, Islas Canarias, España',
       copyright: 'Optima Villas. Todos los derechos reservados.',

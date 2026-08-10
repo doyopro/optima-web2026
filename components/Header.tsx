@@ -29,12 +29,15 @@ export default function Header() {
     <header className="w-full">
       {/* Top bar */}
       <div className="bg-neutral-100 text-dark/70 text-xs sm:text-sm">
-        <div className="mx-auto flex max-w-7xl items-center px-4 py-2 sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6">
           <nav className="flex items-center gap-3">
             <Link href="/manage-booking" className="hover:text-orange transition-colors">
               {nav.manageBooking}
             </Link>
           </nav>
+          <p className="hidden items-center gap-2 sm:flex">
+            <span>{nav.callForEnquiries}</span>
+          </p>
         </div>
       </div>
 
