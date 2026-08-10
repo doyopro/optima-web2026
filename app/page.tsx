@@ -65,7 +65,7 @@ export default function Home() {
       {/* --- HERO SECTION --- */}
       <section className="relative flex h-[75vh] min-h-[600px] items-center justify-center overflow-hidden">
         <Image
-          src="/portada2.jpg"
+          src="/portada3.jpg"
           alt="Optima Villas — Lanzarote landscapes and our villas"
           fill
           priority
