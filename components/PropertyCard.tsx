@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { type Language, translations } from '@/lib/i18n'
 import { type Property } from '@/lib/types'
+import { useCurrency } from '@/lib/CurrencyContext'
+import { formatPrice } from '@/lib/currency'
 
 interface Props {
   property: Property
@@ -16,6 +18,7 @@ const SWIPE_THRESHOLD_PX = 40
 
 export default function PropertyCard({ property, lang }: Props) {
   const t = translations[lang].properties
+  const { currency, gbpToEurRate } = useCurrency()
   const bedroomsLabel = property.bedrooms === 1 ? t.bedroom : t.bedrooms
   const bathroomsLabel = property.bathrooms === 1 ? t.bathroom : t.bathrooms
   const description = (lang === 'es' && property.description_es) || property.description || ''
@@ -96,7 +99,7 @@ export default function PropertyCard({ property, lang }: Props) {
           {/* Price badge */}
           <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-bold text-dark shadow">
             <span className="text-xs font-normal text-dark/60">{t.fromPrice} </span>
-            £{property.price_per_night_gbp}
+            {formatPrice(property.price_per_night_gbp, currency, gbpToEurRate)}
             <span className="text-xs font-normal text-dark/60"> {t.perNight}</span>
           </div>
         </div>

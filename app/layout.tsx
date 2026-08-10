@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Header from "@/components/Header";
 import { LanguageProvider } from "@/lib/LanguageContext";
+import { CurrencyProvider } from "@/lib/CurrencyContext";
 import { fetchSiteContentRows } from "@/lib/content-server";
 import "./globals.css";
 
@@ -36,8 +37,10 @@ export default async function RootLayout({
     <html lang="es" className={`${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
         <LanguageProvider initialContentRows={contentRows}>
-          <Header />
-          {children}
+          <CurrencyProvider>
+            <Header />
+            {children}
+          </CurrencyProvider>
         </LanguageProvider>
         <Analytics />
       </body>

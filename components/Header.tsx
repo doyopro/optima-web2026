@@ -5,9 +5,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
+import { useCurrency } from '@/lib/CurrencyContext'
 
 export default function Header() {
   const { lang, setLang } = useLanguage()
+  const { currency, setCurrency } = useCurrency()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const nav = translations[lang].nav
@@ -66,26 +68,49 @@ export default function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            {/* Lang toggle — desktop only, folded into the mobile menu below md */}
-            <div className="hidden md:flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setLang('en')}
-                className={`px-3 py-1.5 transition-colors ${
-                  lang === 'en' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
-                }`}
-              >
-                EN
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang('es')}
-                className={`px-3 py-1.5 transition-colors ${
-                  lang === 'es' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
-                }`}
-              >
-                ES
-              </button>
+            {/* Lang + currency toggles — desktop only, folded into the mobile menu below md */}
+            <div className="hidden md:flex items-center gap-2">
+              <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setLang('en')}
+                  className={`px-3 py-1.5 transition-colors ${
+                    lang === 'en' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
+                  }`}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLang('es')}
+                  className={`px-3 py-1.5 transition-colors ${
+                    lang === 'es' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
+                  }`}
+                >
+                  ES
+                </button>
+              </div>
+
+              <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setCurrency('GBP')}
+                  className={`px-3 py-1.5 transition-colors ${
+                    currency === 'GBP' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
+                  }`}
+                >
+                  GBP
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrency('EUR')}
+                  className={`px-3 py-1.5 transition-colors ${
+                    currency === 'EUR' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
+                  }`}
+                >
+                  EUR
+                </button>
+              </div>
             </div>
 
             <button
@@ -145,7 +170,7 @@ export default function Header() {
               ))}
             </nav>
 
-            <div className="px-5 py-4 mt-auto border-t border-neutral-200 space-y-4">
+            <div className="px-5 py-4 mt-auto border-t border-neutral-200 space-y-3">
               <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden w-fit">
                 <button
                   type="button"
@@ -164,6 +189,27 @@ export default function Header() {
                   }`}
                 >
                   ES
+                </button>
+              </div>
+
+              <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden w-fit">
+                <button
+                  type="button"
+                  onClick={() => setCurrency('GBP')}
+                  className={`px-4 py-2 transition-colors ${
+                    currency === 'GBP' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
+                  }`}
+                >
+                  GBP
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrency('EUR')}
+                  className={`px-4 py-2 transition-colors ${
+                    currency === 'EUR' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
+                  }`}
+                >
+                  EUR
                 </button>
               </div>
             </div>

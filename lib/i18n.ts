@@ -382,6 +382,8 @@ export const translations = {
       contactToBookNote: 'In the meantime, you can complete this booking via our secure booking partner or by contacting us directly.',
       goToGuesty: 'Book via our booking partner',
       contactUs: 'Contact us',
+      eurEstimate: '≈ €{amount} estimated',
+      eurEstimateDisclaimer: "Estimated in EUR for reference — you'll be charged £{amount} exactly.",
     },
     confirmation: {
       title: 'Booking confirmed!',
@@ -889,6 +891,8 @@ export const translations = {
       contactToBookNote: 'Mientras tanto, puedes completar esta reserva a través de nuestro partner de reservas seguro o contactándonos directamente.',
       goToGuesty: 'Reservar con nuestro partner de reservas',
       contactUs: 'Contáctanos',
+      eurEstimate: '≈ €{amount} estimado',
+      eurEstimateDisclaimer: 'Estimado en EUR como referencia — se te cobrarán £{amount} exactamente.',
     },
     confirmation: {
       title: '¡Reserva confirmada!',

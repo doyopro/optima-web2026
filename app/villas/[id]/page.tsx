@@ -9,6 +9,8 @@ import { Check } from 'lucide-react'
 import { Toaster } from 'react-hot-toast'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
+import { useCurrency } from '@/lib/CurrencyContext'
+import { formatPrice } from '@/lib/currency'
 import { type Property } from '@/lib/types'
 import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
 import { filterDifferentiatorAmenities, parseHighlights } from '@/lib/property'
@@ -41,6 +43,7 @@ export default function VillaDetailPage({ params }: Props) {
   const router = useRouter()
 
   const { lang } = useLanguage()
+  const { currency, gbpToEurRate } = useCurrency()
   const [property, setProperty] = useState<Property | null>(null)
   const [loading, setLoading] = useState(true)
   const [imgIdx, setImgIdx] = useState(0)
@@ -395,7 +398,7 @@ export default function VillaDetailPage({ params }: Props) {
               <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
                 <div className="flex items-baseline gap-1.5 mb-6">
                   <span className="text-dark/50 text-sm">{t.properties.fromPrice}</span>
-                  <span className="text-3xl font-bold text-dark">£{property.price_per_night_gbp}</span>
+                  <span className="text-3xl font-bold text-dark">{formatPrice(property.price_per_night_gbp, currency, gbpToEurRate)}</span>
                   <span className="text-dark/50 text-sm">{t.properties.perNight}</span>
                 </div>
 
@@ -458,7 +461,7 @@ export default function VillaDetailPage({ params }: Props) {
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-neutral-200 px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] flex items-center justify-between gap-4">
         <div>
           <span className="text-dark/50 text-xs">{t.properties.fromPrice} </span>
-          <span className="text-lg font-bold text-dark">£{property.price_per_night_gbp}</span>
+          <span className="text-lg font-bold text-dark">{formatPrice(property.price_per_night_gbp, currency, gbpToEurRate)}</span>
           <span className="text-dark/50 text-xs"> {t.properties.perNight}</span>
         </div>
         <button

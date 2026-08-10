@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Toaster } from 'react-hot-toast'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
+import { useCurrency } from '@/lib/CurrencyContext'
+import { convertFromGbp } from '@/lib/currency'
 import { type Property } from '@/lib/types'
 import { getGuestyPropertyUrl } from '@/lib/guesty'
 import { getPaymentOptions } from '@/lib/booking'
@@ -40,11 +42,34 @@ function formatDate(dateStr: string, lang: string): string {
   })
 }
 
+// Checkout always shows GBP as the real, authoritative amount — that's what
+// Stripe actually charges, unchanged. When the site's currency toggle is
+// set to EUR, this renders a clearly-labeled estimate alongside it; when
+// it's GBP, this renders nothing.
+function EurEstimate({
+  amountGbp,
+  currency,
+  gbpToEurRate,
+  label,
+  className,
+}: {
+  amountGbp: number
+  currency: 'GBP' | 'EUR'
+  gbpToEurRate: number
+  label: string
+  className?: string
+}) {
+  if (currency !== 'EUR') return null
+  const eurAmount = Math.round(convertFromGbp(amountGbp, 'EUR', gbpToEurRate))
+  return <p className={className}>{label.replace('{amount}', String(eurAmount))}</p>
+}
+
 function CheckoutContent({ params }: Props) {
   const { id } = use(params)
   const router = useRouter()
   const searchParams = useSearchParams()
   const { lang } = useLanguage()
+  const { currency, gbpToEurRate } = useCurrency()
 
   const initialCheckIn = searchParams.get('from') ?? ''
   const initialCheckOut = searchParams.get('to') ?? ''
@@ -264,6 +289,13 @@ function CheckoutContent({ params }: Props) {
                       <span>{t.checkout.totalPrice}</span>
                       <span>£{pricing.totalPrice.toFixed(0)}</span>
                     </div>
+                    <EurEstimate
+                      amountGbp={pricing.totalPrice}
+                      currency={currency}
+                      gbpToEurRate={gbpToEurRate}
+                      label={t.checkout.eurEstimate}
+                      className="text-right text-xs text-dark/40"
+                    />
                   </div>
                 )}
               </div>
@@ -293,6 +325,13 @@ function CheckoutContent({ params }: Props) {
                             <span className="font-semibold text-dark">{t.checkout.payDeposit}</span>
                             <span className="font-bold text-dark">£{paymentOptions.depositAmount.toFixed(0)}</span>
                           </div>
+                          <EurEstimate
+                            amountGbp={paymentOptions.depositAmount}
+                            currency={currency}
+                            gbpToEurRate={gbpToEurRate}
+                            label={t.checkout.eurEstimate}
+                            className="text-right text-xs text-dark/40"
+                          />
                           <p className="text-xs text-dark/50 mt-1">{t.checkout.payDepositDesc}</p>
                           {paymentOptions.balanceDueDate && (
                             <p className="text-xs text-dark/50 mt-1">
@@ -319,6 +358,13 @@ function CheckoutContent({ params }: Props) {
                           <span className="font-semibold text-dark">{t.checkout.payInFull}</span>
                           <span className="font-bold text-dark">£{paymentOptions.fullAmount.toFixed(0)}</span>
                         </div>
+                        <EurEstimate
+                          amountGbp={paymentOptions.fullAmount}
+                          currency={currency}
+                          gbpToEurRate={gbpToEurRate}
+                          label={t.checkout.eurEstimate}
+                          className="text-right text-xs text-dark/40"
+                        />
                         <p className="text-xs text-dark/50 mt-1">{t.checkout.payInFullDesc}</p>
                       </div>
                     </label>
@@ -388,9 +434,24 @@ function CheckoutContent({ params }: Props) {
                 )}
 
                 {pricing?.available && paymentOptions && !stayTooShort && (
-                  <div className="flex items-baseline justify-between mt-5 mb-4">
-                    <span className="text-sm text-dark/60">{t.checkout.amountToPay}</span>
-                    <span className="text-2xl font-bold text-dark">£{amountDueToday.toFixed(0)}</span>
+                  <div className="mt-5 mb-4">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-sm text-dark/60">{t.checkout.amountToPay}</span>
+                      <span className="text-2xl font-bold text-dark">£{amountDueToday.toFixed(0)}</span>
+                    </div>
+                    {currency === 'EUR' && (
+                      <>
+                        <p className="text-right text-sm text-dark/40">
+                          {t.checkout.eurEstimate.replace(
+                            '{amount}',
+                            String(Math.round(convertFromGbp(amountDueToday, 'EUR', gbpToEurRate))),
+                          )}
+                        </p>
+                        <p className="text-xs text-dark/50 mt-2 leading-relaxed">
+                          {t.checkout.eurEstimateDisclaimer.replace('{amount}', amountDueToday.toFixed(0))}
+                        </p>
+                      </>
+                    )}
                   </div>
                 )}
 
