@@ -50,7 +50,7 @@ export default function Testimonials({ lang }: Props) {
   }
 
   return (
-    <section className="py-16 md:py-24 px-4 sm:px-6">
+    <section className="py-16 md:py-24 px-4 sm:px-6 bg-[#F5F5F5]">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 max-w-xl">
           <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">{t.title}</h2>

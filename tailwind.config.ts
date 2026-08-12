@@ -9,7 +9,7 @@ const config: Config = {
     extend: {
       colors: {
         orange: "#E26620", // botones principales, CTAs
-        blue: "#1CAFE6", // acentos
+        blue: "#7AB3E4", // acentos — sampled directly from logooptima.png's blue stroke
         yellow: "#FFE734", // review cards
         green: "#BCD133", // review cards
         cream: "#FDF5F0", // background general

@@ -27,26 +27,14 @@ export default function Header() {
 
   return (
     <header className="w-full">
-      {/* Top bar */}
-      <div className="bg-neutral-100 text-dark/70 text-xs sm:text-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6">
-          <nav className="flex items-center gap-3">
-            <Link href="/manage-booking" className="hover:text-orange transition-colors">
-              {nav.manageBooking}
-            </Link>
-          </nav>
-          <p className="hidden items-center gap-2 sm:flex">
-            <span>{nav.callForEnquiries}</span>
-          </p>
-        </div>
-      </div>
-
-      {/* Main header */}
+      {/* Main header — no top bar above it anymore (moved "Manage your
+          booking" to the footer), so this is the very top of the page:
+          white from edge to edge, with more breathing room than before. */}
       <div className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-5 sm:px-6">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <Image src="/logooptima.png" alt="Optima Villas" width={145} height={44} priority />
+            <Image src="/logooptima.png" alt="Optima Villas" width={180} height={55} priority />
           </Link>
 
           {/* Nav */}
@@ -55,7 +43,7 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-dark hover:text-orange transition-colors"
+                className="text-sm font-bold text-dark hover:text-orange transition-colors"
               >
                 {item.label}
               </Link>
@@ -65,7 +53,7 @@ export default function Header() {
           {/* Actions */}
           <div className="flex items-center gap-3">
             {/* Lang + currency toggles — desktop only, folded into the mobile menu below md */}
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-3">
               <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
                 <button
                   type="button"
@@ -87,25 +75,30 @@ export default function Header() {
                 </button>
               </div>
 
-              <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setCurrency('GBP')}
-                  className={`px-3 py-1.5 transition-colors ${
-                    currency === 'GBP' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
-                  }`}
-                >
-                  GBP
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrency('EUR')}
-                  className={`px-3 py-1.5 transition-colors ${
-                    currency === 'EUR' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
-                  }`}
-                >
-                  EUR
-                </button>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-dark/60">{nav.currency}</span>
+                <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setCurrency('GBP')}
+                    aria-label="GBP"
+                    className={`px-3 py-1.5 transition-colors ${
+                      currency === 'GBP' ? 'bg-blue text-white' : 'text-dark hover:bg-neutral-100'
+                    }`}
+                  >
+                    £
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrency('EUR')}
+                    aria-label="EUR"
+                    className={`px-3 py-1.5 transition-colors ${
+                      currency === 'EUR' ? 'bg-blue text-white' : 'text-dark hover:bg-neutral-100'
+                    }`}
+                  >
+                    €
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -142,7 +135,7 @@ export default function Header() {
           />
           <div className="absolute inset-y-0 right-0 w-full max-w-xs bg-white shadow-xl flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-200">
-              <Image src="/logooptima.png" alt="Optima Villas" width={110} height={33} />
+              <Image src="/logooptima.png" alt="Optima Villas" width={130} height={40} />
               <button
                 type="button"
                 onClick={closeMobileMenu}
@@ -159,7 +152,7 @@ export default function Header() {
                   key={item.href}
                   href={item.href}
                   onClick={closeMobileMenu}
-                  className="text-base font-medium text-dark hover:text-orange transition-colors py-3 border-b border-neutral-100"
+                  className="text-base font-bold text-dark hover:text-orange transition-colors py-3 border-b border-neutral-100"
                 >
                   {item.label}
                 </Link>
@@ -188,25 +181,30 @@ export default function Header() {
                 </button>
               </div>
 
-              <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden w-fit">
-                <button
-                  type="button"
-                  onClick={() => setCurrency('GBP')}
-                  className={`px-4 py-2 transition-colors ${
-                    currency === 'GBP' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
-                  }`}
-                >
-                  GBP
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrency('EUR')}
-                  className={`px-4 py-2 transition-colors ${
-                    currency === 'EUR' ? 'bg-orange text-white' : 'text-dark hover:bg-neutral-100'
-                  }`}
-                >
-                  EUR
-                </button>
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-dark/60">{nav.currency}</span>
+                <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden w-fit">
+                  <button
+                    type="button"
+                    onClick={() => setCurrency('GBP')}
+                    aria-label="GBP"
+                    className={`px-4 py-2 transition-colors ${
+                      currency === 'GBP' ? 'bg-blue text-white' : 'text-dark hover:bg-neutral-100'
+                    }`}
+                  >
+                    £
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrency('EUR')}
+                    aria-label="EUR"
+                    className={`px-4 py-2 transition-colors ${
+                      currency === 'EUR' ? 'bg-blue text-white' : 'text-dark hover:bg-neutral-100'
+                    }`}
+                  >
+                    €
+                  </button>
+                </div>
               </div>
             </div>
           </div>

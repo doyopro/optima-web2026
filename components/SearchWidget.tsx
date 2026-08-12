@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { Calendar } from 'lucide-react'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import DateRangePicker from '@/components/DateRangePicker'
@@ -93,29 +94,38 @@ export default function SearchWidget() {
   }
 
   return (
-    <div className="rounded-md bg-white shadow-md border border-neutral-200 p-4 sm:p-6">
-      <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 divide-y md:divide-y-0 md:divide-x divide-neutral-200">
+    <div className="rounded-md bg-white/85 backdrop-blur-md shadow-md border border-white/50 p-2 sm:p-2.5">
+      <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 divide-y md:divide-y-0 md:divide-x divide-neutral-200/70">
 
-        {/* DATES */}
+        {/* DATES — label always shown; only the value slot swaps between a
+            light gray dd/mm/yyyy placeholder and the picked date once set
+            (the "Add dates" wording was the only thing to remove, not the
+            labels). */}
         <div className="relative flex w-full md:w-auto flex-1 gap-4" ref={dateDropdownRef}>
           <button
             type="button"
             onClick={() => setIsDateOpen(!isDateOpen)}
-            className="flex w-full flex-col gap-1.5 text-left"
+            className="flex w-full items-center gap-2 text-left py-1.5"
           >
-            <span className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.from}</span>
-            <span className="text-sm text-dark font-medium">
-              {fromDate ? formatShortDate(fromDate, lang) : t.addDates}
+            <Calendar className="h-5 w-5 text-dark/50 shrink-0" aria-hidden="true" />
+            <span className="flex flex-col gap-0.5">
+              <span className="text-[10px] font-bold uppercase tracking-wide text-dark/60">{t.from}</span>
+              <span className={`text-sm font-medium ${fromDate ? 'text-dark' : 'text-dark/35'}`}>
+                {fromDate ? formatShortDate(fromDate, lang) : t.addDates}
+              </span>
             </span>
           </button>
           <button
             type="button"
             onClick={() => setIsDateOpen(!isDateOpen)}
-            className="flex w-full flex-col gap-1.5 text-left"
+            className="flex w-full items-center gap-2 text-left py-1.5"
           >
-            <span className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.to}</span>
-            <span className="text-sm text-dark font-medium">
-              {toDate ? formatShortDate(toDate, lang) : t.addDates}
+            <Calendar className="h-5 w-5 text-dark/50 shrink-0" aria-hidden="true" />
+            <span className="flex flex-col gap-0.5">
+              <span className="text-[10px] font-bold uppercase tracking-wide text-dark/60">{t.to}</span>
+              <span className={`text-sm font-medium ${toDate ? 'text-dark' : 'text-dark/35'}`}>
+                {toDate ? formatShortDate(toDate, lang) : t.addDates}
+              </span>
             </span>
           </button>
 
@@ -134,7 +144,7 @@ export default function SearchWidget() {
 
         {/* GUESTS POPOVER */}
         <div
-          className="relative flex w-full md:w-auto flex-1 flex-col gap-1.5 pt-4 md:pt-0 md:pl-6"
+          className="relative flex w-full md:w-auto flex-1 flex-col gap-1.5 pt-2 md:pt-0 md:pl-6"
           ref={guestDropdownRef}
         >
           <label className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.guests}</label>
@@ -219,7 +229,7 @@ export default function SearchWidget() {
         </div>
 
         {/* VILLA SELECT */}
-        <div className="flex w-full md:w-auto flex-1 flex-col gap-1.5 pt-4 md:pt-0 md:pl-6">
+        <div className="flex w-full md:w-auto flex-1 flex-col gap-1.5 pt-2 md:pt-0 md:pl-6">
           <label className="text-xs font-bold uppercase tracking-wide text-dark/70">
             {t.villaOptional}
           </label>
@@ -239,11 +249,11 @@ export default function SearchWidget() {
         </div>
 
         {/* SEARCH BUTTON */}
-        <div className="w-full md:w-auto pt-4 md:pt-0 md:pl-4 flex items-end">
+        <div className="w-full md:w-auto pt-2 md:pt-0 md:pl-4 flex items-end">
           <button
             type="button"
             onClick={handleSearch}
-            className="w-full md:w-32 rounded-md bg-orange px-6 py-3.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-orange/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange/50 active:scale-95"
+            className="w-full md:w-40 rounded-md bg-blue px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-blue/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue/50 active:scale-95"
           >
             {t.search}
           </button>

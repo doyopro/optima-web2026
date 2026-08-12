@@ -1,4 +1,5 @@
 import { type Language, translations } from '@/lib/i18n'
+import { TRUSTPILOT_REVIEW_COUNT } from '@/lib/marketing'
 
 interface Props {
   lang: Language
@@ -73,7 +74,7 @@ export default function ReviewBadges({ lang }: Props) {
       name: 'Trustpilot',
       rating: '4.6',
       sub: t.trustScore,
-      count: `615 ${t.reviews}`,
+      count: `${TRUSTPILOT_REVIEW_COUNT} ${t.reviews}`,
       stars: <Stars color="#00b67a" />,
     },
     {

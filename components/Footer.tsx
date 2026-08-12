@@ -59,6 +59,7 @@ export default function Footer({ lang }: Props) {
               <li><Link href="/villas" className="hover:text-orange transition-colors">{f.links.villas}</Link></li>
               <li><Link href="/owners" className="hover:text-orange transition-colors">{f.links.owners}</Link></li>
               <li><Link href="/blog" className="hover:text-orange transition-colors">{f.links.blog}</Link></li>
+              <li><Link href="/manage-booking" className="hover:text-orange transition-colors">{f.links.manageBooking}</Link></li>
             </ul>
           </div>
 

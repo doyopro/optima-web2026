@@ -7,41 +7,44 @@ export const translations = {
       villas: 'Villas',
       owners: 'Owners',
       blog: 'Blog',
-      manageBooking: 'Manage your booking',
       back: 'Back',
-      callForEnquiries: 'Call for enquiries 9am–5pm',
       wishlist: 'Wishlist',
+      currency: 'Currency',
     },
     hero: {
-      title: 'Your Holiday Villa in Lanzarote',
-      subtitle:
-        'Discover exceptional villas with private pools, stunning views, and personalised service.',
+      title: 'YOUR VILLA. YOUR LANZAROTE.',
+      subtitle: 'Handpicked holiday villas with personalised service.',
     },
     home: {
-      whyChoose: 'Why Choose Optima Villas',
-      whyChooseSub: 'Trusted by thousands of families for premium villa holidays in Lanzarote.',
       featuredError: 'We could not load the featured properties at this time.',
       featuredEmpty: 'No featured properties available right now.',
-      metrics: [
-        {
-          value: '98%',
-          label: 'Customer Loyalty',
-          description:
-            'Our guests consistently choose to return to Optima Villas for their Lanzarote holidays, trusting our premium standards year after year.',
+      optimaDifference: {
+        title: 'The Optima Difference',
+        items: [
+          {
+            title: 'HANDPICKED VILLAS',
+            description:
+              'Every property is personally selected and inspected by our team, so you always know exactly what to expect.',
+          },
+          {
+            title: 'LOCAL EXPERTISE',
+            description:
+              'Based in Lanzarote for over 20 years, we know the island inside out — from hidden beaches to the best local recommendations.',
+          },
+          {
+            title: 'PERSONALISED SERVICE',
+            description:
+              'A dedicated local team is on hand throughout your stay, from booking to check-out, whenever you need us.',
+          },
+        ],
+        stats: {
+          experience: '20+ years local experience',
+          reviews: '{count}+ 5★ reviews',
+          localTeam: 'Local team in Lanzarote',
+          secureBooking: 'Secure direct booking',
+          happyStays: '10,000+ Happy Stays',
         },
-        {
-          value: '79',
-          label: 'Premium Properties',
-          description:
-            'A handpicked portfolio of luxury villas featuring private pools, stunning views, and prime locations across the island.',
-        },
-        {
-          value: '10,000+',
-          label: 'Happy Stays',
-          description:
-            'Over two decades of delivering seamless, high-end travel experiences and unforgettable family memories since 2003.',
-        },
-      ],
+      },
       discover: {
         title: 'Discover Lanzarote',
         text: "Lanzarote is the northernmost island in the Canaries, shaped by volcanic eruptions that gave it a landscape unlike anywhere else on earth — the work of both nature and the artist César Manrique, who dedicated his life to protecting the island from uncontrolled development. Enjoy more than 300 days of sunshine a year, with mild temperatures throughout winter (rarely dropping below 18°C) and dry summers without the humidity typical of other destinations. Volcanic sand beaches, vineyards grown in craters, and whitewashed villages by the sea — all just minutes from your villa.",
@@ -56,7 +59,7 @@ export const translations = {
       guests: 'Guests',
       villa: 'Villa',
       allVillas: 'All villas',
-      search: 'Search',
+      search: 'Search Villas',
       loading: 'Loading...',
       searching: 'Searching...',
       checkDates: 'Please select check-in and check-out dates.',
@@ -73,7 +76,7 @@ export const translations = {
       guestWordPlural: 'Guests',
       infantWord: 'Infant',
       infantWordPlural: 'Infants',
-      addDates: 'Add dates',
+      addDates: 'dd/mm/yyyy',
     },
     testimonials: {
       title: 'What our guests say',
@@ -83,7 +86,7 @@ export const translations = {
       seeLess: 'See less',
       previous: 'Previous',
       next: 'Next',
-      trustpilotCta: 'See more reviews on Trustpilot',
+      trustpilotCta: 'See more reviews',
     },
     reviewBadges: {
       trustScore: 'TrustScore',
@@ -471,6 +474,7 @@ export const translations = {
         villas: 'Villas',
         owners: 'Owners',
         blog: 'Blog',
+        manageBooking: 'Manage your booking',
         privacy: 'Privacy Policy',
         terms: 'Terms & Conditions',
       },
@@ -517,41 +521,44 @@ export const translations = {
       villas: 'Villas',
       owners: 'Propietarios',
       blog: 'Blog',
-      manageBooking: 'Gestiona tu reserva',
       back: 'Atrás',
-      callForEnquiries: 'Llámanos de 9:00 a 17:00h',
       wishlist: 'Favoritos',
+      currency: 'Moneda',
     },
     hero: {
-      title: 'Tu Villa de Vacaciones en Lanzarote',
-      subtitle:
-        'Descubre villas excepcionales con piscina privada, vistas espectaculares y servicio personalizado.',
+      title: 'TU VILLA. TU LANZAROTE.',
+      subtitle: 'Villas vacacionales seleccionadas y atención personalizada',
     },
     home: {
-      whyChoose: 'Por qué elegir Optima Villas',
-      whyChooseSub: 'La confianza de miles de familias para sus vacaciones en villas de Lanzarote.',
       featuredError: 'No hemos podido cargar las propiedades destacadas en este momento.',
       featuredEmpty: 'No hay propiedades destacadas disponibles ahora mismo.',
-      metrics: [
-        {
-          value: '98%',
-          label: 'Fidelidad de clientes',
-          description:
-            'Nuestros huéspedes eligen volver a Optima Villas para sus vacaciones en Lanzarote, confiando en nuestros estándares premium año tras año.',
+      optimaDifference: {
+        title: 'La Diferencia Optima',
+        items: [
+          {
+            title: 'VILLAS SELECCIONADAS CON ESMERO',
+            description:
+              'Cada propiedad es seleccionada e inspeccionada personalmente por nuestro equipo, así siempre sabés exactamente qué esperar.',
+          },
+          {
+            title: 'EXPERIENCIA LOCAL',
+            description:
+              'Con más de 20 años en Lanzarote, conocemos la isla a fondo — desde playas escondidas hasta las mejores recomendaciones locales.',
+          },
+          {
+            title: 'SERVICIO PERSONALIZADO',
+            description:
+              'Un equipo local dedicado te acompaña durante toda tu estancia, desde la reserva hasta el check-out, siempre que nos necesites.',
+          },
+        ],
+        stats: {
+          experience: '20+ años de experiencia local',
+          reviews: '{count}+ reseñas 5★',
+          localTeam: 'Equipo local en Lanzarote',
+          secureBooking: 'Reserva directa y segura',
+          happyStays: '10.000+ estancias felices',
         },
-        {
-          value: '79',
-          label: 'Propiedades Premium',
-          description:
-            'Una selección de villas de lujo con piscina privada, vistas espectaculares y ubicaciones privilegiadas en toda la isla.',
-        },
-        {
-          value: '10.000+',
-          label: 'Estancias felices',
-          description:
-            'Más de dos décadas ofreciendo experiencias de viaje impecables y recuerdos familiares inolvidables desde 2003.',
-        },
-      ],
+      },
       discover: {
         title: 'Descubre Lanzarote',
         text: 'Lanzarote es la isla más al norte de Canarias, moldeada por erupciones volcánicas que le dieron un paisaje único en el mundo — obra tanto de la naturaleza como del artista César Manrique, que dedicó su vida a proteger la isla de la construcción descontrolada. Disfruta de más de 300 días de sol al año, con temperaturas suaves durante todo el invierno (rara vez baja de 18°C) y veranos secos sin la humedad típica de otros destinos. Playas de arena volcánica, viñedos cultivados en cráteres, y pueblos blancos frente al mar — todo a pocos minutos de tu villa.',
@@ -566,7 +573,7 @@ export const translations = {
       guests: 'Huéspedes',
       villa: 'Villa',
       allVillas: 'Todas las villas',
-      search: 'Buscar',
+      search: 'Buscar Villas',
       loading: 'Cargando...',
       searching: 'Buscando...',
       checkDates: 'Por favor selecciona fechas de entrada y salida.',
@@ -583,7 +590,7 @@ export const translations = {
       guestWordPlural: 'Huéspedes',
       infantWord: 'Bebé',
       infantWordPlural: 'Bebés',
-      addDates: 'Añadir fechas',
+      addDates: 'dd/mm/aaaa',
     },
     testimonials: {
       title: 'Qué dicen nuestros huéspedes',
@@ -593,7 +600,7 @@ export const translations = {
       seeLess: 'Ver menos',
       previous: 'Anterior',
       next: 'Siguiente',
-      trustpilotCta: 'Ver más reseñas en Trustpilot',
+      trustpilotCta: 'Ver más reseñas',
     },
     reviewBadges: {
       trustScore: 'TrustScore',
@@ -981,6 +988,7 @@ export const translations = {
         villas: 'Villas',
         owners: 'Propietarios',
         blog: 'Blog',
+        manageBooking: 'Gestiona tu reserva',
         privacy: 'Política de privacidad',
         terms: 'Términos y condiciones',
       },
