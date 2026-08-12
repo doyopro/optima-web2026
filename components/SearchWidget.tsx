@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar } from 'lucide-react'
+import { Calendar, ChevronDown } from 'lucide-react'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import DateRangePicker from '@/components/DateRangePicker'
@@ -97,10 +97,9 @@ export default function SearchWidget() {
     <div className="rounded-md bg-white/85 backdrop-blur-md shadow-md border border-white/50 p-2 sm:p-2.5">
       <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 divide-y md:divide-y-0 md:divide-x divide-neutral-200/70">
 
-        {/* DATES — label always shown; only the value slot swaps between a
-            light gray dd/mm/yyyy placeholder and the picked date once set
-            (the "Add dates" wording was the only thing to remove, not the
-            labels). */}
+        {/* DATES — single line per field: label until a date is picked,
+            then the picked date replaces it entirely (no placeholder, no
+            duplicated text). */}
         <div className="relative flex w-full md:w-auto flex-1 gap-4" ref={dateDropdownRef}>
           <button
             type="button"
@@ -108,11 +107,8 @@ export default function SearchWidget() {
             className="flex w-full items-center gap-2 text-left py-1.5"
           >
             <Calendar className="h-5 w-5 text-dark/50 shrink-0" aria-hidden="true" />
-            <span className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-wide text-dark/60">{t.from}</span>
-              <span className={`text-sm font-medium ${fromDate ? 'text-dark' : 'text-dark/35'}`}>
-                {fromDate ? formatShortDate(fromDate, lang) : t.addDates}
-              </span>
+            <span className={`text-sm font-medium ${fromDate ? 'text-dark' : 'text-dark/70'}`}>
+              {fromDate ? formatShortDate(fromDate, lang) : t.from}
             </span>
           </button>
           <button
@@ -121,11 +117,8 @@ export default function SearchWidget() {
             className="flex w-full items-center gap-2 text-left py-1.5"
           >
             <Calendar className="h-5 w-5 text-dark/50 shrink-0" aria-hidden="true" />
-            <span className="flex flex-col gap-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-wide text-dark/60">{t.to}</span>
-              <span className={`text-sm font-medium ${toDate ? 'text-dark' : 'text-dark/35'}`}>
-                {toDate ? formatShortDate(toDate, lang) : t.addDates}
-              </span>
+            <span className={`text-sm font-medium ${toDate ? 'text-dark' : 'text-dark/70'}`}>
+              {toDate ? formatShortDate(toDate, lang) : t.to}
             </span>
           </button>
 
@@ -144,17 +137,19 @@ export default function SearchWidget() {
 
         {/* GUESTS POPOVER */}
         <div
-          className="relative flex w-full md:w-auto flex-1 flex-col gap-1.5 pt-2 md:pt-0 md:pl-6"
+          className="relative flex w-full md:w-auto flex-1 pt-2 md:pt-0 md:pl-6"
           ref={guestDropdownRef}
         >
-          <label className="text-xs font-bold uppercase tracking-wide text-dark/70">{t.guests}</label>
           <button
             type="button"
             onClick={() => setIsGuestOpen(!isGuestOpen)}
-            className="w-full text-left text-sm text-dark font-medium bg-transparent focus:outline-none flex justify-between items-center"
+            className="w-full text-left text-sm text-dark font-medium bg-transparent focus:outline-none flex items-center gap-2 py-1.5"
           >
             {guestLabel}
-            <span className={`text-xs transition-transform duration-200 ${isGuestOpen ? 'rotate-180' : ''}`}>▼</span>
+            <ChevronDown
+              className={`h-4 w-4 text-dark/50 shrink-0 transition-transform duration-200 ${isGuestOpen ? 'rotate-180' : ''}`}
+              aria-hidden="true"
+            />
           </button>
 
           {isGuestOpen && (
@@ -228,16 +223,13 @@ export default function SearchWidget() {
           )}
         </div>
 
-        {/* VILLA SELECT */}
-        <div className="flex w-full md:w-auto flex-1 flex-col gap-1.5 pt-2 md:pt-0 md:pl-6">
-          <label className="text-xs font-bold uppercase tracking-wide text-dark/70">
-            {t.villaOptional}
-          </label>
+        {/* VILLA SELECT — single line: value + chevron, no label above */}
+        <div className="relative flex w-full md:w-auto flex-1 pt-2 md:pt-0 md:pl-6">
           <select
             value={villaId}
             onChange={(e) => setVillaId(e.target.value)}
             disabled={loadingVillas}
-            className="w-full text-sm text-dark font-medium bg-transparent focus:outline-none cursor-pointer appearance-none disabled:opacity-50"
+            className="w-full text-sm text-dark font-medium bg-transparent focus:outline-none cursor-pointer appearance-none pr-6 py-1.5 disabled:opacity-50"
           >
             <option value="">{loadingVillas ? t.loading : t.selectProperty}</option>
             {villas.map((v) => (
@@ -246,6 +238,10 @@ export default function SearchWidget() {
               </option>
             ))}
           </select>
+          <ChevronDown
+            className="h-4 w-4 text-dark/50 shrink-0 pointer-events-none absolute right-0 top-1/2 -translate-y-1/2"
+            aria-hidden="true"
+          />
         </div>
 
         {/* SEARCH BUTTON */}

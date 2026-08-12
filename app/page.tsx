@@ -240,27 +240,28 @@ export default function Home() {
             })}
           </div>
 
-          {/* Simple stat row — 5 items, bigger than before, wraps to 2
-              tidy centered lines on narrow screens instead of squeezing. */}
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:gap-x-10 text-base font-medium text-dark/70">
-            <span className="inline-flex items-center gap-2">
-              <Clock className="h-5 w-5 text-blue" aria-hidden="true" />
+          {/* Stat row — 5 items. Font shrinks at lg so all 5 fit on one
+              line on desktop without feeling cramped; below lg it wraps to
+              2 clean centered lines instead of squeezing. */}
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 lg:flex-nowrap lg:gap-x-4 xl:gap-x-6 text-sm sm:text-base lg:text-[13px] xl:text-sm font-medium text-dark/70">
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <Clock className="h-4 w-4 lg:h-4 lg:w-4 text-blue shrink-0" aria-hidden="true" />
               {home.optimaDifference.stats.experience}
             </span>
-            <span className="inline-flex items-center gap-2">
-              <Star className="h-5 w-5 text-blue" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <Star className="h-4 w-4 text-blue shrink-0" aria-hidden="true" />
               {home.optimaDifference.stats.reviews.replace('{count}', String(TRUSTPILOT_REVIEW_COUNT))}
             </span>
-            <span className="inline-flex items-center gap-2">
-              <Smile className="h-5 w-5 text-blue" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <Smile className="h-4 w-4 text-blue shrink-0" aria-hidden="true" />
               {home.optimaDifference.stats.happyStays}
             </span>
-            <span className="inline-flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-blue" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <MapPin className="h-4 w-4 text-blue shrink-0" aria-hidden="true" />
               {home.optimaDifference.stats.localTeam}
             </span>
-            <span className="inline-flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-blue" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <ShieldCheck className="h-4 w-4 text-blue shrink-0" aria-hidden="true" />
               {home.optimaDifference.stats.secureBooking}
             </span>
           </div>

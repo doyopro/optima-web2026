@@ -53,7 +53,7 @@ export default function Header() {
           {/* Actions */}
           <div className="flex items-center gap-3">
             {/* Lang + currency toggles — desktop only, folded into the mobile menu below md */}
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-6">
               <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
                 <button
                   type="button"
@@ -75,8 +75,8 @@ export default function Header() {
                 </button>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold text-dark/60">{nav.currency}</span>
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-dark/60">{nav.currency}</span>
                 <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
                   <button
                     type="button"
@@ -101,14 +101,6 @@ export default function Header() {
                 </div>
               </div>
             </div>
-
-            <button
-              type="button"
-              aria-label={nav.wishlist}
-              className="text-dark hover:text-orange transition-colors"
-            >
-              <HeartIcon className="h-6 w-6" />
-            </button>
 
             {/* Hamburger — mobile only */}
             <button
@@ -211,23 +203,6 @@ export default function Header() {
         </div>
       )}
     </header>
-  )
-}
-
-function HeartIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z" />
-    </svg>
   )
 }
 
