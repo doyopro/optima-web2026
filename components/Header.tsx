@@ -75,7 +75,7 @@ export default function Header() {
                 </button>
               </div>
 
-              <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-2">
                 <span className="text-[10px] font-semibold uppercase tracking-wide text-dark/60">{nav.currency}</span>
                 <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
                   <button
