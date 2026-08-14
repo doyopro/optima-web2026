@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Clock, Star, MapPin, ShieldCheck, Smile } from 'lucide-react'
+import { Clock, Star, MapPin, ShieldCheck, Smile, Gem, Compass, Heart } from 'lucide-react'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import SearchWidget from '@/components/SearchWidget'
@@ -14,7 +14,6 @@ import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 import PropertyCard from '@/components/PropertyCard'
 import PropertySkeleton from '@/components/PropertySkeleton'
-import { VillaIcon, VolcanoIcon, HeartIcon } from '@/components/icons/OptimaDifferenceIcons'
 import { TRUSTPILOT_REVIEW_COUNT } from '@/lib/marketing'
 import { type Property } from '@/lib/types'
 
@@ -224,14 +223,14 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {home.optimaDifference.items.map((item, i) => {
-              const Icon = [VillaIcon, VolcanoIcon, HeartIcon][i]
+              const Icon = [Gem, Compass, Heart][i]
               return (
                 <div
                   key={item.title}
                   className="flex flex-col items-center bg-white rounded-3xl border-t-4 border-blue p-10 text-center shadow-xl shadow-black/[0.06] hover:shadow-2xl hover:shadow-black/[0.09] hover:-translate-y-1 transition-all duration-300"
                 >
                   <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-blue/25 to-blue/10 mb-6">
-                    <Icon className="h-14 w-14 text-blue" />
+                    <Icon size={32} strokeWidth={1.5} className="text-blue" />
                   </div>
                   <h3 className="text-lg font-bold text-dark mb-3 tracking-tight">{item.title}</h3>
                   <p className="text-dark/65 leading-relaxed">{item.description}</p>
