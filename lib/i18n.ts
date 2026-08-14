@@ -51,6 +51,7 @@ export const translations = {
         volcanicAlt: 'Volcanic landscape of Timanfaya, Lanzarote',
         coastAlt: 'Turquoise cove at Playa Papagayo, Lanzarote',
         architectureAlt: 'Traditional white Lanzarote architecture',
+        viewBlog: 'Read Our Blog',
       },
     },
     search: {
@@ -565,6 +566,7 @@ export const translations = {
         volcanicAlt: 'Paisaje volcánico de Timanfaya, Lanzarote',
         coastAlt: 'Cala turquesa en Playa Papagayo, Lanzarote',
         architectureAlt: 'Arquitectura tradicional blanca de Lanzarote',
+        viewBlog: 'Lee Nuestro Blog',
       },
     },
     search: {

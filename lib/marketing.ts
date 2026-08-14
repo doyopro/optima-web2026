@@ -9,4 +9,4 @@ export const SOCIAL_LINKS = {
 // Single source of truth for the Trustpilot review count shown in
 // ReviewBadges and reused in the homepage "Optima Difference" stats row —
 // update here when the real count changes, never invent a number elsewhere.
-export const TRUSTPILOT_REVIEW_COUNT = 615
+export const TRUSTPILOT_REVIEW_COUNT = 1000

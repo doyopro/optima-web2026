@@ -308,6 +308,12 @@ export default function Home() {
               {home.discover.title}
             </h2>
             <p className="text-dark/70 leading-relaxed">{home.discover.text}</p>
+            <Link
+              href="/blog"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-orange hover:text-dark transition-colors uppercase tracking-wide"
+            >
+              {home.discover.viewBlog} <span className="text-lg">→</span>
+            </Link>
           </div>
         </div>
       </section>
