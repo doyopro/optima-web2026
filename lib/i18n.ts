@@ -484,6 +484,7 @@ export const translations = {
       email: 'info@optimavillas.com',
       address: 'Lanzarote, Canary Islands, Spain',
       copyright: 'Optima Villas. All rights reserved.',
+      devCredit: 'Developed and Designed by',
     },
     faq: {
       title: 'Frequently asked questions',
@@ -999,6 +1000,7 @@ export const translations = {
       email: 'info@optimavillas.com',
       address: 'Lanzarote, Islas Canarias, España',
       copyright: 'Optima Villas. Todos los derechos reservados.',
+      devCredit: 'Desarrollado y Diseñado por',
     },
     faq: {
       title: 'Preguntas frecuentes',

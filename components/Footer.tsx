@@ -13,6 +13,17 @@ export default function Footer({ lang }: Props) {
 
   return (
     <footer className="bg-neutral-900 text-neutral-300 border-t border-neutral-800">
+      <div className="text-center text-xs text-neutral-500 py-3 border-b border-neutral-800">
+        {f.devCredit}{' '}
+        <a
+          href={lang === 'es' ? 'https://www.doyo.pro/?lang=es' : 'https://www.doyo.pro/'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-neutral-400 hover:text-orange hover:underline transition-colors"
+        >
+          Doyo.Pro
+        </a>
+      </div>
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Brand */}
