@@ -13,7 +13,7 @@ export default function Footer({ lang }: Props) {
 
   return (
     <footer className="bg-neutral-900 text-neutral-300 border-t border-neutral-800">
-      <div className="text-center text-lg text-neutral-500 py-3 border-b border-neutral-800">
+      <div className="text-center text-[0.9rem] text-neutral-500 py-3 border-b border-neutral-800">
         {f.devCredit}{' '}
         <a
           href={lang === 'es' ? 'https://www.doyo.pro/?lang=es' : 'https://www.doyo.pro/'}
