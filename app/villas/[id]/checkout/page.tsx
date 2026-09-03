@@ -10,7 +10,6 @@ import { useLanguage } from '@/lib/LanguageContext'
 import { useCurrency } from '@/lib/CurrencyContext'
 import { convertFromGbp } from '@/lib/currency'
 import { type Property } from '@/lib/types'
-import { getGuestyPropertyUrl } from '@/lib/guesty'
 import { getPaymentOptions } from '@/lib/booking'
 import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
 import DateRangePicker from '@/components/DateRangePicker'
@@ -167,7 +166,6 @@ function CheckoutContent({ params }: Props) {
     )
   }
 
-  const bookingUrl = getGuestyPropertyUrl(property.guesty_listing_id)
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
     lang === 'es'
       ? `Hola, quiero reservar ${property.name} del ${checkIn} al ${checkOut}`
@@ -479,26 +477,6 @@ function CheckoutContent({ params }: Props) {
                     }}
                     onSuccess={() => setPaymentSucceeded(true)}
                   />
-                )}
-
-                {/* "Book via our booking partner" is a genuine-error fallback
-                    only — pricing failed to load, dates are unavailable, or
-                    minStay isn't met. It must never show up as a visible
-                    alternative during a normal, working checkout. */}
-                {!paymentSucceeded && (pricingError || stayTooShort || (pricing && !pricing.available)) && (
-                  <>
-                    <p className="text-xs text-dark/40 mt-4 leading-relaxed">{t.checkout.contactToBookNote}</p>
-                    <div className="flex flex-col gap-2 mt-3">
-                      <a
-                        href={bookingUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block w-full text-center border border-orange text-orange font-semibold py-2.5 rounded-lg hover:bg-orange/5 transition-colors text-sm"
-                      >
-                        {t.checkout.goToGuesty}
-                      </a>
-                    </div>
-                  </>
                 )}
 
                 <div className="flex flex-col gap-2 mt-3">
