@@ -5,6 +5,7 @@ export const translations = {
     nav: {
       home: 'Home',
       villas: 'Villas',
+      guides: 'Guides',
       owners: 'Owners',
       blog: 'Blog',
       back: 'Back',
@@ -471,6 +472,7 @@ export const translations = {
       links: {
         home: 'Home',
         villas: 'Villas',
+        guides: 'Guides',
         owners: 'Owners',
         blog: 'Blog',
         manageBooking: 'Manage your booking',
@@ -519,6 +521,7 @@ export const translations = {
     nav: {
       home: 'Inicio',
       villas: 'Villas',
+      guides: 'Guías',
       owners: 'Propietarios',
       blog: 'Blog',
       back: 'Atrás',
@@ -985,6 +988,7 @@ export const translations = {
       links: {
         home: 'Inicio',
         villas: 'Villas',
+        guides: 'Guías',
         owners: 'Propietarios',
         blog: 'Blog',
         manageBooking: 'Gestiona tu reserva',
