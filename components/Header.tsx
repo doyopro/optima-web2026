@@ -13,6 +13,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const nav = translations[lang].nav
+  const guestPortal = translations[lang].guestPortal
 
   const navItems = [
     { label: nav.home, href: '/' },
@@ -20,6 +21,7 @@ export default function Header() {
     { label: nav.owners, href: '/owners' },
     { label: nav.blog, href: '/blog' },
     { label: nav.guides, href: '/guides' },
+    { label: guestPortal.navLink, href: '/guest-login' },
   ]
 
   function closeMobileMenu() {
