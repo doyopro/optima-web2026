@@ -562,6 +562,11 @@ export const translations = {
       price: 'Price (one way)',
       luggage: 'Luggage allowance',
     },
+    dashboard: {
+      title: 'Dashboard',
+      tabs: { faqs: 'FAQs', properties: 'Properties', guides: 'Guides', content: 'Content' },
+      comingSoon: 'This section is not built yet.',
+    },
     guidesAdmin: {
       title: 'Guides Management',
       tabs: { content: 'Guides Content', beaches: 'Beaches', ferries: 'Ferries' },
@@ -1159,6 +1164,11 @@ export const translations = {
       frequency: 'Frecuencia',
       price: 'Precio (ida)',
       luggage: 'Equipaje incluido',
+    },
+    dashboard: {
+      title: 'Panel',
+      tabs: { faqs: 'Preguntas frecuentes', properties: 'Propiedades', guides: 'Guías', content: 'Contenido' },
+      comingSoon: 'Esta sección todavía no está construida.',
     },
     guidesAdmin: {
       title: 'Gestión de guías',

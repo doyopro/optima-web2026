@@ -64,7 +64,7 @@ export default function GuidesDashboardPage() {
   const [tab, setTab] = useState<Tab>('content')
 
   return (
-    <div className="min-h-screen bg-neutral-50 py-8 px-4 sm:px-6">
+    <div className="py-8 px-4 sm:px-6">
       <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
       <div className="mx-auto max-w-6xl">
         <h1 className="text-2xl font-bold text-dark mb-6">{t.title}</h1>
