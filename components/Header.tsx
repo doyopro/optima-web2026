@@ -17,9 +17,9 @@ export default function Header() {
   const navItems = [
     { label: nav.home, href: '/' },
     { label: nav.villas, href: '/villas' },
-    { label: nav.guides, href: '/guides' },
     { label: nav.owners, href: '/owners' },
     { label: nav.blog, href: '/blog' },
+    { label: nav.guides, href: '/guides' },
   ]
 
   function closeMobileMenu() {
