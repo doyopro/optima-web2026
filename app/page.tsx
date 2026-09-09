@@ -14,7 +14,6 @@ import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 import PropertyCard from '@/components/PropertyCard'
 import PropertySkeleton from '@/components/PropertySkeleton'
-import { VillaIcon, VolcanoIcon, HeartIcon } from '@/components/icons/OptimaDifferenceIcons'
 import { TRUSTPILOT_REVIEW_COUNT } from '@/lib/marketing'
 import { type Property } from '@/lib/types'
 
@@ -224,14 +223,18 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {home.optimaDifference.items.map((item, i) => {
-              const Icon = [VillaIcon, VolcanoIcon, HeartIcon][i]
+              const iconSrc = [
+                '/icons/optima-difference/villa-handpicked.svg',
+                '/icons/optima-difference/local-expertise.svg',
+                '/icons/optima-difference/personalized-service.svg',
+              ][i]
               return (
                 <div
                   key={item.title}
                   className="flex flex-col items-center bg-white rounded-3xl border-t-4 border-blue p-10 text-center shadow-xl shadow-black/[0.06] hover:shadow-2xl hover:shadow-black/[0.09] hover:-translate-y-1 transition-all duration-300"
                 >
                   <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-blue/25 to-blue/10 mb-6">
-                    <Icon className="h-14 w-14 text-blue" />
+                    <Image src={iconSrc} alt="" width={80} height={80} className="h-14 w-14" aria-hidden="true" />
                   </div>
                   <h3 className="text-lg font-bold text-dark mb-3 tracking-tight">{item.title}</h3>
                   <p className="text-dark/65 leading-relaxed">{item.description}</p>
