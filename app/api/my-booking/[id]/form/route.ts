@@ -30,18 +30,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Invalid guest_number' }, { status: 400 })
     }
 
+    const fullName = guestNumber === 1 ? reservation.guest_name ?? null : body.full_name || null
+    const email = body.email && body.email !== reservation.guest_email ? body.email : null
+    const phone = body.phone && body.phone !== reservation.guest_phone ? body.phone : null
+
     const { data, error } = await supabaseServer
       .from('guest_form_data')
       .upsert(
         {
           reservation_id: id,
           guest_number: guestNumber,
-          full_name: body.full_name ?? null,
+          full_name: fullName,
           age: body.age ? Number(body.age) : null,
           nationality: body.nationality ?? null,
           passport_number: body.passport_number ?? null,
-          email: body.email ?? null,
-          phone: body.phone ?? null,
+          email,
+          phone,
           submitted_at: new Date().toISOString(),
         },
         { onConflict: 'reservation_id,guest_number' }
