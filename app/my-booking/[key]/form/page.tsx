@@ -13,5 +13,13 @@ export default async function LegacyGuestFormPage({ params }: { params: Promise<
     redirect('/guest-login')
   }
 
-  return <GuestFormClient reservationId={key} numGuests={reservation.num_guests ?? 1} />
+  return (
+    <GuestFormClient
+      reservationId={key}
+      numGuests={reservation.num_guests ?? 1}
+      guestName={reservation.guest_name}
+      guestEmail={reservation.guest_email}
+      guestPhone={reservation.guest_phone}
+    />
+  )
 }

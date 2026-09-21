@@ -30,6 +30,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Invalid guest_number' }, { status: 400 })
     }
 
+    // Needed for the dedup comparison below — guestSessionCanAccessReservation
+    // only returns a boolean (2026-09 contact-session redesign), so the
+    // reservation's own contact fields have to be fetched separately here.
+    const { data: reservation, error: reservationError } = await supabaseServer
+      .from('reservations')
+      .select('guest_name, guest_email, guest_phone')
+      .eq('id', id)
+      .maybeSingle()
+
+    if (reservationError || !reservation) {
+      return NextResponse.json({ error: 'Reservation not found' }, { status: 404 })
+    }
+
     const fullName = guestNumber === 1 ? reservation.guest_name ?? null : body.full_name || null
 
     // Compare against the reservation's contact info in normalized form —

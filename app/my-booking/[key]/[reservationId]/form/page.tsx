@@ -14,5 +14,13 @@ export default async function ReservationGuestFormPage({
     redirect('/guest-login')
   }
 
-  return <GuestFormClient reservationId={reservationId} numGuests={reservation.num_guests ?? 1} />
+  return (
+    <GuestFormClient
+      reservationId={reservationId}
+      numGuests={reservation.num_guests ?? 1}
+      guestName={reservation.guest_name}
+      guestEmail={reservation.guest_email}
+      guestPhone={reservation.guest_phone}
+    />
+  )
 }
