@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-guesty-properties",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/sync-guesty-reviews",
+      "schedule": "0 */4 * * *"
+    }
+  ]
+}

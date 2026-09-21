@@ -11,7 +11,13 @@ import PropertySkeleton from '@/components/PropertySkeleton'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
-type SortKey = 'price_asc' | 'price_desc' | 'rating' | 'reviews'
+// 'rating' removed (2026-09): Property.rating is hardcoded to 0 for every
+// villa (see app/api/villas/route.ts) — sorting by it was a silent no-op,
+// not a real feature. Re-add once a real rating is actually connected
+// (property_reviews). 'reviews' has the exact same problem
+// (reviews_count is also hardcoded 0) but wasn't part of this request —
+// flagged, not removed here.
+type SortKey = 'price_asc' | 'price_desc' | 'reviews'
 
 // Checkbox value must match the real string stored in properties.amenities (Supabase).
 const AMENITY_FILTERS = [
@@ -47,7 +53,7 @@ function VillasPageContent() {
   const checkIn = searchParams.get('from') ?? ''
   const checkOut = searchParams.get('to') ?? ''
   const [amenities, setAmenities] = useState<string[]>([])
-  const [sort, setSort] = useState<SortKey>('rating')
+  const [sort, setSort] = useState<SortKey>('price_asc')
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   function toggleAmenity(value: string) {
@@ -105,7 +111,6 @@ function VillasPageContent() {
 
     if (sort === 'price_asc') return a.price_per_night_gbp - b.price_per_night_gbp
     if (sort === 'price_desc') return b.price_per_night_gbp - a.price_per_night_gbp
-    if (sort === 'rating') return b.rating - a.rating
     return b.reviews_count - a.reviews_count
   })
 
@@ -254,8 +259,7 @@ function VillasPageContent() {
                 onChange={(e) => setSort(e.target.value as SortKey)}
                 className="border border-neutral-200 px-3 py-2 rounded-lg text-sm bg-white focus:outline-none focus:border-orange"
               >
-                <option value="rating">{t.sortBy}: {t.sortRating}</option>
-                <option value="price_asc">{t.sortPrice} ↑</option>
+                <option value="price_asc">{t.sortBy}: {t.sortPrice} ↑</option>
                 <option value="price_desc">{t.sortPrice} ↓</option>
                 <option value="reviews">{t.sortReviews}</option>
               </select>

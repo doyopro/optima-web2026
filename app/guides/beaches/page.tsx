@@ -93,7 +93,7 @@ export default function BeachesGuidePage() {
     <>
       <div className="min-h-screen bg-cream">
         <div className="relative h-[300px] sm:h-[360px] w-full overflow-hidden">
-          <Image src={HERO_IMAGE} alt="" fill priority className="object-cover" />
+          <Image src={HERO_IMAGE} alt={t.guidesPage.heroAlt.beaches} fill priority className="object-cover" />
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
             <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 max-w-2xl">{meta.title}</h1>
@@ -159,7 +159,7 @@ export default function BeachesGuidePage() {
                 return (
                   <div key={beach.id} className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
                     <div className="relative h-40 w-full">
-                      <Image src={image} alt="" fill className="object-cover" />
+                      <Image src={image} alt={`${name} beach, Lanzarote`} fill className="object-cover" />
                       <div className="absolute top-2 right-2 bg-white/90 backdrop-blur rounded-full px-2.5 py-1 text-xs font-bold text-dark">
                         {'⭐'.repeat(Math.round(Number(beach.rating)))} {beach.rating}
                       </div>

@@ -16,7 +16,7 @@ export default function Faq({ lang }: Props) {
   }
 
   return (
-    <section className="bg-white py-20 md:py-28 px-4 sm:px-6">
+    <section id="faq" className="bg-white py-20 md:py-28 px-4 sm:px-6">
       <div className="mx-auto max-w-3xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4 tracking-tight">{t.title}</h2>

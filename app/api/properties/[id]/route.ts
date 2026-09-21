@@ -71,3 +71,29 @@ export async function GET(
     return NextResponse.json({ error: 'Failed to fetch property' }, { status: 500 })
   }
 }
+
+// Admin-only fields from /web/properties — deliberately narrow (just the
+// two flags that dashboard tab edits), not a general property editor.
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
+    const body = await request.json()
+
+    const update: Record<string, boolean> = {}
+    if (typeof body.is_featured === 'boolean') update.is_featured = body.is_featured
+    if (typeof body.is_bookable === 'boolean') update.is_bookable = body.is_bookable
+
+    if (Object.keys(update).length === 0) {
+      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
+    }
+
+    const { error } = await supabaseServer.from('properties').update(update).eq('id', id)
+    if (error) throw new Error(error.message)
+
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err)
+    console.error('[PATCH /api/properties/[id]]', errorMessage)
+    return NextResponse.json({ error: 'Failed to update property' }, { status: 500 })
+  }
+}

@@ -12,6 +12,13 @@ export default function GuestLoginPage() {
   const { lang } = useLanguage()
   const t = translations[lang].guestPortal.login
 
+  // Email + last name is the primary path (2026-09 redesign): it resolves
+  // to a contact_id, which unlocks every reservation linked to that guest,
+  // not just one. Booking code + last name (the old, only method) remains
+  // as a fallback toggle for a guest who doesn't want to give an email, or
+  // who arrives from a link tied to one specific reservation.
+  const [useBookingCode, setUseBookingCode] = useState(false)
+  const [email, setEmail] = useState('')
   const [bookingCode, setBookingCode] = useState('')
   const [lastName, setLastName] = useState('')
   const [loading, setLoading] = useState(false)
@@ -25,11 +32,13 @@ export default function GuestLoginPage() {
       const res = await fetch('/api/guest/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingCode, lastName }),
+        body: JSON.stringify(
+          useBookingCode ? { bookingCode, lastName } : { email, lastName },
+        ),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed')
-      router.push(`/my-booking/${data.reservationId}`)
+      router.push(`/my-booking/${data.contactId ?? data.reservationId}`)
     } catch {
       setError(t.error)
     } finally {
@@ -46,22 +55,40 @@ export default function GuestLoginPage() {
               📋
             </div>
             <h1 className="text-2xl font-bold text-dark mb-2">{t.title}</h1>
-            <p className="text-dark/60 text-sm">{t.subtitle}</p>
+            <p className="text-dark/60 text-sm">
+              {useBookingCode ? t.bookingCodeSubtitle : t.subtitle}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 sm:p-8 space-y-4">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wide text-dark/40 mb-1.5">
-                {t.bookingCodeLabel}
-              </label>
-              <input
-                type="text"
-                required
-                value={bookingCode}
-                onChange={(e) => setBookingCode(e.target.value)}
-                className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm text-dark focus:outline-none focus:ring-2 focus:ring-orange/40"
-              />
-            </div>
+            {useBookingCode ? (
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wide text-dark/40 mb-1.5">
+                  {t.bookingCodeLabel}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={bookingCode}
+                  onChange={(e) => setBookingCode(e.target.value)}
+                  className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm text-dark focus:outline-none focus:ring-2 focus:ring-orange/40"
+                />
+              </div>
+            ) : (
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wide text-dark/40 mb-1.5">
+                  {t.emailLabel}
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm text-dark focus:outline-none focus:ring-2 focus:ring-orange/40"
+                />
+              </div>
+            )}
+
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wide text-dark/40 mb-1.5">
                 {t.lastNameLabel}
@@ -85,6 +112,17 @@ export default function GuestLoginPage() {
               {loading ? t.loading : t.submit}
             </button>
           </form>
+
+          <button
+            type="button"
+            onClick={() => {
+              setUseBookingCode((v) => !v)
+              setError('')
+            }}
+            className="mt-4 w-full text-center text-xs text-dark/50 hover:text-orange transition-colors"
+          >
+            {useBookingCode ? t.useEmailInstead : t.useBookingCodeInstead}
+          </button>
         </div>
       </div>
 

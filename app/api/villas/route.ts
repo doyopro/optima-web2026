@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await supabaseServer
       .from('properties')
       .select(
-        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp, owner_name, is_tina_partner',
+        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp, owner_name, is_tina_partner, is_featured, is_bookable',
       )
       .eq('status', 'active')
 
@@ -51,7 +51,8 @@ export async function GET(req: NextRequest) {
         reviews_count: 0,
         images: (row.images as string[]) ?? [],
         amenities: (row.amenities as string[]) ?? [],
-        is_featured: true,
+        is_featured: row.is_featured ?? false,
+        is_bookable: row.is_bookable ?? true,
         slug: row.id,
         owner_name: row.owner_name ?? null,
         is_tina_partner: row.is_tina_partner ?? false,

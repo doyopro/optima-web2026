@@ -53,7 +53,7 @@ export default function PlayaBlancaGuidePage() {
     <>
       <div className="min-h-screen bg-cream">
         <div className="relative h-[300px] sm:h-[380px] w-full overflow-hidden">
-          <Image src={HERO_IMAGE} alt="" fill priority className="object-cover" />
+          <Image src={HERO_IMAGE} alt={t.guidesPage.heroAlt["playa-blanca"]} fill priority className="object-cover" />
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
             <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 max-w-2xl">{meta.title}</h1>

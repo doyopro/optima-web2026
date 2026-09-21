@@ -31,6 +31,20 @@ function formatDateOnly(date: Date): string {
 }
 
 /**
+ * The date DEPOSIT_THRESHOLD_DAYS before check-in — the same "balance due"
+ * date used by the deposit-payment checkout flow (getPaymentOptions below)
+ * and by the guest portal's outstanding-balance display (lib/guest-payments.ts)
+ * — one shared rule, not reimplemented per caller.
+ * @param checkInDate YYYY-MM-DD
+ */
+export function getBalanceDueDate(checkInDate: string): string {
+  const checkIn = toDateOnly(new Date(checkInDate))
+  const due = new Date(checkIn)
+  due.setDate(due.getDate() - DEPOSIT_THRESHOLD_DAYS)
+  return formatDateOnly(due)
+}
+
+/**
  * @param checkInDate YYYY-MM-DD
  * @param totalPrice total stay price, in the listing's currency's minor-less units (e.g. GBP pounds, not pence)
  * @param today defaults to the real current date — overridable for tests
@@ -49,12 +63,7 @@ export function getPaymentOptions(
   const depositAmount = Math.round(totalPrice * DEPOSIT_PERCENTAGE * 100) / 100
   const depositBalanceAmount = Math.round((totalPrice - depositAmount) * 100) / 100
 
-  let balanceDueDate: string | null = null
-  if (depositAllowed) {
-    const due = new Date(checkIn)
-    due.setDate(due.getDate() - DEPOSIT_THRESHOLD_DAYS)
-    balanceDueDate = formatDateOnly(due)
-  }
+  const balanceDueDate = depositAllowed ? getBalanceDueDate(checkInDate) : null
 
   return {
     daysUntilCheckIn,

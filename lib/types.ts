@@ -26,6 +26,7 @@ export type Property = {
   images: string[]
   amenities: string[]
   is_featured: boolean
+  is_bookable?: boolean
   slug: string
   owner_name?: string | null
   is_tina_partner?: boolean

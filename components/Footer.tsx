@@ -93,6 +93,11 @@ export default function Footer({ lang }: Props) {
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
+                <Link href="/property-enquiry" className="hover:text-orange transition-colors">
+                  {f.links.enquire}
+                </Link>
+              </li>
+              <li>
                 <a href={`mailto:${f.email}`} className="hover:text-orange transition-colors">
                   {f.email}
                 </a>

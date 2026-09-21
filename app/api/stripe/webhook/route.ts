@@ -3,6 +3,18 @@ import Stripe from 'stripe'
 import { stripeServer, stripeConfigured } from '@/lib/stripe-server'
 import { createGuestyReservation, registerGuestyPayment } from '@/lib/guesty-server'
 
+// Guest portal balance payments (app/api/guest/pay-balance) — an EXISTING
+// reservation's outstanding balance being paid down, not a new booking.
+// Deliberately NOT handled here (2026-09 correction): an existing n8n
+// workflow ("Stripe -> Google Sheets (Payments)") already listens to every
+// Stripe charge in real time and inserts it into `payments` itself,
+// matching against reservations.channel_booking_id. That process dedupes
+// by its own `reference` field, not by Stripe's payment_intent id — so this
+// webhook must NOT also insert a row for these, or the same real charge
+// ends up duplicated in `payments`. This event type is intentionally
+// ignored here; the guest-portal balance math (lib/guest-payments.ts)
+// reads whatever row n8n puts there, same as it reads every other payment.
+
 // BETA — internal testing only. This is the ONLY place a Guesty reservation
 // is ever created from the beta checkout: server-side, only after Stripe
 // has itself confirmed the charge via a verified webhook event, using the
@@ -41,6 +53,12 @@ export async function POST(req: NextRequest) {
 
   const paymentIntent = event.data.object as Stripe.PaymentIntent
   const meta = paymentIntent.metadata
+
+  if (meta.kind === 'guest_balance_payment') {
+    // See the comment above imports: n8n's own Stripe webhook records this
+    // charge into `payments`, not this route.
+    return NextResponse.json({ received: true })
+  }
 
   if (meta.beta !== 'true') {
     // Not a beta-checkout PaymentIntent — ignore.

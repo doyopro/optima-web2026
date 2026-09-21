@@ -327,3 +327,77 @@ export async function registerGuestyPayment(input: RegisterPaymentInput): Promis
     throw new Error(`Guesty payment registration failed: ${res.status} — ${body}`)
   }
 }
+
+export interface GuestyListingDetails {
+  title: string
+  active: boolean
+  amenities: string[]
+}
+
+/**
+ * Live listing name/active-status/amenities from Guesty, via
+ * GET /v1/listings/{id}. Confirmed live shape:
+ * { title: string, active: boolean, amenities: string[] }.
+ */
+export async function getListingDetails(guestyListingId: string): Promise<GuestyListingDetails> {
+  const res = await guestyFetch(`/listings/${guestyListingId}`)
+
+  if (!res.ok) {
+    throw new Error(`Guesty listing lookup failed: ${res.status}`)
+  }
+
+  const data = await res.json()
+  return {
+    title: data.title ?? '',
+    active: Boolean(data.active),
+    amenities: Array.isArray(data.amenities) ? data.amenities : [],
+  }
+}
+
+export interface GuestyReview {
+  id: string
+  channel: string | null
+  rating: number | null
+  reviewText: string | null
+  authorName: string | null
+  reviewDate: string | null
+}
+
+/**
+ * Reviews for one listing, via GET /v1/reviews?listingId={id}.
+ *
+ * NOT CONFIRMED WORKING as of 2026-09: this account's Guesty API
+ * credentials get `{"message":"You don't have permission to access, please
+ * contact Guesty support."}` (a 200-shaped permission error, not a 404 —
+ * the route exists, the scope doesn't). This needs Guesty support/an admin
+ * to enable the Reviews API for this integration before it'll return real
+ * data. The task also mentioned GET https://booking.guesty.com/api/reviews
+ * — tried that too, live: 401 "Not Authorized" both with and without this
+ * same OAuth token, meaning it needs an entirely different credential this
+ * repo doesn't have configured anywhere. This function targets
+ * open-api.guesty.com instead specifically because it reuses the SAME
+ * guesty_oauth_token already working for everything else here — once
+ * Guesty grants the permission, this should work with no further code
+ * changes, vs. booking.guesty.com which would need a brand new credential
+ * plumbed in from scratch.
+ */
+export async function getListingReviews(guestyListingId: string): Promise<GuestyReview[]> {
+  const res = await guestyFetch(`/reviews?listingId=${guestyListingId}`)
+
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(`Guesty reviews lookup failed: ${res.status} — ${body}`)
+  }
+
+  const data = await res.json()
+  const rows = Array.isArray(data) ? data : (data.results ?? data.data ?? [])
+
+  return rows.map((r: Record<string, unknown>) => ({
+    id: String(r._id ?? r.id ?? ''),
+    channel: (r.channel as string) ?? null,
+    rating: r.rating != null ? Number(r.rating) : null,
+    reviewText: (r.review ?? r.text ?? r.comment ?? null) as string | null,
+    authorName: (r.guestName ?? r.authorName ?? null) as string | null,
+    reviewDate: (r.date ?? r.createdAt ?? null) as string | null,
+  }))
+}

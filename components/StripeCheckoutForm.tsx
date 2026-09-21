@@ -28,6 +28,42 @@ interface BookingDetails {
   totalPrice: number
 }
 
+declare global {
+  interface Window {
+    dataLayer?: Record<string, unknown>[]
+  }
+}
+
+// GTM (container GTM-MP58Q26, loaded in app/layout.tsx) listens for this
+// dataLayer event to fire a Google Ads conversion — the actual AW-... ID/
+// label mapping lives inside the GTM container's trigger config, not here.
+//
+// This checkout supports two payment paths (see lib/booking.ts:
+// getPaymentOptions — 20% deposit if check-in is >45 days out, full amount
+// otherwise), which map to two DIFFERENT Ads conversion actions
+// ("Purchases" vs "Low deposit payment"). `payment_type` is included so the
+// GTM trigger can branch on it rather than needing two separate dataLayer
+// events wired here.
+//
+// value/currency are the amount actually charged, not a hardcoded currency:
+// /api/checkout/create-payment-intent always creates the PaymentIntent in
+// GBP (see that route — `currency: 'gbp'`, `amount: amountGbp * 100`), so
+// this reports GBP to match what Stripe actually charged, not EUR.
+// transaction_id is the real Stripe PaymentIntent id — this beta has no
+// separate internal booking reference yet, and the PaymentIntent id is
+// already a stable, unique, dedup-safe identifier for the charge.
+function pushPurchaseSuccessEvent(booking: BookingDetails, paymentIntentId: string): void {
+  if (typeof window === 'undefined') return
+  window.dataLayer = window.dataLayer || []
+  window.dataLayer.push({
+    event: 'purchase_success',
+    value: booking.amountGbp,
+    currency: 'GBP',
+    transaction_id: paymentIntentId,
+    payment_type: booking.paymentChoice, // 'deposit' | 'full'
+  })
+}
+
 interface Props {
   lang: Language
   booking: BookingDetails
@@ -77,6 +113,7 @@ function PayButton({ lang, booking, disabled, onSuccess }: Props) {
       }
 
       if (result.paymentIntent?.status === 'succeeded') {
+        pushPurchaseSuccessEvent(booking, result.paymentIntent.id)
         onSuccess()
       } else {
         throw new Error(`Unexpected payment status: ${result.paymentIntent?.status}`)

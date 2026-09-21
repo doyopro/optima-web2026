@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { type Language, translations } from '@/lib/i18n'
 import TestimonialCard from './TestimonialCard'
 import ReviewBadges from './ReviewBadges'
@@ -9,11 +9,36 @@ interface Props {
   lang: Language
 }
 
+interface PropertyReview {
+  id: string
+  rating: number
+  text: string | null
+  author: string | null
+  date: string | null
+  propertyName: string | null
+}
+
 const TRUSTPILOT_URL = 'https://uk.trustpilot.com/review/optimavillaslanzarote.com'
+
+function formatReviewDate(value: string | null, lang: Language): string {
+  if (!value) return ''
+  return new Date(value).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', {
+    month: 'long',
+    year: 'numeric',
+  })
+}
 
 export default function Testimonials({ lang }: Props) {
   const t = translations[lang].testimonials
-  const testimonialsData = translations[lang].testimonialsData
+
+  const [reviews, setReviews] = useState<PropertyReview[]>([])
+
+  useEffect(() => {
+    fetch('/api/property-reviews')
+      .then((r) => r.json())
+      .then((d) => setReviews(d.reviews ?? []))
+      .catch(() => setReviews([]))
+  }, [])
 
   const trackRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -49,6 +74,23 @@ export default function Testimonials({ lang }: Props) {
     setActiveIndex(closest)
   }
 
+  // Nothing to show until the Guesty reviews sync has real 5★ rows (see
+  // app/api/cron/sync-guesty-reviews) — no fake fallback content, this
+  // section just doesn't render rather than show placeholder testimonials.
+  if (reviews.length === 0) {
+    return (
+      <section className="py-16 md:py-24 px-4 sm:px-6 bg-[#F5F5F5]">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-10 max-w-xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">{t.title}</h2>
+            <p className="text-dark/60 leading-relaxed">{t.description}</p>
+          </div>
+          <ReviewBadges lang={lang} />
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="py-16 md:py-24 px-4 sm:px-6 bg-[#F5F5F5]">
       <div className="mx-auto max-w-6xl">
@@ -81,15 +123,23 @@ export default function Testimonials({ lang }: Props) {
             onScroll={handleScroll}
             className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {testimonialsData.map((testimonial, i) => (
+            {reviews.map((review, i) => (
               <div
-                key={i}
+                key={review.id}
                 ref={(el) => {
                   cardRefs.current[i] = el
                 }}
                 className="snap-start shrink-0 w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
               >
-                <TestimonialCard {...testimonial} seeMoreLabel={t.seeMore} seeLessLabel={t.seeLess} />
+                <TestimonialCard
+                  rating={review.rating}
+                  title={review.propertyName ?? ''}
+                  text={review.text ?? ''}
+                  author={review.author ?? ''}
+                  date={formatReviewDate(review.date, lang)}
+                  seeMoreLabel={t.seeMore}
+                  seeLessLabel={t.seeLess}
+                />
               </div>
             ))}
           </div>
@@ -97,7 +147,7 @@ export default function Testimonials({ lang }: Props) {
 
         {/* Dots — mobile & desktop, one per testimonial */}
         <div className="flex items-center justify-center gap-2 mt-8">
-          {testimonialsData.map((_, i) => (
+          {reviews.map((_, i) => (
             <button
               key={i}
               type="button"

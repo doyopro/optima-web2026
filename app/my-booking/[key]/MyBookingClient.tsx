@@ -7,7 +7,9 @@ import { translations, type Language } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
+import PaymentSummaryCard from '@/components/PaymentSummaryCard'
 import type { GuestReservation } from '@/lib/guest-auth'
+import type { PaymentSummary } from '@/lib/guest-payments'
 
 function formatDate(value: string | null, lang: Language) {
   if (!value) return '—'
@@ -19,7 +21,19 @@ function formatDate(value: string | null, lang: Language) {
   })
 }
 
-export default function MyBookingClient({ reservation }: { reservation: GuestReservation }) {
+interface Props {
+  reservation: GuestReservation
+  paymentSummary?: PaymentSummary
+  // Where this reservation's own routes live: `/my-booking/{key}` for the
+  // legacy (contact_id-less) session, `/my-booking/{key}/{reservationId}`
+  // for the contact-scoped detail view.
+  basePath: string
+  // Only set in the contact-scoped case — lets a guest go back to the list
+  // of all their bookings instead of straight to logout.
+  backHref?: string
+}
+
+export default function MyBookingClient({ reservation, paymentSummary, basePath, backHref }: Props) {
   const router = useRouter()
   const { lang } = useLanguage()
   const t = translations[lang].guestPortal.dashboard
@@ -41,6 +55,11 @@ export default function MyBookingClient({ reservation }: { reservation: GuestRes
     <>
       <div className="min-h-screen bg-cream">
         <div className="mx-auto max-w-xl px-4 sm:px-6 py-12 sm:py-16">
+          {backHref && (
+            <Link href={backHref} className="inline-block text-xs text-dark/50 hover:text-orange transition-colors mb-4">
+              {t.backToBookings}
+            </Link>
+          )}
           <h1 className="text-2xl font-bold text-dark mb-6">{t.title}</h1>
 
           <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 sm:p-8 space-y-5 mb-6">
@@ -71,8 +90,19 @@ export default function MyBookingClient({ reservation }: { reservation: GuestRes
             )}
           </div>
 
+          {paymentSummary && (
+            <div className="mb-6">
+              <PaymentSummaryCard
+                lang={lang}
+                reservationId={reservation.id}
+                summary={paymentSummary}
+                isPastStay={Boolean(reservation.check_out && reservation.check_out < new Date().toISOString().slice(0, 10))}
+              />
+            </div>
+          )}
+
           <Link
-            href={`/my-booking/${reservation.id}/form`}
+            href={`${basePath}/form`}
             className="block bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 hover:border-orange transition-colors mb-6"
           >
             <p className="text-sm font-bold text-dark mb-1">{t.formLink}</p>

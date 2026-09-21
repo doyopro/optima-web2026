@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseServer } from '@/lib/supabase-server'
-import { requireGuestSession } from '@/lib/guest-auth'
+import { guestSessionCanAccessReservation } from '@/lib/guest-auth'
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const reservation = await requireGuestSession(id)
-  if (!reservation) return NextResponse.json({ error: 'Not authenticated' }, { status: 403 })
+  const allowed = await guestSessionCanAccessReservation(id)
+  if (!allowed) return NextResponse.json({ error: 'Not authenticated' }, { status: 403 })
 
   const { data, error } = await supabaseServer
     .from('guest_form_data')
@@ -20,8 +20,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const reservation = await requireGuestSession(id)
-  if (!reservation) return NextResponse.json({ error: 'Not authenticated' }, { status: 403 })
+  const allowed = await guestSessionCanAccessReservation(id)
+  if (!allowed) return NextResponse.json({ error: 'Not authenticated' }, { status: 403 })
 
   try {
     const body = await req.json()

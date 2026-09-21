@@ -17,24 +17,15 @@ import PropertySkeleton from '@/components/PropertySkeleton'
 import { VillaIcon, VolcanoIcon, HeartIcon } from '@/components/icons/OptimaDifferenceIcons'
 import { TRUSTPILOT_REVIEW_COUNT } from '@/lib/marketing'
 import { type Property } from '@/lib/types'
+import JsonLd from '@/components/JsonLd'
+import { buildLocalBusinessJsonLd, buildReviewJsonLd, buildFaqJsonLd, type JsonLdReview } from '@/lib/structured-data'
 
-// Curated picks for the homepage — chosen deliberately, not derived from
-// is_featured (every property currently has that flag set to true).
-// Featured Villas is a brand/trust surface: only genuine Optima-owned
-// properties belong here, never Tina/SunBeach partner-managed ones (unlike
-// /villas, which lists partner properties too, just demoted to the end —
-// guests can still book them there). Villa Valhalla was previously listed
-// here despite is_tina_partner = true; swapped for Casa Amorosa. The
-// is_tina_partner filter below is a second, defensive line against this
-// list ever including a partner property again.
-const FEATURED_PROPERTY_IDS = [
-  '03fd7cce-a54d-422c-a07e-3a21d9027ceb', // Casa Amorosa
-  'bbaf4612-dead-4449-9853-5a438068af65', // Casa Piscina
-  '0e7b2121-21fd-4e05-aa2e-4538e6083e5b', // Casa Azul
-  'fa7da782-64f3-4cb1-9a1a-cd126cd56c86', // Casa Bluebird
-  '7bff6d00-e653-40d3-8b51-adc929a4b0f7', // Casa Cielo Azul
-  '5fd591a5-7b42-4fbd-84e2-e789534932f8', // Casa Corfe
-]
+// Featured Villas is a brand/trust surface: only genuine Optima-owned,
+// actually-bookable properties belong here. As of 2026-09 this is
+// dashboard-editable (properties.is_featured, toggled from /web/properties)
+// rather than a hardcoded id list — is_tina_partner and !is_bookable are
+// still filtered out here as a second, defensive line even if one were
+// ever toggled on by mistake in the dashboard.
 
 // Hero rotation — all four already live in /public (hero-pool.jpg is the
 // real Optima villa used elsewhere on this page's Featured Villas request;
@@ -70,6 +61,17 @@ export default function Home() {
   const [loadingFeatured, setLoadingFeatured] = useState(true)
   const [errorFeatured, setErrorFeatured] = useState<boolean>(false)
   const [heroIndex, setHeroIndex] = useState(0)
+  const [reviewsForJsonLd, setReviewsForJsonLd] = useState<JsonLdReview[]>([])
+
+  // Same source components/Testimonials.tsx renders in full — fetched
+  // separately here (rather than lifted state) since this is the only other
+  // consumer, and it's a lightweight GET.
+  useEffect(() => {
+    fetch('/api/property-reviews')
+      .then((r) => r.json())
+      .then((d) => setReviewsForJsonLd(d.reviews ?? []))
+      .catch(() => setReviewsForJsonLd([]))
+  }, [])
 
   // Hero crossfade — plain interval advancing the index; each image is
   // absolutely stacked and only its opacity changes (see render), so this
@@ -89,10 +91,9 @@ export default function Home() {
         if (!response.ok) throw new Error('Failed to fetch')
 
         const data = await response.json()
-        const byId = new Map((data.properties as Property[]).map((p) => [p.id, p]))
-        const featuredProperties = FEATURED_PROPERTY_IDS.map((id) => byId.get(id))
-          .filter((p): p is Property => Boolean(p))
-          .filter((p) => !p.is_tina_partner)
+        const featuredProperties = (data.properties as Property[]).filter(
+          (p) => p.is_featured && !p.is_tina_partner && p.is_bookable !== false,
+        )
 
         setFeatured(featuredProperties)
       } catch (error) {
@@ -112,6 +113,12 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col">
+      <JsonLd data={buildLocalBusinessJsonLd()} />
+      {(() => {
+        const reviewJsonLd = buildReviewJsonLd(reviewsForJsonLd)
+        return reviewJsonLd ? <JsonLd data={reviewJsonLd} /> : null
+      })()}
+      <JsonLd data={buildFaqJsonLd(lang)} />
       <Toaster position="top-center" toastOptions={{ duration: 3000 }} />
 
       {/* --- HERO SECTION --- */}

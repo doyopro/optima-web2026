@@ -59,7 +59,7 @@ export default function GuidesLandingPage() {
         {/* Hero */}
         <div className="relative">
           <div className="relative h-[380px] sm:h-[440px] w-full overflow-hidden">
-            <Image src="/lanzarote2.jpg" alt="" fill priority className="object-cover" />
+            <Image src="/lanzarote2.jpg" alt={g.heroAlt.index} fill priority className="object-cover" />
             <div className="absolute inset-0 bg-black/40" />
           </div>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
@@ -129,7 +129,7 @@ export default function GuidesLandingPage() {
                     <div className="relative h-48 w-full">
                       <Image
                         src={FALLBACK_IMAGE[guide.slug] ?? '/lanzarote2.jpg'}
-                        alt=""
+                        alt={meta.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
