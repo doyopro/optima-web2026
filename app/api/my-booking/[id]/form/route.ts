@@ -30,18 +30,35 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Invalid guest_number' }, { status: 400 })
     }
 
+    const fullName = guestNumber === 1 ? reservation.guest_name ?? null : body.full_name || null
+
+    // Compare against the reservation's contact info in normalized form —
+    // raw strict equality misses "duplicates" that only differ by case,
+    // surrounding whitespace, or phone punctuation/spacing — so those were
+    // slipping through and getting stored again instead of deduped.
+    const normalizeEmail = (v: unknown) => (typeof v === 'string' ? v.trim().toLowerCase() : '')
+    // Strip everything but digits (including a leading "+") so
+    // "+353 89 603 8307" and "353896038307" compare as the same number.
+    const normalizePhone = (v: unknown) => (typeof v === 'string' ? v.replace(/\D/g, '') : '')
+
+    const rawEmail = typeof body.email === 'string' ? body.email.trim() : ''
+    const rawPhone = typeof body.phone === 'string' ? body.phone.trim() : ''
+
+    const email = rawEmail && normalizeEmail(rawEmail) !== normalizeEmail(reservation.guest_email) ? rawEmail : null
+    const phone = rawPhone && normalizePhone(rawPhone) !== normalizePhone(reservation.guest_phone) ? rawPhone : null
+
     const { data, error } = await supabaseServer
       .from('guest_form_data')
       .upsert(
         {
           reservation_id: id,
           guest_number: guestNumber,
-          full_name: body.full_name ?? null,
+          full_name: fullName,
           age: body.age ? Number(body.age) : null,
           nationality: body.nationality ?? null,
           passport_number: body.passport_number ?? null,
-          email: body.email ?? null,
-          phone: body.phone ?? null,
+          email,
+          phone,
           submitted_at: new Date().toISOString(),
         },
         { onConflict: 'reservation_id,guest_number' }
