@@ -55,6 +55,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .from('properties')
     .select('id')
     .eq('status', 'active')
+    .eq('is_bookable', true)
 
   const villaEntries: MetadataRoute.Sitemap = (properties || []).map((p) => ({
     url: `${base}/villas/${p.id}`,

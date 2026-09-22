@@ -19,16 +19,6 @@ import WhatsAppWidget from '@/components/WhatsAppWidget'
 // flagged, not removed here.
 type SortKey = 'price_asc' | 'price_desc' | 'reviews'
 
-// Checkbox value must match the real string stored in properties.amenities (Supabase).
-const AMENITY_FILTERS = [
-  { value: 'Hot tub', labelKey: 'amenityHotTub' as const },
-  { value: 'Air conditioning', labelKey: 'amenityAirConditioning' as const },
-  { value: 'Sea view', labelKey: 'amenitySeaView' as const },
-  { value: 'Ping pong table', labelKey: 'amenityTableTennis' as const },
-  { value: 'Pool table', labelKey: 'amenityPoolTable' as const },
-  { value: 'Private pool', labelKey: 'amenityPrivatePool' as const },
-]
-
 export default function VillasPage() {
   return (
     <Suspense fallback={null}>
@@ -52,13 +42,8 @@ function VillasPageContent() {
   const [villaId, setVillaId] = useState(() => searchParams.get('villa') ?? '')
   const checkIn = searchParams.get('from') ?? ''
   const checkOut = searchParams.get('to') ?? ''
-  const [amenities, setAmenities] = useState<string[]>([])
   const [sort, setSort] = useState<SortKey>('price_asc')
   const [filtersOpen, setFiltersOpen] = useState(false)
-
-  function toggleAmenity(value: string) {
-    setAmenities((prev) => (prev.includes(value) ? prev.filter((a) => a !== value) : [...prev, value]))
-  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -75,9 +60,6 @@ function VillasPageContent() {
       if (guests) props = props.filter((p) => (p.guests_max ?? 0) >= Number(guests))
       if (bathrooms) props = props.filter((p) => (p.bathrooms ?? 0) >= Number(bathrooms))
       if (villaId) props = props.filter((p) => p.id === villaId)
-      if (amenities.length) {
-        props = props.filter((p) => amenities.every((a) => (p.amenities ?? []).includes(a)))
-      }
 
       setProperties(props)
     } catch {
@@ -85,7 +67,7 @@ function VillasPageContent() {
     } finally {
       setLoading(false)
     }
-  }, [minPrice, maxPrice, bedrooms, guests, bathrooms, villaId, amenities, checkIn, checkOut])
+  }, [minPrice, maxPrice, bedrooms, guests, bathrooms, villaId, checkIn, checkOut])
 
   useEffect(() => {
     load()
@@ -98,7 +80,6 @@ function VillasPageContent() {
     setGuests('')
     setBathrooms('')
     setVillaId('')
-    setAmenities([])
   }
 
   const sorted = [...properties].sort((a, b) => {
@@ -190,26 +171,6 @@ function VillasPageContent() {
             <option key={n} value={n}>{n}+</option>
           ))}
         </select>
-      </div>
-
-      {/* Amenities */}
-      <div>
-        <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-2">
-          {t.amenities}
-        </label>
-        <div className="space-y-2">
-          {AMENITY_FILTERS.map(({ value, labelKey }) => (
-            <label key={value} className="flex items-center gap-2 text-sm text-dark/70 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={amenities.includes(value)}
-                onChange={() => toggleAmenity(value)}
-                className="rounded border-neutral-300 text-orange focus:ring-orange"
-              />
-              {t[labelKey]}
-            </label>
-          ))}
-        </div>
       </div>
 
       <div className="flex gap-2 pt-2">

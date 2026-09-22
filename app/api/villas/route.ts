@@ -20,12 +20,18 @@ export async function GET(req: NextRequest) {
     // the client beyond what was already public.
     // Service role bypasses RLS entirely, so the "active only" restriction
     // the anon client got for free from RLS has to be applied explicitly here.
+    // is_bookable=false (Parque del Rey 24, Villa Medina, Villa Mi Casa)
+    // must never show up in any public villa listing — this is the one
+    // query that feeds /villas and (via client-side filtering on top) the
+    // homepage's Featured Villas, so excluding it here covers both instead
+    // of only the featured-section filter catching it.
     const { data, error } = await supabaseServer
       .from('properties')
       .select(
         'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp, owner_name, is_tina_partner, is_featured, is_bookable',
       )
       .eq('status', 'active')
+      .eq('is_bookable', true)
 
     if (error) {
       throw new Error(error.message)
