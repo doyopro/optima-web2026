@@ -401,3 +401,30 @@ export async function getListingReviews(guestyListingId: string): Promise<Guesty
     reviewDate: (r.date ?? r.createdAt ?? null) as string | null,
   }))
 }
+
+/**
+ * Active (reserved/confirmed) reservations for a listing + guest e-mail whose
+ * check-in is `checkInDate` (YYYY-MM-DD). Used by the Stripe webhook to tell
+ * "Guesty refused the booking" apart from "another delivery of the same event
+ * already booked it" before it ever refunds a guest.
+ */
+export async function findActiveGuestyReservation(
+  guestyListingId: string,
+  guestEmail: string,
+  checkInDate: string,
+): Promise<{ id: string; confirmationCode: string; status: string } | null> {
+  const filters = encodeURIComponent(
+    JSON.stringify([
+      { field: 'guest.email', operator: '$eq', value: guestEmail },
+      { field: 'listingId', operator: '$eq', value: guestyListingId },
+    ]),
+  )
+  const res = await guestyFetch(`/reservations?filters=${filters}&fields=status%20confirmationCode%20checkIn&limit=20`)
+  if (!res.ok) throw new Error(`Guesty reservation lookup failed: ${res.status}`)
+  const data = await res.json()
+  const hit = (data.results ?? []).find(
+    (r: { status: string; checkIn?: string }) =>
+      ['reserved', 'confirmed'].includes(r.status) && String(r.checkIn ?? '').startsWith(checkInDate),
+  )
+  return hit ? { id: hit._id as string, confirmationCode: hit.confirmationCode as string, status: hit.status as string } : null
+}

@@ -4,13 +4,12 @@ import { useState } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { type Language, translations } from '@/lib/i18n'
+import { STRIPE_PUBLISHABLE_KEY, STRIPE_PUBLISHABLE_KEY_VALID } from '@/lib/stripe-config'
 
 // Same TEST-MODE-ONLY publishable key as the new-booking checkout
 // (components/StripeCheckoutForm.tsx) — see that file for why this refuses
 // to load anything but a test key.
-const publishableKey = process.env.NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ?? ''
-const isValidTestKey = publishableKey.startsWith('pk_test_')
-const stripePromise = isValidTestKey ? loadStripe(publishableKey) : null
+const stripePromise = STRIPE_PUBLISHABLE_KEY_VALID ? loadStripe(STRIPE_PUBLISHABLE_KEY) : null
 
 interface Props {
   lang: Language

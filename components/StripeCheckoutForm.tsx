@@ -1,19 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { type Language, translations } from '@/lib/i18n'
+import { STRIPE_LIVE, STRIPE_PUBLISHABLE_KEY, STRIPE_PUBLISHABLE_KEY_VALID } from '@/lib/stripe-config'
 
 // BETA — internal testing only. TEST-MODE-ONLY, dedicated publishable key —
 // never the site's live key (which doesn't even exist as a NEXT_PUBLIC var
 // today). Publishable keys are always safe to expose client-side by design,
 // but this still hard-refuses to load anything that isn't a test key, so a
 // misconfigured env var can never let this beta form process a real card.
-const publishableKey = process.env.NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ?? ''
-const isValidTestKey = publishableKey.startsWith('pk_test_')
-const stripePromise = isValidTestKey ? loadStripe(publishableKey) : null
+const stripePromise = STRIPE_PUBLISHABLE_KEY_VALID ? loadStripe(STRIPE_PUBLISHABLE_KEY) : null
 
 interface BookingDetails {
   amountGbp: number
@@ -76,6 +75,10 @@ function PayButton({ lang, booking, disabled, onSuccess }: Props) {
   const elements = useElements()
   const t = translations[lang].checkout
   const [submitting, setSubmitting] = useState(false)
+  // Synchronous re-entrancy guard: `submitting` only updates on the next
+  // render, so two fast clicks could both start a payment. A ref flips
+  // immediately.
+  const inFlight = useRef(false)
   const [error, setError] = useState<string | null>(null)
   // Owned here (rather than by the parent checkout page) so it sits
   // literally immediately above the Pay button, not separated by any other
@@ -83,7 +86,8 @@ function PayButton({ lang, booking, disabled, onSuccess }: Props) {
   const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   async function handlePay() {
-    if (!stripe || !elements || !agreedToTerms) return
+    if (!stripe || !elements || !agreedToTerms || inFlight.current) return
+    inFlight.current = true
     setSubmitting(true)
     setError(null)
 
@@ -121,6 +125,7 @@ function PayButton({ lang, booking, disabled, onSuccess }: Props) {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Payment failed')
     } finally {
+      inFlight.current = false
       setSubmitting(false)
     }
   }
@@ -163,7 +168,7 @@ function PayButton({ lang, booking, disabled, onSuccess }: Props) {
       >
         {submitting ? t.processingPayment : t.payNow}
       </button>
-      <p className="text-[11px] text-dark/40 text-center">{t.testCardHint}</p>
+      {!STRIPE_LIVE && <p className="text-[11px] text-dark/40 text-center">{t.testCardHint}</p>}
     </div>
   )
 }
