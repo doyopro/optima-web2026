@@ -7,7 +7,7 @@ interface Props {
 }
 
 function siteUrl(): string {
-  return (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '')
+  return (process.env.NEXT_PUBLIC_APP_URL || 'https://optimavillaslanzarote.com').replace(/\/$/, '')
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

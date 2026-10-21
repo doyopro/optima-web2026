@@ -21,7 +21,19 @@ export async function GET(req: NextRequest) {
 
     const pricing = await getListingPricing(listingId, checkIn, checkOut)
 
-    return NextResponse.json(pricing)
+    // Public endpoint: Guesty's raw calendar days carry internal data (block
+    // reasons, owner notes, the admin e-mail that created a block). Only
+    // return what the checkout actually needs.
+    return NextResponse.json({
+      ...pricing,
+      days: pricing.days.map((d) => ({
+        date: d.date,
+        price: d.price,
+        currency: d.currency,
+        status: d.status,
+        minNights: d.minNights,
+      })),
+    })
   } catch (err) {
     if (err instanceof GuestyRateLimitError) {
       console.error('[GET /api/guesty/pricing] rate limited by Guesty')

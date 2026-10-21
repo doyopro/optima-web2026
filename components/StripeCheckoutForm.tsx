@@ -56,7 +56,7 @@ function pushPurchaseSuccessEvent(booking: BookingDetails, paymentIntentId: stri
   if (typeof window === 'undefined') return
   window.dataLayer = window.dataLayer || []
   window.dataLayer.push({
-    event: 'purchase_success',
+    event: 'Purchase', // exact name the GTM Ads trigger listens for
     value: booking.amountGbp,
     currency: 'GBP',
     transaction_id: paymentIntentId,

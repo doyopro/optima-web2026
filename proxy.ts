@@ -38,9 +38,53 @@ const GUEST_PORTAL_PREFIXES = ['/guest-login', '/my-booking']
 // component so it can't export `metadata` itself; enforced here instead.
 const INTERNAL_DASHBOARD_PREFIX = '/web'
 
+// Staff-only surface: the /web dashboard and the write/admin API routes it
+// calls (guides CRUD, property flags). These had NO authentication at all.
+// Gated with HTTP Basic auth (env DASHBOARD_PASSWORD, optional
+// DASHBOARD_USER, default "optima") — the browser prompts natively and
+// resends the credentials on the dashboard's own fetch() calls, so no UI
+// change is needed. Fails CLOSED: if DASHBOARD_PASSWORD isn't set, these
+// routes are unreachable (503) everywhere except localhost dev.
+function isAdminRequest(pathname: string, method: string, search: string): boolean {
+  if (pathname === '/web' || pathname.startsWith('/web/')) return true
+  if (pathname === '/api/properties') return true
+  if (pathname.startsWith('/api/properties/') && method !== 'GET') return true
+  if (pathname.startsWith('/api/guides')) {
+    return method !== 'GET' || search.includes('all=true')
+  }
+  return false
+}
+
+function adminAuthResponse(request: NextRequest): NextResponse | null {
+  const password = process.env.DASHBOARD_PASSWORD
+  if (!password) {
+    if (process.env.NODE_ENV !== 'production') return null
+    return new NextResponse('Dashboard is not configured', { status: 503 })
+  }
+  const user = process.env.DASHBOARD_USER || 'optima'
+  const header = request.headers.get('authorization') || ''
+  if (header.startsWith('Basic ')) {
+    try {
+      const [u, ...rest] = atob(header.slice(6)).split(':')
+      if (u === user && rest.join(':') === password) return null
+    } catch {
+      // fall through to the 401 challenge
+    }
+  }
+  return new NextResponse('Authentication required', {
+    status: 401,
+    headers: { 'WWW-Authenticate': 'Basic realm="Optima dashboard", charset="UTF-8"' },
+  })
+}
+
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const host = request.headers.get('host') || ''
+
+  if (isAdminRequest(pathname, request.method, request.nextUrl.search)) {
+    const denied = adminAuthResponse(request)
+    if (denied) return denied
+  }
 
   if (WORDPRESS_IMAGE_ATTACHMENT_PATTERN.test(pathname)) {
     return NextResponse.redirect(new URL('/blog', request.url), 308)

@@ -66,6 +66,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Idempotency: Stripe re-delivers events (and retries on our 5xx). The
+    // event payload's metadata is a snapshot, so re-read the live
+    // PaymentIntent — if a previous delivery already created the Guesty
+    // reservation it left its id in metadata, and we must not book twice.
+    const live = await stripeServer.paymentIntents.retrieve(paymentIntent.id)
+    if (live.metadata?.guesty_reservation_id) {
+      return NextResponse.json({ received: true, duplicate: true })
+    }
+
     const [firstName, ...rest] = (meta.guestName || 'Guest').trim().split(' ')
     const reservation = await createGuestyReservation({
       guestyListingId: meta.guestyListingId,
@@ -78,6 +87,10 @@ export async function POST(req: NextRequest) {
         phone: meta.guestPhone || undefined,
       },
       source: 'Direct',
+    })
+
+    await stripeServer.paymentIntents.update(paymentIntent.id, {
+      metadata: { guesty_reservation_id: reservation.id },
     })
 
     console.log(
