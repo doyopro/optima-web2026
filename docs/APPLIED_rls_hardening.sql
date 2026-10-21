@@ -1,4 +1,6 @@
--- PROPOSED — NOT APPLIED. Needs Nico's approval.
+-- APPLIED 2026-10-21 to the Supabase project (migration rls_hardening_guest_form_owner_statements),
+-- after Nico's approval. Before: anon SELECT 200 on both tables, anon INSERT passed RLS.
+-- After: anon SELECT 401 on both, anon INSERT 401 (42501); service_role still 200.
 --
 -- Evidence (checked 2026-10-21): the only code that touches these tables is
 --   guest_form_data  -> optima-web2026 app/api/my-booking/[id]/form/route.ts   (service_role)
@@ -28,8 +30,12 @@ commit;
 
 -- Verify (as anon, expect 401/empty):  GET /rest/v1/guest_form_data?select=id
 --
--- Rollback (restores the previous, insecure state):
+-- ROLLBACK (restores the previous, INSECURE state — only if something breaks):
 --   create policy "Allow all on guest_form_data" on public.guest_form_data for all to public using (true);
 --   grant all on public.guest_form_data to anon, authenticated;
 --   create policy "Allow read" on public.owner_statements for select to public using (true);
+--   create policy "Allow insert service role" on public.owner_statements for insert to public
+--     with check (auth.role() = 'service_role');
 --   grant all on public.owner_statements to anon, authenticated;
+--   create policy "Allow all on guest_conversations" on public.guest_conversations for all to public using (true);
+--   create policy "Allow all on guest_messages" on public.guest_messages for all to public using (true);

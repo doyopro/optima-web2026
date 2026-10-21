@@ -17,7 +17,8 @@ import { filterDifferentiatorAmenities, parseHighlights } from '@/lib/property'
 import DateRangePicker from '@/components/DateRangePicker'
 import Footer from '@/components/Footer'
 import BookingNotice from '@/components/BookingNotice'
-import { CHECKOUT_ENABLED } from '@/lib/features'
+import { CHECKOUT_ENABLED, GUESTY_BOOKING_FALLBACK } from '@/lib/features'
+import { getGuestyBookingUrl } from '@/lib/guesty-booking-url'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
 // Leaflet touches `window` at module load — must stay out of the SSR pass.
@@ -126,6 +127,10 @@ export default function VillaDetailClient({ params }: Props) {
     if (toDate) q.set('to', toDate)
     router.push(`/property-enquiry?${q.toString()}`)
   }
+  const showGuestyBooking = !CHECKOUT_ENABLED && GUESTY_BOOKING_FALLBACK && Boolean(property?.guesty_listing_id)
+  const guestyBookingUrl = property?.guesty_listing_id
+    ? getGuestyBookingUrl(property.guesty_listing_id, { checkIn: fromDate, checkOut: toDate })
+    : '#'
   const bookLabel = !CHECKOUT_ENABLED
     ? t.properties.requestToBook
     : canContinue ? t.availability.proceedToBook : t.properties.bookNow
@@ -456,6 +461,16 @@ export default function VillaDetailClient({ params }: Props) {
                 >
                   {bookLabel}
                 </button>
+                {showGuestyBooking && (
+                  <a
+                    href={guestyBookingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 block w-full text-center border border-orange text-orange font-semibold py-3 rounded-lg hover:bg-orange/5 transition-colors text-sm"
+                  >
+                    {t.properties.bookNowSecure}
+                  </a>
+                )}
 
                 <p className="text-xs text-center text-dark/40 mt-3">
                   {CHECKOUT_ENABLED ? t.properties.bookNowNote : t.properties.requestToBookNote}
@@ -485,6 +500,7 @@ export default function VillaDetailClient({ params }: Props) {
           <span className="text-lg font-bold text-dark">{formatPrice(property.price_per_night_gbp, currency, gbpToEurRate)}</span>
           <span className="text-dark/50 text-xs"> {t.properties.perNight}</span>
         </div>
+        <div className="flex flex-col items-end gap-1">
         <button
           type="button"
           onClick={handleBookNowClick}
@@ -492,6 +508,17 @@ export default function VillaDetailClient({ params }: Props) {
         >
           {bookLabel}
         </button>
+        {showGuestyBooking && (
+          <a
+            href={guestyBookingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold text-orange underline underline-offset-2"
+          >
+            {t.properties.bookNowSecure}
+          </a>
+        )}
+        </div>
       </div>
 
       {/* Gallery modal */}
@@ -522,7 +549,7 @@ export default function VillaDetailClient({ params }: Props) {
       )}
 
       <Footer lang={lang} />
-      <WhatsAppWidget villaName={property.name} lang={lang} />
+      <WhatsAppWidget villaName={property.name} lang={lang} aboveBottomBar />
     </>
   )
 }
