@@ -74,22 +74,32 @@ export default function Testimonials({ lang }: Props) {
     setActiveIndex(closest)
   }
 
-  // Real Guesty reviews (property_reviews) win once the reviews sync has
-  // data. Until then — the sync is blocked on a Guesty permission — fall back
-  // to the curated testimonials in site_content (section testimonialsData,
-  // EN + ES, already merged into translations by the CMS overlay). Without
-  // this fallback the section rendered empty.
-  const curated = translations[lang].testimonialsData
-  const items = reviews.length > 0
-    ? reviews.map((r) => ({
-        key: r.id,
-        rating: r.rating,
-        title: r.propertyName ?? '',
-        text: r.text ?? '',
-        author: r.author ?? '',
-        date: formatReviewDate(r.date, lang),
-      }))
-    : curated.map((c, i) => ({ key: `c${i}`, rating: c.rating, title: c.title, text: c.text, author: c.author, date: c.date }))
+  // ONLY real Guesty reviews (property_reviews). The curated site_content
+  // testimonialsData rows are NOT real guest reviews and must never be shown
+  // here, not even as a fallback. With no real reviews the section is just
+  // the heading and the Trustpilot/Facebook/Google badges — no cards.
+  const items = reviews.map((r) => ({
+    key: r.id,
+    rating: r.rating,
+    title: r.propertyName ?? '',
+    text: r.text ?? '',
+    author: r.author ?? '',
+    date: formatReviewDate(r.date, lang),
+  }))
+
+  if (items.length === 0) {
+    return (
+      <section className="py-16 md:py-24 px-4 sm:px-6 bg-[#F5F5F5]">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-10 max-w-xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">{t.title}</h2>
+            <p className="text-dark/60 leading-relaxed">{t.description}</p>
+          </div>
+          <ReviewBadges lang={lang} />
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="py-16 md:py-24 px-4 sm:px-6 bg-[#F5F5F5]">
