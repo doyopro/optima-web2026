@@ -68,7 +68,9 @@ export default function Home() {
   useEffect(() => {
     fetch('/api/property-reviews')
       .then((r) => r.json())
-      .then((d) => setReviewsForJsonLd(d.reviews ?? []))
+      // Review markup only for real Guesty reviews: Trustpilot reviews live on
+      // Trustpilot, and no aggregateRating is emitted for them (for now).
+      .then((d) => setReviewsForJsonLd(d.source === 'guesty' ? (d.reviews ?? []) : []))
       .catch(() => setReviewsForJsonLd([]))
   }, [])
 

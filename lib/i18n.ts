@@ -81,6 +81,7 @@ export const translations = {
       addDates: 'dd/mm/yyyy',
     },
     testimonials: {
+      originalInEnglish: 'Original review in English',
       title: 'Guests who come back',
       description:
         'Thousands of travellers have already enjoyed Lanzarote with us. See their ratings on Trustpilot, Google and Facebook.',
@@ -794,6 +795,7 @@ export const translations = {
       addDates: 'dd/mm/aaaa',
     },
     testimonials: {
+      originalInEnglish: 'Reseña original en inglés',
       title: 'Huéspedes que repiten',
       description:
         'Miles de viajeros ya han disfrutado de Lanzarote con nosotros. Mira sus valoraciones en Trustpilot, Google y Facebook.',

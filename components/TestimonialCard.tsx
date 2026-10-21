@@ -10,6 +10,12 @@ interface Props {
   date: string
   seeMoreLabel?: string
   seeLessLabel?: string
+  // Optional extras (Trustpilot reviews): country shown next to the name, a
+  // source link in the footer, and a note under the text (e.g. "Original
+  // review in English").
+  country?: string
+  source?: { label: string; url: string }
+  note?: string
 }
 
 export default function TestimonialCard({
@@ -20,6 +26,9 @@ export default function TestimonialCard({
   date,
   seeMoreLabel = 'See more',
   seeLessLabel = 'See less',
+  country,
+  source,
+  note,
 }: Props) {
   const [expanded, setExpanded] = useState(false)
 
@@ -40,7 +49,7 @@ export default function TestimonialCard({
       </div>
 
       {/* Title */}
-      <h3 className="text-lg font-bold leading-snug text-dark line-clamp-2">{title}</h3>
+      {title && <h3 className="text-lg font-bold leading-snug text-dark line-clamp-2">{title}</h3>}
 
       {/* Text */}
       <div className="flex-1">
@@ -52,12 +61,31 @@ export default function TestimonialCard({
         >
           {expanded ? seeLessLabel : seeMoreLabel}
         </button>
+        {note && <p className="mt-2 text-xs italic text-dark/50">{note}</p>}
       </div>
 
       {/* Footer */}
       <div className="pt-4 border-t border-orange/15 flex items-center justify-between text-xs">
-        <span className="font-semibold text-dark">{author}</span>
-        <span className="text-dark/50">{date}</span>
+        <span className="font-semibold text-dark">
+          {author}
+          {country && <span className="font-normal text-dark/50"> · {country}</span>}
+        </span>
+        <span className="text-dark/50 text-right">
+          {date}
+          {source && (
+            <>
+              {' · '}
+              <a
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-orange hover:underline"
+              >
+                {source.label}
+              </a>
+            </>
+          )}
+        </span>
       </div>
     </div>
   )

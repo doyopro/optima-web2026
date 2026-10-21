@@ -23,17 +23,42 @@ export async function GET() {
 
   if (error) {
     console.error('[/api/property-reviews]', error.message)
-    return NextResponse.json({ reviews: [] }, { status: 200 })
   }
 
-  const reviews = (data ?? []).map((row) => ({
+  // Real Guesty reviews win as soon as there are any — and are then the ONLY
+  // thing shown. Never mixed with the Trustpilot ones below.
+  if (!error && (data ?? []).length > 0) {
+    const reviews = (data ?? []).map((row) => ({
+      id: row.id,
+      rating: row.rating,
+      text: row.review_text,
+      author: row.author_name,
+      date: row.review_date,
+      propertyName: (row.properties as unknown as { name: string } | null)?.name ?? null,
+    }))
+    return NextResponse.json({ source: 'guesty', reviews })
+  }
+
+  // Otherwise: the real Trustpilot reviews (own table, verbatim text).
+  const { data: tp, error: tpError } = await supabaseServer
+    .from('trustpilot_reviews')
+    .select('id, rating, review_text, author_name, country_code, review_month, original_language')
+    .order('sort_order', { ascending: true })
+
+  if (tpError) {
+    console.error('[/api/property-reviews] trustpilot', tpError.message)
+    return NextResponse.json({ source: 'none', reviews: [] }, { status: 200 })
+  }
+
+  const reviews = (tp ?? []).map((row) => ({
     id: row.id,
     rating: row.rating,
     text: row.review_text,
     author: row.author_name,
-    date: row.review_date,
-    propertyName: (row.properties as unknown as { name: string } | null)?.name ?? null,
+    country: row.country_code,
+    date: row.review_month,
+    originalLanguage: row.original_language,
+    propertyName: null,
   }))
-
-  return NextResponse.json({ reviews })
+  return NextResponse.json({ source: reviews.length > 0 ? 'trustpilot' : 'none', reviews })
 }

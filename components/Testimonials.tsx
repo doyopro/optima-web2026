@@ -16,15 +16,22 @@ interface PropertyReview {
   author: string | null
   date: string | null
   propertyName: string | null
+  country?: string
+  originalLanguage?: string
 }
 
 const TRUSTPILOT_URL = 'https://uk.trustpilot.com/review/optimavillaslanzarote.com'
+
+const TRUSTPILOT_SOURCE = { label: 'Trustpilot', url: TRUSTPILOT_URL }
 
 function formatReviewDate(value: string | null, lang: Language): string {
   if (!value) return ''
   return new Date(value).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', {
     month: 'long',
     year: 'numeric',
+    // dates are stored as the 1st of the month at UTC midnight — without this
+    // a browser west of UTC would show the previous month
+    timeZone: 'UTC',
   })
 }
 
@@ -32,11 +39,15 @@ export default function Testimonials({ lang }: Props) {
   const t = translations[lang].testimonials
 
   const [reviews, setReviews] = useState<PropertyReview[]>([])
+  const [source, setSource] = useState<'guesty' | 'trustpilot' | 'none'>('none')
 
   useEffect(() => {
     fetch('/api/property-reviews')
       .then((r) => r.json())
-      .then((d) => setReviews(d.reviews ?? []))
+      .then((d) => {
+        setReviews(d.reviews ?? [])
+        setSource(d.source ?? 'none')
+      })
       .catch(() => setReviews([]))
   }, [])
 
@@ -85,6 +96,10 @@ export default function Testimonials({ lang }: Props) {
     text: r.text ?? '',
     author: r.author ?? '',
     date: formatReviewDate(r.date, lang),
+    country: r.country,
+    // Trustpilot reviews are shown verbatim in their original English; on
+    // the Spanish site they carry a note saying so (no translation).
+    note: source === 'trustpilot' && lang === 'es' && r.originalLanguage === 'en' ? t.originalInEnglish : undefined,
   }))
 
   if (items.length === 0) {
@@ -147,6 +162,9 @@ export default function Testimonials({ lang }: Props) {
                   text={review.text}
                   author={review.author}
                   date={review.date}
+                  country={review.country}
+                  note={review.note}
+                  source={source === 'trustpilot' ? TRUSTPILOT_SOURCE : undefined}
                   seeMoreLabel={t.seeMore}
                   seeLessLabel={t.seeLess}
                 />
