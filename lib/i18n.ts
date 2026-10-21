@@ -81,9 +81,9 @@ export const translations = {
       addDates: 'dd/mm/yyyy',
     },
     testimonials: {
-      title: 'What our guests say',
+      title: 'Guests who come back',
       description:
-        "Don't just take our word for it — hear from our happy guests who made unforgettable memories in Lanzarote.",
+        'Thousands of travellers have already enjoyed Lanzarote with us. See their ratings on Trustpilot, Google and Facebook.',
       seeMore: 'See more',
       seeLess: 'See less',
       previous: 'Previous',
@@ -794,9 +794,9 @@ export const translations = {
       addDates: 'dd/mm/aaaa',
     },
     testimonials: {
-      title: 'Qué dicen nuestros huéspedes',
+      title: 'Huéspedes que repiten',
       description:
-        'No te fíes sólo de nuestra palabra — escucha a nuestros felices huéspedes que vivieron momentos inolvidables en Lanzarote.',
+        'Miles de viajeros ya han disfrutado de Lanzarote con nosotros. Mira sus valoraciones en Trustpilot, Google y Facebook.',
       seeMore: 'Ver más',
       seeLess: 'Ver menos',
       previous: 'Anterior',
