@@ -27,6 +27,7 @@ export type Property = {
   amenities: string[]
   is_featured: boolean
   is_bookable?: boolean
+  guesty_engine_published?: boolean
   slug: string
   owner_name?: string | null
   is_tina_partner?: boolean

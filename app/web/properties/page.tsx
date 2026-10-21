@@ -13,6 +13,7 @@ interface PropertyRow {
   status: string | null
   is_featured: boolean
   is_bookable: boolean
+  guesty_engine_published: boolean
   is_tina_partner: boolean
   guesty_synced_at: string | null
 }
@@ -40,7 +41,7 @@ export default function PropertiesAdminPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  async function toggle(id: string, field: 'is_featured' | 'is_bookable', value: boolean) {
+  async function toggle(id: string, field: 'is_featured' | 'is_bookable' | 'guesty_engine_published', value: boolean) {
     setSaving(id)
     const previous = properties
     setProperties((rows) => rows.map((r) => (r.id === id ? { ...r, [field]: value } : r)))
@@ -85,6 +86,7 @@ export default function PropertiesAdminPage() {
               <th className="text-left px-4 py-3">Guesty synced</th>
               <th className="text-left px-4 py-3">Featured</th>
               <th className="text-left px-4 py-3">Bookable</th>
+              <th className="text-left px-4 py-3" title="Villa is published on optimavillas.guestybookings.com">On booking engine</th>
             </tr>
           </thead>
           <tbody>
@@ -123,6 +125,15 @@ export default function PropertiesAdminPage() {
                     checked={p.is_bookable}
                     disabled={saving === p.id}
                     onChange={(e) => toggle(p.id, 'is_bookable', e.target.checked)}
+                    className="h-4 w-4 rounded border-neutral-300 text-orange focus:ring-orange"
+                  />
+                </td>
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={p.guesty_engine_published}
+                    disabled={saving === p.id}
+                    onChange={(e) => toggle(p.id, 'guesty_engine_published', e.target.checked)}
                     className="h-4 w-4 rounded border-neutral-300 text-orange focus:ring-orange"
                   />
                 </td>

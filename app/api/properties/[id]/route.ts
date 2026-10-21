@@ -17,7 +17,7 @@ export async function GET(
     const { data, error } = await supabaseServer
       .from('properties')
       .select(
-        'id, guesty_listing_id, name, type, city, region, country, latitude, longitude, bedrooms, bathrooms, max_guests, description_en, description_es, overview_en, overview_es, highlights_en, highlights_es, the_space_en, the_space_es, amenities, images, base_price_gbp',
+        'id, guesty_listing_id, name, type, city, region, country, latitude, longitude, bedrooms, bathrooms, max_guests, description_en, description_es, overview_en, overview_es, highlights_en, highlights_es, the_space_en, the_space_es, amenities, images, base_price_gbp, guesty_engine_published',
       )
       .eq('id', id)
       .maybeSingle()
@@ -61,6 +61,7 @@ export async function GET(
       images: (data.images as string[]) ?? [],
       amenities: (data.amenities as string[]) ?? [],
       is_featured: true,
+      guesty_engine_published: data.guesty_engine_published ?? false,
       slug: data.id,
     }
 
@@ -82,6 +83,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const update: Record<string, boolean> = {}
     if (typeof body.is_featured === 'boolean') update.is_featured = body.is_featured
     if (typeof body.is_bookable === 'boolean') update.is_bookable = body.is_bookable
+    if (typeof body.guesty_engine_published === 'boolean') update.guesty_engine_published = body.guesty_engine_published
 
     if (Object.keys(update).length === 0) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })

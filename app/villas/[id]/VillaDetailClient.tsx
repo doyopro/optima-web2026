@@ -127,7 +127,7 @@ export default function VillaDetailClient({ params }: Props) {
     if (toDate) q.set('to', toDate)
     router.push(`/property-enquiry?${q.toString()}`)
   }
-  const showGuestyBooking = !CHECKOUT_ENABLED && GUESTY_BOOKING_FALLBACK && Boolean(property?.guesty_listing_id)
+  const showGuestyBooking = !CHECKOUT_ENABLED && GUESTY_BOOKING_FALLBACK && Boolean(property?.guesty_listing_id) && Boolean(property?.guesty_engine_published)
   const guestyBookingUrl = property?.guesty_listing_id
     ? getGuestyBookingUrl(property.guesty_listing_id, { checkIn: fromDate, checkOut: toDate })
     : '#'
@@ -475,7 +475,7 @@ export default function VillaDetailClient({ params }: Props) {
                 <p className="text-xs text-center text-dark/40 mt-3">
                   {CHECKOUT_ENABLED ? t.properties.bookNowNote : t.properties.requestToBookNote}
                 </p>
-                <BookingNotice className="mt-4" />
+                <BookingNotice className="mt-4" partner={showGuestyBooking} />
               </div>
             </div>
           </div>

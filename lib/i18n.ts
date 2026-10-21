@@ -337,6 +337,7 @@ export const translations = {
     },
     propertyEnquiry: {
       bookingNotice: 'Bookings are handled personally on 21-22 October while we update our booking system. Send us your request via the form, by email at {email} or WhatsApp {whatsapp} and we will reply with a secure payment link.',
+      bookingNoticePartner: 'Book online through our secure partner checkout, or send us a request and we will reply with a payment link. Contact: {email} / WhatsApp {whatsapp}',
       title: 'Enquire about a stay',
       subtitle: "Tell us what you're looking for and our local team will get back to you with availability and a quote.",
       name: 'Name',
@@ -1049,6 +1050,7 @@ export const translations = {
     },
     propertyEnquiry: {
       bookingNotice: 'Las reservas se gestionan personalmente los días 21 y 22 de octubre mientras actualizamos nuestro sistema de reservas. Envíanos tu solicitud con el formulario, por email a {email} o por WhatsApp {whatsapp} y te responderemos con un enlace de pago seguro.',
+      bookingNoticePartner: 'Reserva online a través de nuestro pago seguro con nuestro partner, o envíanos una solicitud y te responderemos con un enlace de pago. Contacto: {email} / WhatsApp {whatsapp}',
       title: 'Consulta sobre una estancia',
       subtitle: 'Contanos qué estás buscando y nuestro equipo local te responderá con disponibilidad y presupuesto.',
       name: 'Nombre',

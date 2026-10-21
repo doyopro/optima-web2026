@@ -6,7 +6,7 @@ import { supabaseServer } from '@/lib/supabase-server'
 export async function GET() {
   const { data, error } = await supabaseServer
     .from('properties')
-    .select('id, name, status, is_featured, is_bookable, is_tina_partner, guesty_synced_at')
+    .select('id, name, status, is_featured, is_bookable, guesty_engine_published, is_tina_partner, guesty_synced_at')
     .order('name', { ascending: true })
 
   if (error) {

@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await supabaseServer
       .from('properties')
       .select(
-        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp, owner_name, is_tina_partner, is_featured, is_bookable',
+        'id, guesty_listing_id, name, city, region, country, bedrooms, bathrooms, max_guests, description_en, description_es, amenities, images, base_price_gbp, owner_name, is_tina_partner, is_featured, is_bookable, guesty_engine_published',
       )
       .eq('status', 'active')
       .eq('is_bookable', true)
@@ -59,6 +59,7 @@ export async function GET(req: NextRequest) {
         amenities: (row.amenities as string[]) ?? [],
         is_featured: row.is_featured ?? false,
         is_bookable: row.is_bookable ?? true,
+        guesty_engine_published: row.guesty_engine_published ?? false,
         slug: row.id,
         owner_name: row.owner_name ?? null,
         is_tina_partner: row.is_tina_partner ?? false,
