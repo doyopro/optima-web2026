@@ -1,16 +1,32 @@
 'use client'
 
-import { type FormEvent, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { type FormEvent, Suspense, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
+import BookingNotice from '@/components/BookingNotice'
 
 type SubmitState = 'idle' | 'submitting' | 'error'
 
 export default function PropertyEnquiryPage() {
+  return (
+    <Suspense fallback={null}>
+      <PropertyEnquiryContent />
+    </Suspense>
+  )
+}
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
+
+function PropertyEnquiryContent() {
+  const searchParams = useSearchParams()
+  const villaId = searchParams.get('villa') ?? ''
+  const qFrom = searchParams.get('from') ?? ''
+  const qTo = searchParams.get('to') ?? ''
+  const qGuests = searchParams.get('guests') ?? ''
   const { lang } = useLanguage()
   const t = translations[lang].propertyEnquiry
   const router = useRouter()
@@ -20,12 +36,25 @@ export default function PropertyEnquiryPage() {
     email: '',
     phone: '',
     propertyInterest: '',
-    checkIn: '',
-    checkOut: '',
-    guests: '',
+    checkIn: ISO_DATE.test(qFrom) ? qFrom : '',
+    checkOut: ISO_DATE.test(qTo) ? qTo : '',
+    guests: /^\d{1,2}$/.test(qGuests) ? qGuests : '',
     message: '',
   })
   const [submitState, setSubmitState] = useState<SubmitState>('idle')
+
+  // Villa preselected from a villa page ("Request to book"): look up its
+  // name so the form shows it, and the team sees which villa was meant.
+  useEffect(() => {
+    if (!villaId) return
+    fetch(`/api/properties/${encodeURIComponent(villaId)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        const name = d?.property?.name
+        if (name) setForm((f) => (f.propertyInterest ? f : { ...f, propertyInterest: name }))
+      })
+      .catch(() => {})
+  }, [villaId])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -60,6 +89,7 @@ export default function PropertyEnquiryPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-dark mb-3">{t.title}</h1>
             <p className="text-dark/60">{t.subtitle}</p>
           </div>
+          <BookingNotice className="mb-6" />
 
           <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 sm:p-8 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { CHECKOUT_ENABLED } from '@/lib/features'
 import { stripeServer, stripeConfigured } from '@/lib/stripe-server'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getListingPricing, GuestyRateLimitError } from '@/lib/guesty-server'
@@ -22,6 +23,8 @@ function bad(error: string, status = 400) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!CHECKOUT_ENABLED) return new NextResponse(null, { status: 404 })
+
   if (!stripeConfigured || !stripeServer) {
     return bad('Stripe is not configured for this beta (missing STRIPE_TEST_SECRET_KEY).', 503)
   }

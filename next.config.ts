@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  skipTrailingSlashRedirect: true,
   async headers() {
     return [
       {
@@ -16,7 +17,7 @@ const nextConfig: NextConfig = {
     ]
   },
   async redirects() {
-    return [
+    const rules = [
       // Old villas/apartments listing pages -> new villas listing
       { source: '/apartments', destination: '/villas', permanent: true },
 
@@ -110,6 +111,16 @@ const nextConfig: NextConfig = {
       // and the Spanish translation is pending human review (falls back to
       // English in the meantime) — see app/privacy/PrivacyClient.tsx.
     ]
+    // Single-hop redirects for old URLs that end in "/": with
+    // skipTrailingSlashRedirect Next no longer strips the slash first (which
+    // made every old URL a 308 -> 308 chain), so each explicit rule is also
+    // registered in its trailing-slash form, and a final catch-all strips the
+    // slash from any other path (e.g. /villas/ -> /villas).
+    const withSlash = rules
+      .filter((r) => !r.source.includes(':'))
+      .map((r) => ({ ...r, source: `${r.source}/` }))
+    const stripSlash = { source: '/:path+/', destination: '/:path+', permanent: true }
+    return [...rules, ...withSlash, stripSlash]
   },
   images: {
     remotePatterns: [

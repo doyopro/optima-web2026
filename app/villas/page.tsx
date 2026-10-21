@@ -10,6 +10,7 @@ import PropertyCard from '@/components/PropertyCard'
 import PropertySkeleton from '@/components/PropertySkeleton'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
+import BookingNotice from '@/components/BookingNotice'
 
 // 'rating' removed (2026-09): Property.rating is hardcoded to 0 for every
 // villa (see app/api/villas/route.ts) — sorting by it was a silent no-op,
@@ -197,6 +198,7 @@ function VillasPageContent() {
       <Toaster position="top-center" />
       <div className="min-h-screen bg-cream">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
+          <BookingNotice className="mb-6" />
           {/* Header row */}
           <div className="flex items-center justify-between mb-8 gap-4">
             <div>

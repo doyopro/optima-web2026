@@ -16,6 +16,8 @@ import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
 import { filterDifferentiatorAmenities, parseHighlights } from '@/lib/property'
 import DateRangePicker from '@/components/DateRangePicker'
 import Footer from '@/components/Footer'
+import BookingNotice from '@/components/BookingNotice'
+import { CHECKOUT_ENABLED } from '@/lib/features'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
 // Leaflet touches `window` at module load — must stay out of the SSR pass.
@@ -116,6 +118,18 @@ export default function VillaDetailClient({ params }: Props) {
     router.push(`/villas/${id}/checkout?from=${fromDate}&to=${toDate}`)
   }
 
+  // Checkout switched off (lib/features.ts): the primary action becomes a
+  // personal booking request, with villa + dates carried to the form.
+  function goToRequest() {
+    const q = new URLSearchParams({ villa: id })
+    if (fromDate) q.set('from', fromDate)
+    if (toDate) q.set('to', toDate)
+    router.push(`/property-enquiry?${q.toString()}`)
+  }
+  const bookLabel = !CHECKOUT_ENABLED
+    ? t.properties.requestToBook
+    : canContinue ? t.availability.proceedToBook : t.properties.bookNow
+
   function handleDateChange(from: string, to: string) {
     setFromDate(from)
     setToDate(to)
@@ -130,6 +144,10 @@ export default function VillaDetailClient({ params }: Props) {
   // engine. The external link only remains as a genuine-error fallback on
   // the checkout page itself.
   function handleBookNowClick() {
+    if (!CHECKOUT_ENABLED) {
+      goToRequest()
+      return
+    }
     if (canContinue) {
       goToCheckout()
       return
@@ -436,10 +454,13 @@ export default function VillaDetailClient({ params }: Props) {
                   onClick={handleBookNowClick}
                   className="block w-full text-center bg-orange text-white font-semibold py-3 rounded-lg hover:bg-orange/90 transition-colors text-sm"
                 >
-                  {canContinue ? t.availability.proceedToBook : t.properties.bookNow}
+                  {bookLabel}
                 </button>
 
-                <p className="text-xs text-center text-dark/40 mt-3">{t.properties.bookNowNote}</p>
+                <p className="text-xs text-center text-dark/40 mt-3">
+                  {CHECKOUT_ENABLED ? t.properties.bookNowNote : t.properties.requestToBookNote}
+                </p>
+                <BookingNotice className="mt-4" />
               </div>
             </div>
           </div>
@@ -469,7 +490,7 @@ export default function VillaDetailClient({ params }: Props) {
           onClick={handleBookNowClick}
           className="bg-orange text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-orange/90 transition-colors"
         >
-          {canContinue ? t.availability.proceedToBook : t.properties.bookNow}
+          {bookLabel}
         </button>
       </div>
 

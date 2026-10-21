@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { CHECKOUT_ENABLED } from '@/lib/features'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { type Language, translations } from '@/lib/i18n'
 import { type Property } from '@/lib/types'
@@ -145,7 +146,7 @@ export default function PropertyCard({ property, lang }: Props) {
           href={`/villas/${property.id}`}
           className="block w-full text-center text-sm font-semibold text-white bg-orange hover:bg-orange/90 transition-colors rounded-lg py-2.5"
         >
-          {t.bookNow} →
+          {CHECKOUT_ENABLED ? t.bookNow : t.viewVilla} →
         </Link>
       </div>
     </div>

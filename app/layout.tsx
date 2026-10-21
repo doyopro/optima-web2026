@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Script from "next/script";
+import ConsentGatedGtm from "@/components/ConsentGatedGtm";
 import { Montserrat } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Header from "@/components/Header";
@@ -43,31 +43,7 @@ export default async function RootLayout({
   return (
     <html lang="es" className={`${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">
-        {/* Google Tag Manager. Google's standard snippet asks for this in
-            <head>, but next/script's "afterInteractive" strategy always
-            injects into <body> regardless of where the component sits in
-            JSX (documented Next.js App Router behavior) — writing it inside
-            a custom <head> here would be misleading dead placement, so it's
-            first in <body> instead, which is Next's own documented pattern
-            for third-party tags like this. "beforeInteractive" is reserved
-            for scripts hydration itself depends on, which this isn't. */}
-        <Script id="gtm-head" strategy="afterInteractive">
-          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');`}
-        </Script>
-        {/* Google Tag Manager (noscript) — must be the first thing in body,
-            per Google's standard snippet, so it fires even with JS disabled. */}
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${GTM_CONTAINER_ID}`}
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript>
+        <ConsentGatedGtm containerId={GTM_CONTAINER_ID} />
 
         {/* TODO: Cookiebot — DEFERRED, not installed yet (2026-09 decision).
             Cookiebot bills per domain with no multi-domain discount, so

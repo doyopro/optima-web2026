@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { type Language, translations } from '@/lib/i18n'
 import GuestPayBalanceForm from './GuestPayBalanceForm'
+import { CHECKOUT_ENABLED } from '@/lib/features'
 import type { PaymentSummary } from '@/lib/guest-payments'
 
 function formatDate(value: string | null, lang: Language) {
@@ -99,7 +100,7 @@ export default function PaymentSummaryCard({
         </div>
       )}
 
-      {!fullyPaid && !justPaid && !isPastStay && (
+      {CHECKOUT_ENABLED && !fullyPaid && !justPaid && !isPastStay && (
         <div className="pt-4 border-t border-neutral-100">
           {paying ? (
             <GuestPayBalanceForm

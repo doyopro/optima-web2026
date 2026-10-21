@@ -29,9 +29,16 @@ interface PrivacyContent {
 
 // value_es is NULL for every privacy row today (Spanish legal translation is
 // pending human review) — fall back to English rather than rendering blank.
+// Internal drafting markers still sitting in the CMS text ("[NOTE FOR
+// REVIEW: ...]", "[CONFIRM ...]", "[DATE TO BE CONFIRMED]") must never reach
+// the public page. They stay in Supabase so the team can find and resolve
+// them; this only hides them from visitors.
+const REVIEW_MARKER = /[ \t]*\[(?:NOTE FOR REVIEW|CONFIRM|DATE TO BE CONFIRMED)[^\]]*\]/gi
+
 function pick(row: SiteContentRow | undefined, lang: 'en' | 'es'): string {
   if (!row) return ''
-  return (lang === 'es' && row.value_es) || row.value_en || ''
+  const raw = (lang === 'es' && row.value_es) || row.value_en || ''
+  return raw.replace(REVIEW_MARKER, '').trim()
 }
 
 function buildPrivacyContent(rows: SiteContentRow[], lang: 'en' | 'es'): PrivacyContent | null {
@@ -96,7 +103,7 @@ export default function PrivacyClient() {
           {content && (
             <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 sm:p-10 mb-10">
               <h1 className="text-2xl md:text-3xl font-bold text-dark mb-2">{content.title}</h1>
-              {content.lastUpdated && (
+              {content.lastUpdated && !/:\s*$/.test(content.lastUpdated) && (
                 <p className="text-sm text-dark/50 mb-10">{content.lastUpdated}</p>
               )}
 

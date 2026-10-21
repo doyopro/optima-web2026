@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { CHECKOUT_ENABLED } from '@/lib/features'
 import { supabaseServer } from '@/lib/supabase-server'
 import { stripeServer, stripeConfigured } from '@/lib/stripe-server'
 import { guestSessionCanAccessReservation } from '@/lib/guest-auth'
@@ -9,6 +10,8 @@ import { getPaymentSummary } from '@/lib/guest-payments'
 // (app/villas/[id]/checkout), since a guest paying off an existing deposit
 // in installments needs an arbitrary amount each time.
 export async function POST(req: NextRequest) {
+  if (!CHECKOUT_ENABLED) return new NextResponse(null, { status: 404 })
+
   if (!stripeConfigured || !stripeServer) {
     return NextResponse.json({ error: 'Stripe is not configured for this beta.' }, { status: 503 })
   }
