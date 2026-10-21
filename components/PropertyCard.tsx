@@ -125,8 +125,12 @@ export default function PropertyCard({ property, lang }: Props) {
           {/* Stats */}
           <div className="flex items-center gap-3 text-xs text-dark/60">
             <span>{property.bedrooms} {bedroomsLabel}</span>
-            <span className="text-dark/30">·</span>
-            <span>{property.bathrooms} {bathroomsLabel}</span>
+            {property.bathrooms > 0 && (
+              <>
+                <span className="text-dark/30">·</span>
+                <span>{property.bathrooms} {bathroomsLabel}</span>
+              </>
+            )}
             <span className="text-dark/30">·</span>
             <span>{property.guests_max} {t.guests}</span>
           </div>

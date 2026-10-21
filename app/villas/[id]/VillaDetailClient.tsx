@@ -306,8 +306,12 @@ export default function VillaDetailClient({ params }: Props) {
                   <span>{property.guests_max} {t.properties.guests}</span>
                   <span className="text-dark/30">·</span>
                   <span>{property.bedrooms} {bedroomsLabel}</span>
-                  <span className="text-dark/30">·</span>
-                  <span>{property.bathrooms} {bathroomsLabel}</span>
+                  {property.bathrooms > 0 && (
+                    <>
+                      <span className="text-dark/30">·</span>
+                      <span>{property.bathrooms} {bathroomsLabel}</span>
+                    </>
+                  )}
                 </div>
 
                 {/* Tourist license */}

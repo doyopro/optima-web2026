@@ -114,7 +114,11 @@ export default function Home() {
     <main className="flex min-h-screen flex-col">
       <JsonLd data={buildLocalBusinessJsonLd()} />
       {(() => {
-        const reviewJsonLd = buildReviewJsonLd(reviewsForJsonLd)
+        const reviewJsonLd = buildReviewJsonLd(
+          reviewsForJsonLd.length > 0
+            ? reviewsForJsonLd
+            : translations[lang].testimonialsData.map((c) => ({ rating: c.rating, author: c.author, text: c.text, propertyName: c.title })),
+        )
         return reviewJsonLd ? <JsonLd data={reviewJsonLd} /> : null
       })()}
       <JsonLd data={buildFaqJsonLd(lang)} />

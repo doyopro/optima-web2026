@@ -74,22 +74,22 @@ export default function Testimonials({ lang }: Props) {
     setActiveIndex(closest)
   }
 
-  // Nothing to show until the Guesty reviews sync has real 5★ rows (see
-  // app/api/cron/sync-guesty-reviews) — no fake fallback content, this
-  // section just doesn't render rather than show placeholder testimonials.
-  if (reviews.length === 0) {
-    return (
-      <section className="py-16 md:py-24 px-4 sm:px-6 bg-[#F5F5F5]">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-10 max-w-xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">{t.title}</h2>
-            <p className="text-dark/60 leading-relaxed">{t.description}</p>
-          </div>
-          <ReviewBadges lang={lang} />
-        </div>
-      </section>
-    )
-  }
+  // Real Guesty reviews (property_reviews) win once the reviews sync has
+  // data. Until then — the sync is blocked on a Guesty permission — fall back
+  // to the curated testimonials in site_content (section testimonialsData,
+  // EN + ES, already merged into translations by the CMS overlay). Without
+  // this fallback the section rendered empty.
+  const curated = translations[lang].testimonialsData
+  const items = reviews.length > 0
+    ? reviews.map((r) => ({
+        key: r.id,
+        rating: r.rating,
+        title: r.propertyName ?? '',
+        text: r.text ?? '',
+        author: r.author ?? '',
+        date: formatReviewDate(r.date, lang),
+      }))
+    : curated.map((c, i) => ({ key: `c${i}`, rating: c.rating, title: c.title, text: c.text, author: c.author, date: c.date }))
 
   return (
     <section className="py-16 md:py-24 px-4 sm:px-6 bg-[#F5F5F5]">
@@ -123,9 +123,9 @@ export default function Testimonials({ lang }: Props) {
             onScroll={handleScroll}
             className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {reviews.map((review, i) => (
+            {items.map((review, i) => (
               <div
-                key={review.id}
+                key={review.key}
                 ref={(el) => {
                   cardRefs.current[i] = el
                 }}
@@ -133,10 +133,10 @@ export default function Testimonials({ lang }: Props) {
               >
                 <TestimonialCard
                   rating={review.rating}
-                  title={review.propertyName ?? ''}
-                  text={review.text ?? ''}
-                  author={review.author ?? ''}
-                  date={formatReviewDate(review.date, lang)}
+                  title={review.title}
+                  text={review.text}
+                  author={review.author}
+                  date={review.date}
                   seeMoreLabel={t.seeMore}
                   seeLessLabel={t.seeLess}
                 />
@@ -147,7 +147,7 @@ export default function Testimonials({ lang }: Props) {
 
         {/* Dots — mobile & desktop, one per testimonial */}
         <div className="flex items-center justify-center gap-2 mt-8">
-          {reviews.map((_, i) => (
+          {items.map((_, i) => (
             <button
               key={i}
               type="button"

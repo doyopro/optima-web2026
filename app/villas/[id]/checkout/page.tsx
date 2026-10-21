@@ -234,7 +234,11 @@ function CheckoutContent({ params }: Props) {
                   <h2 className="font-bold text-dark truncate">{property.name}</h2>
                   <p className="text-sm text-dark/60 mt-1">
                     {property.bedrooms} {property.bedrooms === 1 ? t.properties.bedroom : t.properties.bedrooms} ·{' '}
-                    {property.bathrooms} {property.bathrooms === 1 ? t.properties.bathroom : t.properties.bathrooms} ·{' '}
+                    {property.bathrooms > 0 && (
+                      <>
+                        {property.bathrooms} {property.bathrooms === 1 ? t.properties.bathroom : t.properties.bathrooms} ·{' '}
+                      </>
+                    )}
                     {guests} {t.checkout.guests}
                   </p>
                 </div>
