@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { stripeServer, stripeConfigured } from '@/lib/stripe-server'
+import { stripeServer, stripeConfigured, stripeWebhookSecret } from '@/lib/stripe-server'
 import { createGuestyReservation, registerGuestyPayment } from '@/lib/guesty-server'
 
 // Guest portal balance payments (app/api/guest/pay-balance) — an EXISTING
@@ -25,11 +25,11 @@ import { createGuestyReservation, registerGuestyPayment } from '@/lib/guesty-ser
 // — see lib/guesty-server.ts) so it triggers the account's existing
 // "Booking (Direct)" automation, the same one real future direct bookings
 // will use.
-const webhookSecret = process.env.STRIPE_TEST_WEBHOOK_SECRET
+const webhookSecret = stripeWebhookSecret
 
 export async function POST(req: NextRequest) {
   if (!stripeConfigured || !stripeServer || !webhookSecret) {
-    return NextResponse.json({ error: 'Stripe webhook is not configured for this beta.' }, { status: 503 })
+    return NextResponse.json({ error: 'Stripe webhook is not configured.' }, { status: 503 })
   }
 
   const signature = req.headers.get('stripe-signature')
@@ -60,8 +60,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true })
   }
 
-  if (meta.beta !== 'true') {
-    // Not a beta-checkout PaymentIntent — ignore.
+  if (meta.checkout !== 'web' && meta.beta !== 'true') {
+    // Not a website-checkout PaymentIntent — ignore.
     return NextResponse.json({ received: true })
   }
 

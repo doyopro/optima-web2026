@@ -1,22 +1,27 @@
-// Server-only. BETA checkout — internal testing only, no real guest is sent
-// here (the site's "Book Now" buttons still point at Guesty's real booking
-// engine, untouched). This file is deliberately wired to TEST-MODE-ONLY,
-// dedicated env vars (STRIPE_TEST_SECRET_KEY), never the existing
-// STRIPE_SECRET_KEY (which is a live key already in use elsewhere) — and it
-// refuses to start if that key isn't actually a test key, so a
-// misconfigured env var can never let this beta code path charge a real
-// card.
+// Server-only. The Stripe client for the website checkout.
+//
+// Test mode (default) uses the dedicated STRIPE_TEST_* env vars. Live mode is
+// opt-in with NEXT_PUBLIC_STRIPE_MODE=live and uses STRIPE_SECRET_KEY. The key
+// prefix must match the selected mode, otherwise this refuses to start — a
+// misconfigured env var can never charge a real card in test mode, nor send a
+// test key to production by mistake.
 import Stripe from 'stripe'
+import { STRIPE_LIVE } from '@/lib/stripe-mode'
 
-const secretKey = process.env.STRIPE_TEST_SECRET_KEY
+const secretKey = STRIPE_LIVE ? process.env.STRIPE_SECRET_KEY : process.env.STRIPE_TEST_SECRET_KEY
+const expectedPrefix = STRIPE_LIVE ? 'sk_live_' : 'sk_test_'
 
-if (secretKey && !secretKey.startsWith('sk_test_')) {
+if (secretKey && !secretKey.startsWith(expectedPrefix)) {
   throw new Error(
-    'STRIPE_TEST_SECRET_KEY is set but is not a Stripe TEST key (must start with sk_test_) — refusing to start to avoid ever charging a real card from the beta checkout.',
+    `Stripe secret key does not match the selected mode (${STRIPE_LIVE ? 'live' : 'test'} needs a key starting with ${expectedPrefix}) — refusing to start.`,
   )
 }
 
 export const stripeConfigured = Boolean(secretKey)
+
+export const stripeWebhookSecret = STRIPE_LIVE
+  ? process.env.STRIPE_WEBHOOK_SECRET
+  : process.env.STRIPE_TEST_WEBHOOK_SECRET
 
 export const stripeServer = secretKey
   ? new Stripe(secretKey, { apiVersion: '2026-07-29.dahlia' })

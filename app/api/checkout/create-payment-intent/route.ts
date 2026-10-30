@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { CHECKOUT_ENABLED } from '@/lib/features'
 import { stripeServer, stripeConfigured } from '@/lib/stripe-server'
+import { STRIPE_LIVE } from '@/lib/stripe-mode'
 import { supabaseServer } from '@/lib/supabase-server'
 import { getListingPricing, GuestyRateLimitError } from '@/lib/guesty-server'
 import { getPaymentOptions } from '@/lib/booking'
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
   if (!CHECKOUT_ENABLED) return new NextResponse(null, { status: 404 })
 
   if (!stripeConfigured || !stripeServer) {
-    return bad('Stripe is not configured for this beta (missing STRIPE_TEST_SECRET_KEY).', 503)
+    return bad('Stripe is not configured (missing secret key for the selected mode).', 503)
   }
 
   try {
@@ -89,7 +90,8 @@ export async function POST(req: NextRequest) {
       // Read back by the webhook (the only place a Guesty reservation is
       // created) — written by the server, so trustworthy at that point.
       metadata: {
-        beta: 'true',
+        checkout: 'web',
+        beta: STRIPE_LIVE ? 'false' : 'true',
         propertyId: property.id,
         guestyListingId: property.guesty_listing_id,
         checkIn,

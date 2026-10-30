@@ -5,15 +5,21 @@ import Link from 'next/link'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { type Language, translations } from '@/lib/i18n'
+import { STRIPE_LIVE } from '@/lib/stripe-mode'
 
 // BETA — internal testing only. TEST-MODE-ONLY, dedicated publishable key —
 // never the site's live key (which doesn't even exist as a NEXT_PUBLIC var
 // today). Publishable keys are always safe to expose client-side by design,
 // but this still hard-refuses to load anything that isn't a test key, so a
 // misconfigured env var can never let this beta form process a real card.
-const publishableKey = process.env.NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ?? ''
-const isValidTestKey = publishableKey.startsWith('pk_test_')
-const stripePromise = isValidTestKey ? loadStripe(publishableKey) : null
+// Test by default; live only when NEXT_PUBLIC_STRIPE_MODE=live (lib/stripe-mode.ts).
+// The key prefix must match the mode, so a test key can't run in live mode or
+// the reverse. (Each NEXT_PUBLIC_ var is referenced literally so Next inlines it.)
+const publishableKey = STRIPE_LIVE
+  ? (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '')
+  : (process.env.NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ?? '')
+const isValidKey = publishableKey.startsWith(STRIPE_LIVE ? 'pk_live_' : 'pk_test_')
+const stripePromise = isValidKey ? loadStripe(publishableKey) : null
 
 interface BookingDetails {
   amountGbp: number
@@ -163,7 +169,7 @@ function PayButton({ lang, booking, disabled, onSuccess }: Props) {
       >
         {submitting ? t.processingPayment : t.payNow}
       </button>
-      <p className="text-[11px] text-dark/40 text-center">{t.testCardHint}</p>
+      {!STRIPE_LIVE && <p className="text-[11px] text-dark/40 text-center">{t.testCardHint}</p>}
     </div>
   )
 }

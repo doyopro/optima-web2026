@@ -4,13 +4,16 @@ import { useState } from 'react'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { type Language, translations } from '@/lib/i18n'
+import { STRIPE_LIVE } from '@/lib/stripe-mode'
 
-// Same TEST-MODE-ONLY publishable key as the new-booking checkout
-// (components/StripeCheckoutForm.tsx) — see that file for why this refuses
-// to load anything but a test key.
-const publishableKey = process.env.NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ?? ''
-const isValidTestKey = publishableKey.startsWith('pk_test_')
-const stripePromise = isValidTestKey ? loadStripe(publishableKey) : null
+// Same key selection as the new-booking checkout
+// (components/StripeCheckoutForm.tsx): test by default, live only with
+// NEXT_PUBLIC_STRIPE_MODE=live, and the key prefix must match the mode.
+const publishableKey = STRIPE_LIVE
+  ? (process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '')
+  : (process.env.NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY ?? '')
+const isValidKey = publishableKey.startsWith(STRIPE_LIVE ? 'pk_live_' : 'pk_test_')
+const stripePromise = isValidKey ? loadStripe(publishableKey) : null
 
 interface Props {
   lang: Language

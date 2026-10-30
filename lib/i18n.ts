@@ -488,10 +488,14 @@ export const translations = {
           heading: 'Data Protection',
           body: 'We collect personal data including your name, contact details and, where relevant, payment information, in order to process and manage your booking. Payments are processed directly and securely by Stripe — we do not store your card details on our own systems.\n\nYou have the right to request access to, or deletion of, the personal data we hold about you at any time by contacting us at enquiries@optimavillas.com.',
         },
+        {
+          heading: 'Company Details',
+          body: 'Optima Villas is the trading name of Sonrisa 1 S.C.P. (Tax ID J76063056), registered office C/ Macedonia 8, Playa Blanca, Yaiza, Lanzarote, 35580, Canary Islands, Spain. Contact: enquiries@optimavillas.com.',
+        },
       ],
     },
     footer: {
-      tagline: 'Exceptional holiday villas in Lanzarote since 2010.',
+      tagline: 'Exceptional holiday villas in Lanzarote since 2003.',
       company: 'Company',
       legal: 'Legal',
       contact: 'Contact',
@@ -1202,10 +1206,14 @@ export const translations = {
           heading: 'Protección de Datos',
           body: 'Recopilamos datos personales, incluyendo tu nombre, datos de contacto y, cuando corresponda, información de pago, con el fin de procesar y gestionar tu reserva. Los pagos son procesados de forma directa y segura por Stripe — no almacenamos los datos de tu tarjeta en nuestros propios sistemas.\n\nTienes derecho a solicitar acceso a, o la eliminación de, los datos personales que conservamos sobre ti en cualquier momento, contactando con nosotros en enquiries@optimavillas.com.',
         },
+        {
+          heading: 'Datos de la Empresa',
+          body: 'Óptima Villas es el nombre comercial de Sonrisa 1 S.C.P. (NIF J76063056), con domicilio en C/ Macedonia 8, Playa Blanca, Yaiza, Lanzarote, 35580, Islas Canarias, España. Contacto: enquiries@optimavillas.com.',
+        },
       ],
     },
     footer: {
-      tagline: 'Villas vacacionales excepcionales en Lanzarote desde 2010.',
+      tagline: 'Villas vacacionales excepcionales en Lanzarote desde 2003.',
       company: 'Empresa',
       legal: 'Legal',
       contact: 'Contacto',

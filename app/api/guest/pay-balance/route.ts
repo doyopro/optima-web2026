@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   if (!CHECKOUT_ENABLED) return new NextResponse(null, { status: 404 })
 
   if (!stripeConfigured || !stripeServer) {
-    return NextResponse.json({ error: 'Stripe is not configured for this beta.' }, { status: 503 })
+    return NextResponse.json({ error: 'Stripe is not configured.' }, { status: 503 })
   }
 
   try {
