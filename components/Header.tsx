@@ -41,12 +41,12 @@ export default function Header() {
           </Link>
 
           {/* Nav */}
-          <nav className="hidden items-center gap-8 md:flex">
+          <nav className="hidden items-center gap-5 xl:gap-8 lg:flex">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-bold text-dark hover:text-orange transition-colors"
+                className="whitespace-nowrap text-sm font-bold text-dark hover:text-orange transition-colors"
               >
                 {item.label}
               </Link>
@@ -56,7 +56,7 @@ export default function Header() {
           {/* Actions */}
           <div className="flex items-center gap-3">
             {/* Lang + currency toggles — desktop only, folded into the mobile menu below md */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden lg:flex items-center gap-6">
               <div className="flex items-center rounded-full border border-neutral-200 text-xs font-semibold overflow-hidden">
                 <button
                   type="button"
@@ -111,7 +111,7 @@ export default function Header() {
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Menu"
               aria-expanded={mobileMenuOpen}
-              className="md:hidden text-dark hover:text-orange transition-colors"
+              className="lg:hidden text-dark hover:text-orange transition-colors"
             >
               <MenuIcon className="h-6 w-6" />
             </button>
@@ -121,7 +121,7 @@ export default function Header() {
 
       {/* Mobile menu overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50">
+        <div className="lg:hidden fixed inset-0 z-50">
           <button
             type="button"
             aria-label="Close menu"
