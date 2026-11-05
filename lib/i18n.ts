@@ -258,7 +258,7 @@ export const translations = {
           "Hi, I have a property in Lanzarote and I'd like to know more about management with Óptima Villas",
       },
       trust: {
-        title: 'Why owners trust us',
+        title: 'Why entrust your villa to us',
         localKnowledge: 'Local knowledge',
         localKnowledgeDesc: 'Our team is based on the island — not remote.',
         noHiddenFees: 'No hidden fees',
@@ -279,7 +279,7 @@ export const translations = {
         optimaEstateCta: 'Visit Optima Estate by Optima Group',
       },
       testimonials: {
-        title: 'What owners say',
+        title: 'What our clients say',
         items: [
           {
             author: 'Henrik Sandmark',
@@ -976,7 +976,7 @@ export const translations = {
           'Hola, tengo una propiedad en Lanzarote y quiero saber más sobre la gestión con Óptima Villas',
       },
       trust: {
-        title: 'Por qué confían en nosotros',
+        title: 'Por qué confiarnos tu villa',
         localKnowledge: 'Conocimiento local',
         localKnowledgeDesc: 'Nuestro equipo está en la isla — no en remoto.',
         noHiddenFees: 'Sin comisiones ocultas',
@@ -997,7 +997,7 @@ export const translations = {
         optimaEstateCta: 'Visita Optima Estate, del Grupo Optima',
       },
       testimonials: {
-        title: 'Qué dicen los propietarios',
+        title: 'Lo que dicen nuestros clientes',
         items: [
           {
             author: 'Henrik Sandmark',
