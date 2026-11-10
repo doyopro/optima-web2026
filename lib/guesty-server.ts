@@ -183,6 +183,61 @@ export async function getListingPricing(
   }
 }
 
+export interface ListingQuote {
+  currency: string
+  // Whitelisted money lines Guesty would charge for the stay (guest-facing).
+  money: Record<string, unknown>
+  invoiceItems: { title: string; amount: number; type?: string }[]
+}
+
+/**
+ * What Guesty itself would charge for a stay (POST /v1/quotes): nightly fares
+ * plus cleaning, fees and taxes. Read-only — creates a quote, not a
+ * reservation, and charges nothing. Used to check that the website's price
+ * (sum of calendar nights) matches the price Guesty will put on the
+ * reservation.
+ */
+export async function getListingQuote(
+  guestyListingId: string,
+  checkInDate: string,
+  checkOutDate: string,
+  guests: number,
+): Promise<ListingQuote> {
+  const res = await guestyFetch('/quotes', {
+    method: 'POST',
+    body: JSON.stringify({
+      listingId: guestyListingId,
+      checkInDateLocalized: checkInDate,
+      checkOutDateLocalized: checkOutDate,
+      guestsCount: guests,
+      source: 'Direct',
+    }),
+  })
+
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(`Guesty quote failed: ${res.status} — ${body.slice(0, 300)}`)
+  }
+
+  const raw = await res.json()
+  const plan = raw?.rates?.ratePlans?.[0]
+  const money = (plan?.money ?? {}) as Record<string, unknown>
+  const keep = ['fareAccommodation', 'fareCleaning', 'totalFees', 'totalTaxes', 'subTotalPrice', 'currency']
+  const safeMoney: Record<string, unknown> = {}
+  for (const k of keep) if (k in money) safeMoney[k] = money[k]
+
+  const items = Array.isArray(money.invoiceItems) ? (money.invoiceItems as Record<string, unknown>[]) : []
+  return {
+    currency: String(money.currency ?? 'GBP'),
+    money: safeMoney,
+    invoiceItems: items.map((i) => ({
+      title: String(i.title ?? i.normalType ?? ''),
+      amount: Number(i.amount ?? 0),
+      type: i.type ? String(i.type) : undefined,
+    })),
+  }
+}
+
 export interface GuestyGuestInput {
   firstName: string
   lastName: string
