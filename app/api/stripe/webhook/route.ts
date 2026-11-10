@@ -2,6 +2,33 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { stripeServer, stripeConfigured, stripeWebhookSecret } from '@/lib/stripe-server'
 import { createGuestyReservation, registerGuestyPayment } from '@/lib/guesty-server'
+import { supabaseServer } from '@/lib/supabase-server'
+
+// Audit trail + "needs a human" flag, read by the dashboard (checkout_events).
+// Never allowed to break the webhook: a logging failure is only console-logged.
+async function logCheckoutEvent(
+  event: Stripe.Event,
+  paymentIntentId: string,
+  outcome: string,
+  detail: Record<string, unknown>,
+  needsAttention: boolean,
+) {
+  try {
+    const { error } = await supabaseServer.from('checkout_events').insert({
+      stripe_event_id: event.id,
+      event_type: event.type,
+      payment_intent_id: paymentIntentId,
+      outcome,
+      detail,
+      needs_attention: needsAttention,
+    })
+    if (error) console.error('[stripe webhook] checkout_events insert failed', error.message)
+  } catch (e) {
+    console.error('[stripe webhook] checkout_events insert threw', e instanceof Error ? e.message : e)
+  }
+}
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 // Guest portal balance payments (app/api/guest/pay-balance) — an EXISTING
 // reservation's outstanding balance being paid down, not a new booking.
@@ -71,12 +98,12 @@ export async function POST(req: NextRequest) {
     // PaymentIntent — if a previous delivery already created the Guesty
     // reservation it left its id in metadata, and we must not book twice.
     const live = await stripeServer.paymentIntents.retrieve(paymentIntent.id)
-    if (live.metadata?.guesty_reservation_id) {
+    if (live.metadata?.guesty_reservation_id || live.metadata?.auto_refunded === 'true') {
       return NextResponse.json({ received: true, duplicate: true })
     }
 
     const [firstName, ...rest] = (meta.guestName || 'Guest').trim().split(' ')
-    const reservation = await createGuestyReservation({
+    const reservationInput = {
       guestyListingId: meta.guestyListingId,
       checkInDate: meta.checkIn,
       checkOutDate: meta.checkOut,
@@ -86,8 +113,62 @@ export async function POST(req: NextRequest) {
         email: meta.guestEmail,
         phone: meta.guestPhone || undefined,
       },
-      source: 'Direct',
-    })
+      source: 'Direct' as const,
+    }
+
+    // The guest has already paid. If Guesty cannot create the reservation
+    // (dates taken in the meantime, API down) we try once more, and if it
+    // still fails we REFUND automatically instead of keeping money for a
+    // booking that does not exist. Marked so a later Stripe retry of this
+    // same event can never book it for free.
+    let reservation: Awaited<ReturnType<typeof createGuestyReservation>>
+    try {
+      try {
+        reservation = await createGuestyReservation(reservationInput)
+      } catch {
+        await wait(2000)
+        reservation = await createGuestyReservation(reservationInput)
+      }
+    } catch (createErr) {
+      const reason = createErr instanceof Error ? createErr.message : 'Unknown error'
+      console.error('[POST /api/stripe/webhook] GUESTY RESERVATION CREATION FAILED — refunding', {
+        paymentIntentId: paymentIntent.id,
+        error: reason,
+        metadata: meta,
+      })
+      try {
+        await stripeServer.refunds.create({
+          payment_intent: paymentIntent.id,
+          reason: 'requested_by_customer',
+          metadata: { auto_refund: 'guesty_reservation_failed' },
+        })
+        try {
+          // Marks the payment so a later redelivery of this event can't book it for free.
+          await stripeServer.paymentIntents.update(paymentIntent.id, {
+            metadata: { auto_refunded: 'true' },
+          })
+        } catch (markErr) {
+          console.error('[stripe webhook] could not mark PaymentIntent as refunded', markErr instanceof Error ? markErr.message : markErr)
+        }
+        await logCheckoutEvent(event, paymentIntent.id, 'reservation_failed_refunded', { reason, booking: meta }, true)
+        return NextResponse.json({ received: true, refunded: true })
+      } catch (refundErr) {
+        const refundReason = refundErr instanceof Error ? refundErr.message : 'Unknown error'
+        console.error('[POST /api/stripe/webhook] AUTO-REFUND FAILED — MANUAL ACTION NEEDED', {
+          paymentIntentId: paymentIntent.id,
+          error: refundReason,
+        })
+        await logCheckoutEvent(
+          event,
+          paymentIntent.id,
+          'reservation_failed_refund_failed',
+          { reason, refundReason, booking: meta },
+          true,
+        )
+        // Let Stripe retry the delivery; the refund is attempted again.
+        return NextResponse.json({ error: 'Reservation failed and refund failed', details: refundReason }, { status: 500 })
+      }
+    }
 
     await stripeServer.paymentIntents.update(paymentIntent.id, {
       metadata: { guesty_reservation_id: reservation.id },
@@ -108,6 +189,12 @@ export async function POST(req: NextRequest) {
         note: `Stripe PaymentIntent ${paymentIntent.id}`,
       })
       console.log('[POST /api/stripe/webhook] BETA payment registered in Guesty', reservation.id)
+      await logCheckoutEvent(event, paymentIntent.id, 'reservation_created', {
+        reservationId: reservation.id,
+        confirmationCode: reservation.confirmationCode,
+        paymentChoice: meta.paymentChoice,
+        amount: paymentIntent.amount_received / 100,
+      }, false)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
       // The reservation itself was created successfully — a failure here
@@ -119,6 +206,11 @@ export async function POST(req: NextRequest) {
         paymentIntentId: paymentIntent.id,
         error: message,
       })
+      await logCheckoutEvent(event, paymentIntent.id, 'payment_registration_failed', {
+        reservationId: reservation.id,
+        confirmationCode: reservation.confirmationCode,
+        error: message,
+      }, true)
     }
 
     return NextResponse.json({ received: true, reservationId: reservation.id })
