@@ -221,7 +221,7 @@ export async function getListingQuote(
 
   const raw = await res.json()
   const plan = raw?.rates?.ratePlans?.[0]
-  const money = (plan?.money ?? plan?.ratePlan?.money ?? {}) as Record<string, unknown>
+  const money = (plan?.money?.money ?? {}) as Record<string, unknown>
   if (guests === -1) {
     // Diagnostic (guests=-1): key paths only, never values.
     const paths: string[] = []
@@ -246,7 +246,7 @@ export async function getListingQuote(
     invoiceItems: items.map((i) => ({
       title: String(i.title ?? i.normalType ?? ''),
       amount: Number(i.amount ?? 0),
-      type: i.type ? String(i.type) : undefined,
+      type: [i.type, i.normalType].filter(Boolean).join('/') || undefined,
     })),
   }
 }
