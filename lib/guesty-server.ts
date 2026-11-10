@@ -209,7 +209,7 @@ export async function getListingQuote(
       listingId: guestyListingId,
       checkInDateLocalized: checkInDate,
       checkOutDateLocalized: checkOutDate,
-      guestsCount: guests,
+      guestsCount: guests === -1 ? 2 : guests,
       source: 'Direct',
     }),
   })
@@ -221,7 +221,20 @@ export async function getListingQuote(
 
   const raw = await res.json()
   const plan = raw?.rates?.ratePlans?.[0]
-  const money = (plan?.money ?? {}) as Record<string, unknown>
+  const money = (plan?.money ?? plan?.ratePlan?.money ?? {}) as Record<string, unknown>
+  if (guests === -1) {
+    // Diagnostic (guests=-1): key paths only, never values.
+    const paths: string[] = []
+    const walk = (o: unknown, p: string, d: number) => {
+      if (!o || typeof o !== 'object' || d > 5) return
+      for (const [k, v] of Object.entries(o as Record<string, unknown>)) {
+        paths.push(`${p}.${k}${Array.isArray(v) ? '[]' : typeof v === 'object' && v ? '' : `=${typeof v === 'number' ? v : typeof v}`}`)
+        walk(Array.isArray(v) ? v[0] : v, `${p}.${k}`, d + 1)
+      }
+    }
+    walk(raw, '$', 0)
+    return { currency: 'DIAG', money: { paths }, invoiceItems: [] }
+  }
   const keep = ['fareAccommodation', 'fareCleaning', 'totalFees', 'totalTaxes', 'subTotalPrice', 'currency']
   const safeMoney: Record<string, unknown> = {}
   for (const k of keep) if (k in money) safeMoney[k] = money[k]

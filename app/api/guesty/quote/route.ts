@@ -9,7 +9,8 @@ export async function GET(req: NextRequest) {
     const listingId = searchParams.get('listingId')
     const checkIn = searchParams.get('checkIn')
     const checkOut = searchParams.get('checkOut')
-    const guests = Math.max(1, Number(searchParams.get('guests') ?? '2') || 2)
+    const guestsParam = Number(searchParams.get('guests') ?? '2') || 2
+    const guests = guestsParam === -1 ? -1 : Math.max(1, guestsParam)
 
     if (!listingId || !checkIn || !checkOut) {
       return NextResponse.json({ error: 'listingId, checkIn and checkOut are required' }, { status: 400 })
