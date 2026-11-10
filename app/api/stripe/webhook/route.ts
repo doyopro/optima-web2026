@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { stripeServer, stripeConfigured, stripeWebhookSecret } from '@/lib/stripe-server'
-import { createGuestyReservation, registerGuestyPayment } from '@/lib/guesty-server'
+import { createGuestyReservation, registerGuestyPayment, confirmGuestyReservation } from '@/lib/guesty-server'
 import { supabaseServer } from '@/lib/supabase-server'
 
 // Audit trail + "needs a human" flag, read by the dashboard (checkout_events).
@@ -189,12 +189,27 @@ export async function POST(req: NextRequest) {
         note: `Stripe PaymentIntent ${paymentIntent.id}`,
       })
       console.log('[POST /api/stripe/webhook] BETA payment registered in Guesty', reservation.id)
-      await logCheckoutEvent(event, paymentIntent.id, 'reservation_created', {
+
+      // Paid → confirm, so Guesty's "Booking (Direct)" messages fire. A failure
+      // here is flagged for a human (the booking and payment themselves are fine).
+      let confirmed = false
+      let confirmError: string | undefined
+      try {
+        await confirmGuestyReservation(reservation.id)
+        confirmed = true
+      } catch (confirmErr) {
+        confirmError = confirmErr instanceof Error ? confirmErr.message : String(confirmErr)
+        console.error('[POST /api/stripe/webhook] GUESTY CONFIRMATION FAILED', reservation.id, confirmError)
+      }
+
+      await logCheckoutEvent(event, paymentIntent.id, confirmed ? 'reservation_created' : 'reservation_created_not_confirmed', {
         reservationId: reservation.id,
         confirmationCode: reservation.confirmationCode,
         paymentChoice: meta.paymentChoice,
         amount: paymentIntent.amount_received / 100,
-      }, false)
+        confirmed,
+        ...(confirmError ? { confirmError } : {}),
+      }, !confirmed)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
       // The reservation itself was created successfully — a failure here

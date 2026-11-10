@@ -283,6 +283,24 @@ export async function createGuestyReservation(
   }
 }
 
+/**
+ * Moves a paid reservation from "reserved" to "confirmed"
+ * (PUT /v1/reservations-v3/{id}/status). Guesty's "Booking (Direct)"
+ * automation messages key off a confirmed reservation, so without this the
+ * guest pays but never receives them.
+ */
+export async function confirmGuestyReservation(reservationId: string): Promise<void> {
+  const res = await guestyFetch(`/reservations-v3/${reservationId}/status`, {
+    method: 'PUT',
+    body: JSON.stringify({ status: 'confirmed' }),
+  })
+
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(`Guesty reservation confirmation failed: ${res.status} — ${body}`)
+  }
+}
+
 export interface RegisterPaymentInput {
   reservationId: string
   // Major currency units (e.g. GBP pounds, not pence) — convert from
