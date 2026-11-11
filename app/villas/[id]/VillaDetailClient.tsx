@@ -92,7 +92,7 @@ export default function VillaDetailClient({ params }: Props) {
       ? property?.overview_es || property?.description_es || property?.overview || description
       : property?.overview || description
   const theSpace = lang === 'es' ? property?.the_space_es || '' : property?.the_space || ''
-  const differentiatorAmenities = filterDifferentiatorAmenities(property?.amenities ?? [])
+  const differentiatorAmenities = filterDifferentiatorAmenities(property?.amenities ?? [], lang)
 
   if (loading) {
     return (

@@ -43,10 +43,31 @@ const DIFFERENTIATOR_AMENITIES: Record<string, string> = {
   'Outdoor kitchen': 'Outdoor kitchen',
 }
 
-export function filterDifferentiatorAmenities(amenities: string[]): string[] {
-  return amenities
-    .filter((a) => a in DIFFERENTIATOR_AMENITIES)
-    .map((a) => DIFFERENTIATOR_AMENITIES[a])
+const DIFFERENTIATOR_AMENITIES_ES: Record<string, string> = {
+  'Air conditioning': 'Aire acondicionado',
+  'Free WiFi': 'WiFi gratuito',
+  'Sea view': 'Vistas al mar',
+  'Mountain view': 'Vistas a la montaña',
+  'Garden view': 'Vistas al jardín',
+  'Beach view': 'Vistas a la playa',
+  'Ocean front': 'Primera línea de mar',
+  'Near ocean': 'Cerca del mar',
+  'Pool table': 'Mesa de billar',
+  'Hot tub': 'Jacuzzi',
+  'Private pool': 'Piscina privada',
+  'Ping pong table': 'Mesa de ping-pong',
+  Gym: 'Gimnasio',
+  Sauna: 'Sauna',
+  'Game console': 'Consola de videojuegos',
+  'Game room': 'Sala de juegos',
+  'Wheelchair accessible': 'Accesible para sillas de ruedas',
+  'Outdoor kitchen': 'Cocina exterior',
+}
+
+export function filterDifferentiatorAmenities(amenities: string[], lang: 'en' | 'es' = 'en'): string[] {
+  const labels = amenities.filter((a) => a in DIFFERENTIATOR_AMENITIES).map((a) => DIFFERENTIATOR_AMENITIES[a])
+  const unique = Array.from(new Set(labels))
+  return lang === 'es' ? unique.map((l) => DIFFERENTIATOR_AMENITIES_ES[l] ?? l) : unique
 }
 
 // Raw highlights come back as free text delimited by asterisks and/or
