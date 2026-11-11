@@ -1,6 +1,7 @@
 'use client'
 
 import { use, useEffect, useRef, useState } from 'react'
+import { pushEvent } from '@/lib/analytics'
 import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -66,6 +67,19 @@ export default function VillaDetailClient({ params }: Props) {
       .catch(() => setProperty(null))
       .finally(() => setLoading(false))
   }, [id])
+
+  // GA4 funnel: one view_item per villa page view.
+  const viewItemSent = useRef(false)
+  useEffect(() => {
+    if (!property || viewItemSent.current) return
+    viewItemSent.current = true
+    pushEvent({
+      event: 'view_item',
+      currency: 'GBP',
+      value: property.price_per_night_gbp || undefined,
+      items: [{ item_id: property.id, item_name: property.name, price: property.price_per_night_gbp || undefined }],
+    })
+  }, [property])
 
   // Availability comes from our own reservations data, not Guesty pricing —
   // this must keep working even while Guesty pricing is rate-limited.

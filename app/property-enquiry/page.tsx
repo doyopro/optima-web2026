@@ -75,6 +75,11 @@ function PropertyEnquiryContent() {
         }),
       })
       if (!res.ok) throw new Error('Request failed')
+      // Read (and cleared) by the thank-you page so a reload or a direct visit
+      // there can never count as a second lead.
+      try {
+        sessionStorage.setItem('optima_pending_lead', 'guest_enquiry')
+      } catch {}
       router.push('/property-enquiry-thank-you')
     } catch {
       setSubmitState('error')

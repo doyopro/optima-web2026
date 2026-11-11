@@ -6,6 +6,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { type Language, translations } from '@/lib/i18n'
 import { STRIPE_LIVE } from '@/lib/stripe-mode'
+import { pushEvent, runOnce } from '@/lib/analytics'
 
 // BETA — internal testing only. TEST-MODE-ONLY, dedicated publishable key —
 // never the site's live key (which doesn't even exist as a NEXT_PUBLIC var
@@ -32,42 +33,56 @@ interface BookingDetails {
   guestEmail: string
   guestPhone: string
   totalPrice: number
+  propertyName?: string
 }
 
-declare global {
-  interface Window {
-    dataLayer?: Record<string, unknown>[]
+// ANALYTICS — exactly ONE 'Purchase' dataLayer push per RESERVATION (not per
+// payment). GTM (container GTM-MP58Q26) maps this single event to the Google
+// Ads conversion and to GA4 'purchase'; do NOT add a second push.
+//
+// The reservation is created by the Stripe webhook a moment AFTER the card is
+// charged, so the push waits for it: /api/checkout/purchase-status reports the
+// reservation code (used as transaction_id) and the amount Stripe really
+// charged (deposit or full — never trusted from the browser). If the booking
+// fails and is auto-refunded, nothing is pushed. runOnce() guarantees a
+// reload or a retry can never count the same reservation twice.
+//
+// Balance payments made later from the guest portal never go through this
+// component, so they do not fire Purchase.
+//
+// currency is always GBP (the PaymentIntent is created in GBP); the Google
+// Ads account is in EUR, so the Ads tag must take `currency` from this event
+// for Google to convert the value.
+async function reportPurchaseWhenBooked(paymentIntentId: string, propertyName: string): Promise<void> {
+  const deadline = Date.now() + 60_000
+  while (Date.now() < deadline) {
+    try {
+      const res = await fetch(`/api/checkout/purchase-status?pi=${encodeURIComponent(paymentIntentId)}`, {
+        cache: 'no-store',
+      })
+      if (res.ok) {
+        const d = await res.json()
+        if (d.status === 'refunded') return
+        if (d.status === 'ready') {
+          runOnce(`purchase:${d.transactionId}`, () =>
+            pushEvent({
+              event: 'Purchase',
+              transaction_id: d.transactionId,
+              value: d.value,
+              currency: d.currency,
+              payment_type: d.paymentChoice, // 'deposit' | 'full'
+              items: [{ item_id: d.propertyId, item_name: propertyName, price: d.value, quantity: 1 }],
+            }),
+          )
+          return
+        }
+      }
+    } catch {
+      // network blip — keep trying until the deadline
+    }
+    await new Promise((r) => setTimeout(r, 2000))
   }
-}
-
-// GTM (container GTM-MP58Q26, loaded in app/layout.tsx) listens for this
-// dataLayer event to fire a Google Ads conversion — the actual AW-... ID/
-// label mapping lives inside the GTM container's trigger config, not here.
-//
-// This checkout supports two payment paths (see lib/booking.ts:
-// getPaymentOptions — 20% deposit if check-in is >45 days out, full amount
-// otherwise), which map to two DIFFERENT Ads conversion actions
-// ("Purchases" vs "Low deposit payment"). `payment_type` is included so the
-// GTM trigger can branch on it rather than needing two separate dataLayer
-// events wired here.
-//
-// value/currency are the amount actually charged, not a hardcoded currency:
-// /api/checkout/create-payment-intent always creates the PaymentIntent in
-// GBP (see that route — `currency: 'gbp'`, `amount: amountGbp * 100`), so
-// this reports GBP to match what Stripe actually charged, not EUR.
-// transaction_id is the real Stripe PaymentIntent id — this beta has no
-// separate internal booking reference yet, and the PaymentIntent id is
-// already a stable, unique, dedup-safe identifier for the charge.
-function pushPurchaseSuccessEvent(booking: BookingDetails, paymentIntentId: string): void {
-  if (typeof window === 'undefined') return
-  window.dataLayer = window.dataLayer || []
-  window.dataLayer.push({
-    event: 'Purchase', // exact name the GTM Ads trigger listens for
-    value: booking.amountGbp,
-    currency: 'GBP',
-    transaction_id: paymentIntentId,
-    payment_type: booking.paymentChoice, // 'deposit' | 'full'
-  })
+  console.error('[checkout] reservation not confirmed in time; Purchase event not sent for', paymentIntentId)
 }
 
 interface Props {
@@ -119,7 +134,7 @@ function PayButton({ lang, booking, disabled, onSuccess }: Props) {
       }
 
       if (result.paymentIntent?.status === 'succeeded') {
-        pushPurchaseSuccessEvent(booking, result.paymentIntent.id)
+        void reportPurchaseWhenBooked(result.paymentIntent.id, booking.propertyName ?? booking.propertyId)
         onSuccess()
       } else {
         throw new Error(`Unexpected payment status: ${result.paymentIntent?.status}`)

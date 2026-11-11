@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
       // Old Lanzarote guide hub -> new guides hub
       { source: '/lanzarote-guide', destination: '/guides', permanent: true },
       { source: '/lanzarote-guide/ferry', destination: '/guides/ferries', permanent: true },
-      { source: '/lanzarote-guide/weather', destination: '/guides/climate', permanent: true },
+      { source: '/lanzarote-guide/weather', destination: '/guides', permanent: true },
       // PLACEHOLDER REDIRECTS — content backlog, not a code task. Confirmed
       // (2026-09 audit + direct guides_content query) these topics have no
       // page and no unpublished row waiting to be wired up: car-hire,

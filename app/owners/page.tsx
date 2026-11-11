@@ -1,5 +1,6 @@
 'use client'
 
+import { pushEvent } from '@/lib/analytics'
 import { useEffect, useState, type FormEvent } from 'react'
 import Image from 'next/image'
 import { Share2, MessageCircle, Wrench, FileCheck2, BarChart3, LayoutDashboard, ArrowUpRight } from 'lucide-react'
@@ -40,6 +41,7 @@ export default function OwnersPage() {
         }),
       })
       if (!res.ok) throw new Error('Request failed')
+      pushEvent({ event: 'generate_lead', lead_type: 'owner_enquiry' })
       setSubmitState('success')
       setForm({ name: '', email: '', phone: '', propertyLocation: '', message: '' })
     } catch {

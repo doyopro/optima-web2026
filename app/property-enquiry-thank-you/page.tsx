@@ -1,25 +1,32 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
+import { pushEvent } from '@/lib/analytics'
 import { Check } from 'lucide-react'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
-// NOT wired yet, deliberately (per 2026-09 decision): the "Request quotes"
-// Google Ads conversion needs its exact trigger confirmed against this real
-// guest-facing form first (this page/form didn't exist before), so pushing
-// a dataLayer event here is a follow-up task, not part of building the form
-// itself. Once confirmed, the shape should mirror the Purchases event in
-// components/StripeCheckoutForm.tsx:
-//
-// useEffect(() => {
-//   window.dataLayer = window.dataLayer || []
-//   window.dataLayer.push({ event: 'property_enquiry_submitted' })
-// }, [])
+// "Request quotes" conversion: this page is reached only from the GUEST
+// enquiry form (/property-enquiry); owner enquiries are a separate on-page
+// form. One generate_lead per real submission: the form leaves a one-shot
+// flag in sessionStorage which is consumed here, so reloading this page or
+// opening it directly never counts again.
+function useLeadEvent() {
+  useEffect(() => {
+    let pending: string | null = null
+    try {
+      pending = sessionStorage.getItem('optima_pending_lead')
+      if (pending) sessionStorage.removeItem('optima_pending_lead')
+    } catch {}
+    if (pending === 'guest_enquiry') pushEvent({ event: 'generate_lead', lead_type: 'guest_enquiry' })
+  }, [])
+}
 
 export default function PropertyEnquiryThankYouPage() {
+  useLeadEvent()
   const { lang } = useLanguage()
   const t = translations[lang].propertyEnquiry
 

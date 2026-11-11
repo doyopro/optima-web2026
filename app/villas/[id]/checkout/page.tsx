@@ -1,6 +1,7 @@
 'use client'
 
-import { Suspense, use, useEffect, useState } from 'react'
+import { Suspense, use, useEffect, useRef, useState } from 'react'
+import { pushEvent } from '@/lib/analytics'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -137,6 +138,22 @@ function CheckoutContent({ params }: Props) {
   const datesBlocked = Boolean(checkIn && checkOut && rangeOverlapsBooking(checkIn, checkOut, bookedRanges))
 
   const t = translations[lang]
+
+  // GA4 funnel: begin_checkout once per villa + dates once a real price is
+  // shown (value = total stay price, GBP).
+  const beginCheckoutKey = useRef('')
+  useEffect(() => {
+    if (!property || !pricing?.available) return
+    const key = `${property.id}|${checkIn}|${checkOut}`
+    if (beginCheckoutKey.current === key) return
+    beginCheckoutKey.current = key
+    pushEvent({
+      event: 'begin_checkout',
+      currency: 'GBP',
+      value: pricing.totalPrice,
+      items: [{ item_id: property.id, item_name: property.name, price: pricing.totalPrice, quantity: 1 }],
+    })
+  }, [property, pricing, checkIn, checkOut])
 
   if (loadingProperty) {
     return (
@@ -470,6 +487,7 @@ function CheckoutContent({ params }: Props) {
                     booking={{
                       amountGbp: amountDueToday,
                       propertyId: id,
+                      propertyName: property.name,
                       guestyListingId: property.guesty_listing_id,
                       checkIn,
                       checkOut,

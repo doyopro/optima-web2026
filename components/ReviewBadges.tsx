@@ -1,5 +1,4 @@
 import { type Language, translations } from '@/lib/i18n'
-import { TRUSTPILOT_REVIEW_COUNT } from '@/lib/marketing'
 
 interface Props {
   lang: Language
@@ -72,14 +71,14 @@ export default function ReviewBadges({ lang }: Props) {
       href: 'https://uk.trustpilot.com/review/optimavillaslanzarote.com',
       icon: <TrustpilotIcon />,
       name: 'Trustpilot',
-      rating: '4.6',
+      rating: '4.6/5',
       sub: t.trustScore,
-      count: `${TRUSTPILOT_REVIEW_COUNT} ${t.reviews}`,
+      count: null,
       stars: <Stars color="#00b67a" />,
     },
     {
       key: 'facebook',
-      href: 'https://facebook.com/optimavillas',
+      href: 'https://www.facebook.com/optimavillas/reviews',
       icon: <FacebookIcon />,
       name: 'Facebook',
       rating: '4.9',

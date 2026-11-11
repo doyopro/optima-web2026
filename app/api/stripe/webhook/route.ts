@@ -171,7 +171,10 @@ export async function POST(req: NextRequest) {
     }
 
     await stripeServer.paymentIntents.update(paymentIntent.id, {
-      metadata: { guesty_reservation_id: reservation.id },
+      metadata: {
+        guesty_reservation_id: reservation.id,
+        ...(reservation.confirmationCode ? { guesty_confirmation_code: reservation.confirmationCode } : {}),
+      },
     })
 
     // The charge must carry the booking code as its Stripe description,

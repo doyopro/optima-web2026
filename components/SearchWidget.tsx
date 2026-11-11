@@ -1,5 +1,6 @@
 'use client'
 
+import { pushEvent } from '@/lib/analytics'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Calendar, ChevronDown } from 'lucide-react'
@@ -90,6 +91,13 @@ export default function SearchWidget() {
     if (toDate) params.set('to', toDate)
     if (totalGuests > 1) params.set('guests', String(totalGuests))
     if (villaId) params.set('villa', villaId)
+    pushEvent({
+      event: 'search',
+      search_term: [fromDate, toDate].filter(Boolean).join(' to '),
+      check_in: fromDate || undefined,
+      check_out: toDate || undefined,
+      guests: totalGuests,
+    })
     router.push(`/villas?${params}`)
   }
 
