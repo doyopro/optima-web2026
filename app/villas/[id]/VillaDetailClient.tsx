@@ -84,8 +84,14 @@ export default function VillaDetailClient({ params }: Props) {
   // Space simply don't render when there's no real data yet, rather than
   // faking a list out of unstructured prose.
   const highlights = parseHighlights((lang === 'es' && property?.highlights_es) || property?.highlights)
-  const overview = (lang === 'es' && property?.overview_es) || property?.overview || description
-  const theSpace = (lang === 'es' && property?.the_space_es) || property?.the_space || ''
+  // Spanish: never mix English long-form copy into a Spanish page. Until
+  // overview_es / the_space_es are translated, Overview shows the Spanish
+  // description and The Space (room-by-room list) is left out.
+  const overview =
+    lang === 'es'
+      ? property?.overview_es || property?.description_es || property?.overview || description
+      : property?.overview || description
+  const theSpace = lang === 'es' ? property?.the_space_es || '' : property?.the_space || ''
   const differentiatorAmenities = filterDifferentiatorAmenities(property?.amenities ?? [])
 
   if (loading) {
