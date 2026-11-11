@@ -7,6 +7,8 @@ import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
+import GuideDisclaimer from '@/components/GuideDisclaimer'
+import { VISIBLE_GUIDE_SLUGS } from '@/lib/guides-config'
 
 interface BeachRow {
   id: string
@@ -34,21 +36,6 @@ const FILTER_KEYS: Record<Exclude<FilterKey, 'all'>, string[]> = {
   surfer: ['surfer', 'active', 'windsurfing'],
   scenic: ['scenic', 'pristine', 'photography', 'unique'],
   secluded: ['secluded', 'wild', 'adventurous'],
-}
-
-// image_url is null for every row today — fall back to a local image keyed
-// by beach name until real photos are uploaded to Supabase.
-const FALLBACK_IMAGE: Record<string, string> = {
-  'Playa de Papagayo': '/lanzarote4.jpg',
-  'Playa de Famara': '/lanzarote9.jpg',
-  'Playa Dorada': '/lanzarote3.jpg',
-  'Playa Flamingo': '/lanzarote6.jpg',
-  'Playa Mujeres': '/lanzarote4.jpg',
-  'Playa Grande': '/lanzarote13.jpg',
-  'Playa de las Conchas': '/lanzarote14.jpg',
-  'Caletón Blanco': '/lanzarote16.jpg',
-  'Playa de la Cantería': '/lanzarote17.jpg',
-  'Playa Blanca Beach': '/lanzarote2.jpg',
 }
 
 const SLUG = 'beaches'
@@ -154,33 +141,39 @@ export default function BeachesGuidePage() {
               {filteredBeaches.map((beach) => {
                 const name = lang === 'es' ? beach.name_es || beach.name_en : beach.name_en
                 const description = lang === 'es' ? beach.description_es : beach.description_en
-                const image = beach.image_url || FALLBACK_IMAGE[beach.name_en] || '/lanzarote4.jpg'
+                const image = beach.image_url
                 const amenityKeys = Object.keys(beach.amenities ?? {}).filter((k) => beach.amenities[k] && k !== 'none')
+                const distance = Number(beach.distance_km)
+                const location = g.locationNames[beach.location] ?? beach.location
+                const sand = g.sandTypes[beach.sand_type] ?? beach.sand_type
                 return (
                   <div key={beach.id} className="bg-white rounded-2xl border border-neutral-100 shadow-sm overflow-hidden flex flex-col">
-                    <div className="relative h-40 w-full">
-                      <Image src={image} alt={`${name} beach, Lanzarote`} fill className="object-cover" />
-                      <div className="absolute top-2 right-2 bg-white/90 backdrop-blur rounded-full px-2.5 py-1 text-xs font-bold text-dark">
-                        {'⭐'.repeat(Math.round(Number(beach.rating)))} {beach.rating}
+                    {image ? (
+                      <div className="relative h-40 w-full">
+                        <Image src={image} alt={`${name}, Lanzarote`} fill className="object-cover" />
                       </div>
-                    </div>
+                    ) : (
+                      <div aria-hidden className="h-1.5 w-full bg-orange/70" />
+                    )}
                     <div className="p-5 flex flex-col flex-1">
                       <h3 className="font-bold text-dark mb-2">{name}</h3>
                       <dl className="space-y-1.5 text-sm text-dark/70 mb-3">
-                        <div><span className="font-medium text-dark">{g.locationLabel}: </span>{beach.location}</div>
-                        <div><span className="font-medium text-dark">{g.distanceLabel}: </span>{beach.distance_km} km</div>
-                        <div><span className="font-medium text-dark">{g.sandLabel}: </span>{beach.sand_type}</div>
+                        <div><span className="font-medium text-dark">{g.locationLabel}: </span>{location}</div>
+                        {distance > 0 && (
+                          <div><span className="font-medium text-dark">{g.distanceLabel}: </span>{distance} km {g.fromBase}</div>
+                        )}
+                        <div><span className="font-medium text-dark">{g.sandLabel}: </span>{sand}</div>
                       </dl>
                       {amenityKeys.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mb-3">
                           {amenityKeys.map((key) => (
                             <span key={key} className="text-[11px] font-medium bg-neutral-100 text-dark/60 px-2 py-0.5 rounded-full">
-                              {key.replace(/_/g, ' ')}
+                              {g.amenityLabels[key] ?? key.replace(/_/g, ' ')}
                             </span>
                           ))}
                         </div>
                       )}
-                      <p className="text-xs text-dark/50 leading-relaxed mt-auto pt-3 border-t border-neutral-100">
+                      <p className="text-sm text-dark/60 leading-relaxed mt-auto pt-3 border-t border-neutral-100">
                         {description}
                       </p>
                     </div>
@@ -196,7 +189,7 @@ export default function BeachesGuidePage() {
               <h2 className="text-xl font-bold text-dark mb-4">{g.mapTitle}</h2>
               <div className="rounded-2xl overflow-hidden border border-neutral-200 h-80">
                 <iframe
-                  title="Lanzarote beaches map"
+                  title={g.mapTitle}
                   className="w-full h-full border-0"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -206,11 +199,13 @@ export default function BeachesGuidePage() {
             </section>
           )}
 
+          <GuideDisclaimer lang={lang} className="mb-10" />
+
           {/* Related guides */}
           <div className="pb-16">
             <h2 className="text-lg font-bold text-dark mb-4">{g.relatedGuides}</h2>
             <div className="flex flex-wrap gap-3">
-              {(Object.keys(g.sectionTitles) as (keyof typeof g.sectionTitles)[])
+              {VISIBLE_GUIDE_SLUGS
                 .filter((slug) => slug !== SLUG)
                 .map((slug) => (
                   <Link

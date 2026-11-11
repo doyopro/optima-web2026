@@ -174,6 +174,27 @@ export async function POST(req: NextRequest) {
       metadata: { guesty_reservation_id: reservation.id },
     })
 
+    // The charge must carry the booking code as its Stripe description,
+    // EXACTLY and nothing else: the payments sync (n8n / dashboard
+    // sync-stripe) matches a Stripe charge to reservations.channel_booking_id
+    // through that description. The code does not exist yet when the
+    // PaymentIntent is created, so it is stamped here, after the reservation
+    // is booked. Without it the payment lands in `payments` with no
+    // reservation and the guest portal shows nothing paid. Best-effort: a
+    // failure here never blocks the booking.
+    if (reservation.confirmationCode) {
+      try {
+        await stripeServer.paymentIntents.update(paymentIntent.id, { description: reservation.confirmationCode })
+        const latestCharge = live.latest_charge
+        const chargeId = typeof latestCharge === 'string' ? latestCharge : latestCharge?.id
+        if (chargeId) {
+          await stripeServer.charges.update(chargeId, { description: reservation.confirmationCode })
+        }
+      } catch (descErr) {
+        console.error('[stripe webhook] could not set the charge description', descErr instanceof Error ? descErr.message : descErr)
+      }
+    }
+
     console.log(
       '[POST /api/stripe/webhook] BETA reservation created',
       reservation.id,

@@ -7,6 +7,8 @@ import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
+import GuideDisclaimer from '@/components/GuideDisclaimer'
+import { VISIBLE_GUIDE_SLUGS } from '@/lib/guides-config'
 
 interface FerryRow {
   id: string
@@ -118,15 +120,15 @@ export default function FerriesGuidePage() {
                       {notes && <p className="text-sm text-dark/70 leading-relaxed mb-4">{notes}</p>}
                       <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 text-sm mb-4">
                         <Fact label={g.crossing} value={`${ferry.duration_minutes} min`} />
-                        <Fact label={g.frequency} value={`${ferry.frequency_daily}/day`} />
-                        <Fact label={g.price} value={`€${ferry.price_eur}`} />
+                        <Fact label={g.frequency} value={`${g.upTo} ${ferry.frequency_daily} ${g.perDay}`} />
+                        <Fact label={g.price} value={`~€${ferry.price_eur}`} />
                         <Fact label={g.luggage} value={`${ferry.luggage_limit_kg} kg`} />
                       </dl>
                       {amenityKeys.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-4">
                           {amenityKeys.map((key) => (
                             <span key={key} className="text-xs font-medium bg-neutral-100 text-dark/70 px-2.5 py-1 rounded-full">
-                              {key.replace(/_/g, ' ')}
+                              {g.amenityLabels[key] ?? key.replace(/_/g, ' ')}
                             </span>
                           ))}
                         </div>
@@ -146,11 +148,13 @@ export default function FerriesGuidePage() {
             )}
           </div>
 
+          <GuideDisclaimer lang={lang} className="mb-10" />
+
           {/* Related guides */}
           <div className="pb-16">
             <h2 className="text-lg font-bold text-dark mb-4">{g.relatedGuides}</h2>
             <div className="flex flex-wrap gap-3">
-              {(Object.keys(g.sectionTitles) as (keyof typeof g.sectionTitles)[])
+              {VISIBLE_GUIDE_SLUGS
                 .filter((slug) => slug !== SLUG)
                 .map((slug) => (
                   <Link

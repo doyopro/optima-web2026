@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
+import GuideDisclaimer from '@/components/GuideDisclaimer'
+import { isGuideHidden } from '@/lib/guides-config'
 
 interface GuideRow {
   id: string
@@ -48,6 +50,8 @@ export default function GuidesLandingPage() {
       .finally(() => setLoading(false))
   }
 
+  const visibleGuides = useMemo(() => guides.filter((guide) => !isGuideHidden(guide.slug)), [guides])
+
   useEffect(() => {
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,22 +92,69 @@ export default function GuidesLandingPage() {
           </div>
         </div>
 
-        {/* Main guide cards — from Supabase (guides_content) */}
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-12">
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="rounded-2xl overflow-hidden border border-neutral-100 bg-white animate-pulse">
-                  <div className="h-48 w-full bg-neutral-200" />
-                  <div className="p-5 space-y-2">
-                    <div className="h-4 w-1/3 bg-neutral-200 rounded" />
-                    <div className="h-3 w-2/3 bg-neutral-200 rounded" />
+        {/* Guide cards: the static essentials guide first, then the published
+            guides from Supabase (guides_content). Guides listed in
+            HIDDEN_GUIDE_SLUGS are not shown. */}
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <Link
+              href="/guides/essentials"
+              className="group relative rounded-2xl overflow-hidden shadow-sm border border-neutral-100 bg-white hover:shadow-md transition-shadow"
+            >
+              <div className="relative h-48 w-full">
+                <Image
+                  src="/lanzarote2.jpg"
+                  alt={g.sectionTitles.essentials.title}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="p-5">
+                <p className="text-2xl mb-1">🧭</p>
+                <h2 className="text-lg font-bold text-dark mb-1">{g.sectionTitles.essentials.title}</h2>
+                <p className="text-sm text-dark/60 line-clamp-2">{g.sectionTitles.essentials.subtitle}</p>
+              </div>
+            </Link>
+
+            {loading
+              ? [0, 1].map((i) => (
+                  <div key={i} className="rounded-2xl overflow-hidden border border-neutral-100 bg-white animate-pulse">
+                    <div className="h-48 w-full bg-neutral-200" />
+                    <div className="p-5 space-y-2">
+                      <div className="h-4 w-1/3 bg-neutral-200 rounded" />
+                      <div className="h-3 w-2/3 bg-neutral-200 rounded" />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : error ? (
-            <div className="text-center py-12">
+                ))
+              : visibleGuides.map((guide) => {
+                  const meta = g.sectionTitles[guide.slug as keyof typeof g.sectionTitles]
+                  const blurb = lang === 'es' ? guide.content_es : guide.content_en
+                  return (
+                    <Link
+                      key={guide.slug}
+                      href={`/guides/${guide.slug}`}
+                      className="group relative rounded-2xl overflow-hidden shadow-sm border border-neutral-100 bg-white hover:shadow-md transition-shadow"
+                    >
+                      <div className="relative h-48 w-full">
+                        <Image
+                          src={FALLBACK_IMAGE[guide.slug] ?? '/lanzarote2.jpg'}
+                          alt={meta?.title ?? guide.section}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="p-5">
+                        <p className="text-2xl mb-1">{guide.metadata?.icon}</p>
+                        <h2 className="text-lg font-bold text-dark mb-1">{meta?.title ?? guide.section}</h2>
+                        <p className="text-sm text-dark/60 line-clamp-2">{meta?.subtitle || blurb}</p>
+                      </div>
+                    </Link>
+                  )
+                })}
+          </div>
+
+          {!loading && error && (
+            <div className="text-center py-8">
               <p className="text-dark/60 mb-4">{g.loadError}</p>
               <button
                 type="button"
@@ -113,51 +164,11 @@ export default function GuidesLandingPage() {
                 {g.retry}
               </button>
             </div>
-          ) : guides.length === 0 ? (
-            <p className="text-center text-dark/50 py-12">{g.empty}</p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {guides.map((guide) => {
-                const meta = g.sectionTitles[guide.slug as keyof typeof g.sectionTitles]
-                const blurb = lang === 'es' ? guide.content_es : guide.content_en
-                return (
-                  <Link
-                    key={guide.slug}
-                    href={`/guides/${guide.slug}`}
-                    className="group relative rounded-2xl overflow-hidden shadow-sm border border-neutral-100 bg-white hover:shadow-md transition-shadow"
-                  >
-                    <div className="relative h-48 w-full">
-                      <Image
-                        src={FALLBACK_IMAGE[guide.slug] ?? '/lanzarote2.jpg'}
-                        alt={meta.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-5">
-                      <p className="text-2xl mb-1">{guide.metadata?.icon}</p>
-                      <h2 className="text-lg font-bold text-dark mb-1">{meta?.title ?? guide.section}</h2>
-                      <p className="text-sm text-dark/60 line-clamp-2">{blurb || meta?.subtitle}</p>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
           )}
         </div>
 
-        {/* Bonus section — decorative, not backed by a table */}
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-16">
-          <h2 className="text-xl font-bold text-dark mb-5">{g.bonus.title}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {g.bonus.items.map((item) => (
-              <div key={item.title} className="bg-white rounded-2xl border border-neutral-100 p-5">
-                <p className="text-2xl mb-2">{item.emoji}</p>
-                <h3 className="font-bold text-dark mb-1">{item.title}</h3>
-                <p className="text-sm text-dark/60">{item.description}</p>
-              </div>
-            ))}
-          </div>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-12">
+          <GuideDisclaimer lang={lang} />
         </div>
 
         {/* Bottom CTA */}

@@ -8,6 +8,7 @@ import { translations, getBlogCategoryLabel } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import { type BlogPost } from '@/lib/types'
 import { resolveCoverImage } from '@/lib/blog'
+import { renderMarkdownLite } from '@/lib/markdown-lite'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 
@@ -51,7 +52,6 @@ export default function BlogPostClient({ params }: Props) {
 
   const title = (lang === 'es' && post.title_es) || post.title
   const content = (lang === 'es' && post.content_es) || post.content || ''
-  const paragraphs = content.split(/\n\s*\n/).filter((p) => p.trim())
   const publishedDate = post.published_at
     ? new Date(post.published_at).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-GB', {
         year: 'numeric',
@@ -105,12 +105,9 @@ export default function BlogPostClient({ params }: Props) {
             {publishedDate && <span>{t.blog.publishedOn} {publishedDate}</span>}
           </div>
 
-          <div className="space-y-4">
-            {paragraphs.map((paragraph, i) => (
-              <p key={i} className="text-dark/70 leading-relaxed whitespace-pre-line">
-                {paragraph}
-              </p>
-            ))}
+          {/* Post bodies use **bold** and blank-line paragraphs; render them rather than showing raw asterisks. */}
+          <div className="space-y-4 text-dark/70 leading-relaxed [&_strong]:font-semibold [&_strong]:text-dark">
+            {renderMarkdownLite(content)}
           </div>
 
           <div className="mt-10">
