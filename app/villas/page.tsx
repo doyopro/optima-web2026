@@ -200,13 +200,13 @@ function VillasPageContent() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
           <BookingNotice className="mb-6" />
           {/* Header row */}
-          <div className="flex items-center justify-between mb-8 gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-dark">
+              <h1 className="text-2xl sm:text-3xl font-bold text-dark">
                 {loading ? t.loading : `${sorted.length} ${t.results}`}
               </h1>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               {/* Mobile filter toggle */}
               <button
                 type="button"
@@ -220,7 +220,7 @@ function VillasPageContent() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortKey)}
-                className="border border-neutral-200 px-3 py-2 rounded-lg text-sm bg-white focus:outline-none focus:border-orange"
+                className="min-w-0 flex-1 sm:flex-none border border-neutral-200 px-3 py-2 rounded-lg text-sm bg-white focus:outline-none focus:border-orange"
               >
                 <option value="price_asc">{t.sortBy}: {t.sortPrice} ↑</option>
                 <option value="price_desc">{t.sortPrice} ↓</option>
