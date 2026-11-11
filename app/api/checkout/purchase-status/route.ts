@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
       propertyId: meta.propertyId ?? null,
     })
   } catch (err) {
+    if ((err as { code?: string }).code === 'resource_missing') return NextResponse.json({ status: 'unknown' }, { status: 404 })
     console.error('[GET /api/checkout/purchase-status]', err instanceof Error ? err.message : err)
     return NextResponse.json({ error: 'Failed' }, { status: 500 })
   }
