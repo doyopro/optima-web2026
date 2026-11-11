@@ -39,7 +39,7 @@ const FILTER_KEYS: Record<Exclude<FilterKey, 'all'>, string[]> = {
 }
 
 const SLUG = 'beaches'
-const HERO_IMAGE = '/lanzarote4.jpg'
+const HERO_IMAGE = '/lanzarote9.jpg'
 
 export default function BeachesGuidePage() {
   const { lang } = useLanguage()

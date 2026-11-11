@@ -54,7 +54,7 @@ export default function OwnersPage() {
         <section className="relative flex min-h-[560px] items-center justify-center overflow-hidden px-4 py-24 sm:px-6">
           <Image
             src="/lanzarote14.jpg"
-            alt="Charco de los Clicos green lagoon, Lanzarote"
+            alt={t.heroAlt}
             fill
             priority
             sizes="100vw"
@@ -161,7 +161,7 @@ export default function OwnersPage() {
         <section className="relative py-20 px-4 sm:px-6 overflow-hidden">
           <Image
             src="/lanzarote14.jpg"
-            alt="Volcanic coastline and green lagoon at El Golfo, Lanzarote"
+            alt={t.trustAlt}
             fill
             loading="lazy"
             sizes="100vw"

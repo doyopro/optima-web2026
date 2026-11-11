@@ -28,7 +28,7 @@ interface FerryRow {
 }
 
 const SLUG = 'ferries'
-const HERO_IMAGE = '/lanzarote11.jpg'
+const HERO_IMAGE = '/lanzarote14.jpg'
 
 function websiteUrl(website: string) {
   return website.startsWith('http') ? website : `https://${website}`

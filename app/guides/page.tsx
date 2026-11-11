@@ -24,8 +24,8 @@ interface GuideRow {
 const FALLBACK_IMAGE: Record<string, string> = {
   'playa-blanca': '/lanzarote2.jpg',
   climate: '/lanzarote7.jpg',
-  ferries: '/lanzarote11.jpg',
-  beaches: '/lanzarote4.jpg',
+  ferries: '/lanzarote14.jpg',
+  beaches: '/lanzarote9.jpg',
 }
 
 export default function GuidesLandingPage() {
@@ -63,7 +63,7 @@ export default function GuidesLandingPage() {
         {/* Hero */}
         <div className="relative">
           <div className="relative h-[380px] sm:h-[440px] w-full overflow-hidden">
-            <Image src="/lanzarote2.jpg" alt={g.heroAlt.index} fill priority className="object-cover" />
+            <Image src="/lanzarote10.jpg" alt={g.heroAlt.index} fill priority className="object-cover" />
             <div className="absolute inset-0 bg-black/40" />
           </div>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
@@ -103,8 +103,8 @@ export default function GuidesLandingPage() {
             >
               <div className="relative h-48 w-full">
                 <Image
-                  src="/lanzarote2.jpg"
-                  alt={g.sectionTitles.essentials.title}
+                  src="/lanzarote8.jpg"
+                  alt={g.heroAlt.essentials}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />

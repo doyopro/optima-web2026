@@ -10,7 +10,7 @@ import WhatsAppWidget from '@/components/WhatsAppWidget'
 import GuideDisclaimer from '@/components/GuideDisclaimer'
 
 const SLUG = 'essentials'
-const HERO_IMAGE = '/lanzarote2.jpg'
+const HERO_IMAGE = '/lanzarote8.jpg'
 const BUS_URL = 'https://arrecifebus.com'
 
 function telHref(phone: string) {
@@ -40,7 +40,7 @@ export default function EssentialsGuidePage() {
     <>
       <div className="min-h-screen bg-cream">
         <div className="relative h-[260px] sm:h-[340px] w-full overflow-hidden">
-          <Image src={HERO_IMAGE} alt={g.heroAlt.index} fill priority className="object-cover" />
+          <Image src={HERO_IMAGE} alt={g.heroAlt.essentials} fill priority className="object-cover" />
           <div className="absolute inset-0 bg-black/45" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
             <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2 max-w-2xl">{meta.title}</h1>

@@ -3,6 +3,8 @@ export type Language = 'en' | 'es'
 export const translations = {
   en: {
     nav: {
+      menuLabel: 'Menu',
+      closeMenuLabel: 'Close menu',
       home: 'Home',
       villas: 'Villas',
       guides: 'Guides',
@@ -248,6 +250,8 @@ export const translations = {
       welcome: 'Hi! I\'m the Optima Villas assistant. How can I help you today?',
     },
     owners: {
+      heroAlt: 'Green lagoon of El Golfo (Charco de los Clicos), Lanzarote',
+      trustAlt: 'Volcanic coastline and green lagoon at El Golfo, Lanzarote',
       hero: {
         title: "Your villa in Lanzarote, managed like it's our own",
         subtitle:
@@ -697,11 +701,12 @@ export const translations = {
       price: 'Approx. price (one way)',
       luggage: 'Luggage allowance',
       heroAlt: {
-        index: 'Volcanic landscape and coastline of Lanzarote',
+        index: 'Volcanic landscape of Lanzarote',
+        essentials: 'Whitewashed building and volcanic hills in Lanzarote',
         'playa-blanca': 'Playa Blanca coastline and beaches, Lanzarote',
         climate: 'Sunny volcanic landscape in Lanzarote',
-        ferries: 'Ferry port in Playa Blanca, Lanzarote',
-        beaches: 'A beach in Lanzarote',
+        ferries: 'Lanzarote coastline and Atlantic Ocean',
+        beaches: 'Golden beach and turquoise sea on the Lanzarote coast',
       },
     },
     dashboard: {
@@ -824,6 +829,8 @@ export const translations = {
   },
   es: {
     nav: {
+      menuLabel: 'Menú',
+      closeMenuLabel: 'Cerrar menú',
       home: 'Inicio',
       villas: 'Villas',
       guides: 'Guías',
@@ -1069,6 +1076,8 @@ export const translations = {
       welcome: '¡Hola! Soy el asistente de Optima Villas. ¿En qué puedo ayudarte hoy?',
     },
     owners: {
+      heroAlt: 'Laguna verde de El Golfo (Charco de los Clicos), Lanzarote',
+      trustAlt: 'Costa volcánica y laguna verde de El Golfo, Lanzarote',
       hero: {
         title: 'Tu villa en Lanzarote, gestionada como si fuera nuestra',
         subtitle:
@@ -1528,11 +1537,12 @@ export const translations = {
       price: 'Precio orientativo (ida)',
       luggage: 'Equipaje incluido',
       heroAlt: {
-        index: 'Paisaje volcánico y costa de Lanzarote',
+        index: 'Paisaje volcánico de Lanzarote',
+        essentials: 'Edificio encalado y montañas volcánicas en Lanzarote',
         'playa-blanca': 'Costa y playas de Playa Blanca, Lanzarote',
         climate: 'Paisaje volcánico soleado en Lanzarote',
-        ferries: 'Puerto de ferris en Playa Blanca, Lanzarote',
-        beaches: 'Una playa en Lanzarote',
+        ferries: 'Costa de Lanzarote y océano Atlántico',
+        beaches: 'Playa de arena dorada y mar turquesa en la costa de Lanzarote',
       },
     },
     dashboard: {

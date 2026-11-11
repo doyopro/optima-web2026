@@ -109,7 +109,7 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              aria-label="Menu"
+              aria-label={nav.menuLabel}
               aria-expanded={mobileMenuOpen}
               className="lg:hidden text-dark hover:text-orange transition-colors"
             >
@@ -124,7 +124,7 @@ export default function Header() {
         <div className="lg:hidden fixed inset-0 z-50">
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={nav.closeMenuLabel}
             onClick={closeMobileMenu}
             className="absolute inset-0 bg-black/40"
           />
@@ -134,7 +134,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={closeMobileMenu}
-                aria-label="Close menu"
+                aria-label={nav.closeMenuLabel}
                 className="text-dark hover:text-orange transition-colors"
               >
                 <CloseIcon className="h-6 w-6" />
