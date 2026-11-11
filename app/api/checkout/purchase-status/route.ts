@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
       value: pi.amount_received / 100,
       currency: pi.currency.toUpperCase(),
       paymentChoice: meta.paymentChoice === 'deposit' ? 'deposit' : 'full',
+      bookingTotal: Number.isFinite(Number(meta.totalPrice)) ? Number(meta.totalPrice) : null,
       propertyId: meta.propertyId ?? null,
     })
   } catch (err) {

@@ -71,6 +71,7 @@ async function reportPurchaseWhenBooked(paymentIntentId: string, propertyName: s
               value: d.value,
               currency: d.currency,
               payment_type: d.paymentChoice, // 'deposit' | 'full'
+              booking_total: d.bookingTotal, // full stay price (value = amount charged now)
               items: [{ item_id: d.propertyId, item_name: propertyName, price: d.value, quantity: 1 }],
             }),
           )
