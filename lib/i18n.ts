@@ -503,7 +503,7 @@ export const translations = {
       ],
     },
     footer: {
-      tagline: 'Exceptional holiday villas in Lanzarote since 2003.',
+      tagline: 'A great choice of holiday villas in Lanzarote since 2003.',
       company: 'Company',
       legal: 'Legal',
       contact: 'Contact',
@@ -1329,7 +1329,7 @@ export const translations = {
       ],
     },
     footer: {
-      tagline: 'Villas vacacionales excepcionales en Lanzarote desde 2003.',
+      tagline: 'Una gran selección de villas vacacionales en Lanzarote desde 2003.',
       company: 'Empresa',
       legal: 'Legal',
       contact: 'Contacto',

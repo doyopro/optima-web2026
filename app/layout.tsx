@@ -30,7 +30,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Optima Villas — Holiday Villas in Lanzarote",
-  description: "Discover exceptional holiday villas in Lanzarote with private pools, stunning views and personalised service. Book direct with Optima Villas.",
+  description: "Discover a great choice of holiday villas in Lanzarote with private pools, stunning views and personalised service. Book direct with Optima Villas.",
   keywords: ["villas lanzarote", "holiday villas", "optima villas", "lanzarote rentals"],
 };
 
