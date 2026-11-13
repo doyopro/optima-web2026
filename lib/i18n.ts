@@ -222,6 +222,7 @@ export const translations = {
       reviews: 'reviews',
       amenities: 'Amenities',
       priceIndicative: 'Indicative price — confirmed at checkout',
+      eurNote: 'Prices are set in GBP. Euro amounts are approximate; all online bookings are charged in GBP.',
       bookNowNote: "You'll be redirected to our secure booking site to confirm dates, availability and final pricing.",
     },
     availability: {
@@ -417,7 +418,7 @@ export const translations = {
       testPaymentSucceededDesc: 'This was a Stripe test-mode payment — no real card was charged. A test reservation is being created in Guesty.',
       contactUs: 'Contact us',
       eurEstimate: '≈ €{amount} estimated',
-      eurEstimateDisclaimer: "Estimated in EUR for reference — you'll be charged £{amount} exactly.",
+      eurEstimateDisclaimer: "Estimated in EUR for reference. All online bookings are charged in GBP (£{amount}). The final amount in euros depends on your bank's exchange rate and fees. If you prefer to pay in euros, please contact us before booking.",
     },
     confirmation: {
       title: 'Booking confirmed!',
@@ -1048,6 +1049,7 @@ export const translations = {
       reviews: 'reseñas',
       amenities: 'Comodidades',
       priceIndicative: 'Precio orientativo — se confirma al reservar',
+      eurNote: 'Los precios están fijados en GBP. Los importes en euros son aproximados; todas las reservas online se cobran en GBP.',
       bookNowNote: 'Serás redirigido a nuestro sitio de reservas seguro para confirmar fechas, disponibilidad y precio final.',
     },
     availability: {
@@ -1243,7 +1245,7 @@ export const translations = {
       testPaymentSucceededDesc: 'Este fue un pago de prueba de Stripe — no se cobró ninguna tarjeta real. Se está creando una reserva de prueba en Guesty.',
       contactUs: 'Contáctanos',
       eurEstimate: '≈ €{amount} estimado',
-      eurEstimateDisclaimer: 'Estimado en EUR como referencia — se te cobrarán £{amount} exactamente.',
+      eurEstimateDisclaimer: 'Estimado en EUR como referencia. Todas las reservas online se cobran en GBP (£{amount}). El importe final en euros depende del tipo de cambio y las comisiones de tu banco. Si prefieres pagar en euros, contáctanos antes de reservar.',
     },
     confirmation: {
       title: '¡Reserva confirmada!',

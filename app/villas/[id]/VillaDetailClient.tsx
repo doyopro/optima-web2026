@@ -450,6 +450,7 @@ export default function VillaDetailClient({ params }: Props) {
                 </div>
 
                 <p className="text-xs text-dark/40 mb-3">{t.properties.priceIndicative}</p>
+                {currency === 'EUR' && <p className="text-xs text-dark/60 mb-3">{t.properties.eurNote}</p>}
 
                 {datesSelected && (
                   <p className="text-xs font-semibold text-dark mb-2">
@@ -523,6 +524,7 @@ export default function VillaDetailClient({ params }: Props) {
           <span className="text-dark/50 text-xs">{t.properties.fromPrice} </span>
           <span className="text-lg font-bold text-dark">{formatPrice(property.price_per_night_gbp, currency, gbpToEurRate)}</span>
           <span className="text-dark/50 text-xs"> {t.properties.perNight}</span>
+          {currency === 'EUR' && <p className="text-[10px] leading-tight text-dark/60 max-w-[11rem] mt-0.5">{t.properties.eurNote}</p>}
         </div>
         <div className="flex flex-col items-end gap-1">
         <button
