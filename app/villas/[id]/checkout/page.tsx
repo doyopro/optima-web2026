@@ -10,6 +10,7 @@ import { translations } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
 import { useCurrency } from '@/lib/CurrencyContext'
 import { convertFromGbp } from '@/lib/currency'
+import { EUR_CHECKOUT_ENABLED } from '@/lib/features'
 import { type Property } from '@/lib/types'
 import { getPaymentOptions } from '@/lib/booking'
 import { type BookedRange, rangeOverlapsBooking } from '@/lib/availability'
@@ -69,7 +70,7 @@ function CheckoutContent({ params }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { lang } = useLanguage()
-  const { currency, gbpToEurRate } = useCurrency()
+  const { currency, gbpToEurRate, checkoutRate } = useCurrency()
 
   const initialCheckIn = searchParams.get('from') ?? ''
   const initialCheckOut = searchParams.get('to') ?? ''
@@ -203,6 +204,11 @@ function CheckoutContent({ params }: Props) {
       : paymentChoice === 'deposit' && paymentOptions.depositAllowed
         ? paymentOptions.depositAmount
         : paymentOptions.fullAmount
+
+  // Paying in euros for real: only when the feature is on, the guest chose EUR
+  // and the checkout rate has loaded. Same rounding as the server (whole euros).
+  const payInEur = EUR_CHECKOUT_ENABLED && currency === 'EUR' && checkoutRate != null
+  const amountDueEur = payInEur ? Math.round(amountDueToday * (checkoutRate as number)) : 0
 
   return (
     <>
@@ -456,9 +462,16 @@ function CheckoutContent({ params }: Props) {
                   <div className="mt-5 mb-4">
                     <div className="flex items-baseline justify-between">
                       <span className="text-sm text-dark/60">{t.checkout.amountToPay}</span>
-                      <span className="text-2xl font-bold text-dark">£{amountDueToday.toFixed(0)}</span>
+                      <span className="text-2xl font-bold text-dark">
+                        {payInEur ? `€${amountDueEur}` : `£${amountDueToday.toFixed(0)}`}
+                      </span>
                     </div>
-                    {currency === 'EUR' && (
+                    {payInEur && (
+                      <p className="text-xs text-dark/50 mt-2 leading-relaxed">
+                        {t.checkout.eurChargeNotice.replace('{amount}', String(amountDueEur))}
+                      </p>
+                    )}
+                    {currency === 'EUR' && !payInEur && (
                       <>
                         <p className="text-right text-sm text-dark/40">
                           {t.checkout.eurEstimate.replace(
@@ -496,6 +509,7 @@ function CheckoutContent({ params }: Props) {
                       guestEmail,
                       guestPhone,
                       totalPrice: pricing.totalPrice,
+                      currency: payInEur ? 'EUR' : 'GBP',
                     }}
                     onSuccess={() => setPaymentSucceeded(true)}
                   />

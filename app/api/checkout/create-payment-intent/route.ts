@@ -6,6 +6,8 @@ import { supabaseServer } from '@/lib/supabase-server'
 import { getListingPricing, GuestyRateLimitError } from '@/lib/guesty-server'
 import { getPaymentOptions } from '@/lib/booking'
 import { rangeOverlapsBooking } from '@/lib/availability'
+import { EUR_CHECKOUT_ENABLED } from '@/lib/features'
+import { getCheckoutEurRate, gbpToEur } from '@/lib/eur-checkout'
 
 // BETA — internal testing only (test-mode Stripe, see lib/stripe-server.ts).
 //
@@ -84,9 +86,17 @@ export async function POST(req: NextRequest) {
     }
     const amountGbp = paymentChoice === 'deposit' ? options.depositAmount : options.fullAmount
 
+    // EUR is only honoured when the feature flag is on; anything else is GBP,
+    // exactly as before. The EUR price is computed here from the GBP price
+    // (never taken from the client) at a rate fixed for this booking.
+    const payInEur = EUR_CHECKOUT_ENABLED && body.currency === 'EUR'
+    const fxRate = payInEur ? await getCheckoutEurRate() : null
+    const amountEur = fxRate ? gbpToEur(amountGbp, fxRate) : null
+    const totalEur = fxRate ? gbpToEur(pricing.totalPrice, fxRate) : null
+
     const paymentIntent = await stripeServer.paymentIntents.create({
-      amount: Math.round(amountGbp * 100), // pence
-      currency: 'gbp',
+      amount: amountEur != null ? amountEur * 100 : Math.round(amountGbp * 100), // cents / pence
+      currency: amountEur != null ? 'eur' : 'gbp',
       // Read back by the webhook (the only place a Guesty reservation is
       // created) — written by the server, so trustworthy at that point.
       metadata: {
@@ -101,11 +111,23 @@ export async function POST(req: NextRequest) {
         guestEmail,
         guestPhone,
         totalPrice: String(pricing.totalPrice),
+        ...(fxRate && amountEur != null && totalEur != null
+          ? {
+              payCurrency: 'EUR',
+              amountGbp: String(amountGbp),
+              amountEur: String(amountEur),
+              totalEur: String(totalEur),
+              fxRate: String(fxRate),
+            }
+          : {}),
       },
       receipt_email: guestEmail,
     })
 
-    return NextResponse.json({ clientSecret: paymentIntent.client_secret })
+    return NextResponse.json({
+      clientSecret: paymentIntent.client_secret,
+      ...(amountEur != null ? { currency: 'EUR', amountEur } : {}),
+    })
   } catch (err) {
     if (err instanceof GuestyRateLimitError) {
       return bad('Pricing is temporarily unavailable, please try again in a minute', 503)

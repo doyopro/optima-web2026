@@ -1,6 +1,7 @@
 import { supabaseServer } from '@/lib/supabase-server'
 import { getBalanceDueDate } from '@/lib/booking'
 import { type GuestReservation } from '@/lib/guest-auth'
+import { getGbpToEurRate } from '@/lib/fx-rate'
 
 export interface GuestPaymentEntry {
   id: string
@@ -41,12 +42,41 @@ export async function getPaymentSummary(reservation: GuestReservation): Promise<
 
   const { data } = await supabaseServer
     .from('payments')
-    .select('id, amount_gbp, payment_date, payment_reference, status')
+    .select('id, amount_gbp, amount_eur_gross, currency, payment_date, payment_reference, status')
     .eq('reservation_id', reservation.id)
     .in('status', ['succeeded', 'refund'])
     .order('payment_date', { ascending: true })
 
-  const rows = data ?? []
+  // Payments charged in EUR have no GBP figure of their own (amount_gbp is
+  // empty), so they would count as "nothing paid". Give each one a GBP
+  // equivalent: the exact figure from the website's EUR checkout when we have
+  // it (eur_checkout_rates, fixed at booking), otherwise today's rate.
+  const rawRows = data ?? []
+  const needsGbp = rawRows.some((r) => r.amount_gbp == null && r.currency === 'EUR')
+  let fixedRates: { amount_eur: number; amount_gbp: number; fx_rate: number }[] = []
+  let liveRate = 0
+  if (needsGbp) {
+    if (reservation.channel_booking_id) {
+      const { data: rates } = await supabaseServer
+        .from('eur_checkout_rates')
+        .select('amount_eur, amount_gbp, fx_rate')
+        .eq('channel_booking_id', reservation.channel_booking_id)
+      fixedRates = (rates ?? []).map((r) => ({
+        amount_eur: Number(r.amount_eur),
+        amount_gbp: Number(r.amount_gbp),
+        fx_rate: Number(r.fx_rate),
+      }))
+    }
+    liveRate = await getGbpToEurRate()
+  }
+  const rows = rawRows.map((row) => {
+    if (row.amount_gbp != null || row.currency !== 'EUR') return row
+    const eur = Number(row.amount_eur_gross ?? 0)
+    const exact = fixedRates.find((r) => Math.abs(r.amount_eur - eur) < 0.01)
+    const rate = exact?.fx_rate ?? fixedRates[0]?.fx_rate ?? liveRate
+    const gbp = exact ? exact.amount_gbp : rate > 0 ? Math.round((eur / rate) * 100) / 100 : 0
+    return { ...row, amount_gbp: gbp }
+  })
   const paidSoFarGbp = rows.reduce((sum, row) => sum + Number(row.amount_gbp ?? 0), 0)
   const balanceDueGbp = Math.round((totalPriceGbp - paidSoFarGbp) * 100) / 100
 

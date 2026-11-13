@@ -421,6 +421,7 @@ export const translations = {
       testPaymentSucceededDesc: 'This was a Stripe test-mode payment — no real card was charged. A test reservation is being created in Guesty.',
       contactUs: 'Contact us',
       eurEstimate: '≈ €{amount} estimated',
+      eurChargeNotice: 'You will be charged €{amount}. This is a fixed price in euros at today\'s exchange rate. To pay in pounds instead, switch the currency to GBP.',
       eurEstimateDisclaimer: "Estimated in EUR for reference. All online bookings are charged in GBP (£{amount}). The final amount in euros depends on your bank's exchange rate and fees. If you prefer to pay in euros, please contact us before booking.",
     },
     confirmation: {
@@ -1257,6 +1258,7 @@ export const translations = {
       testPaymentSucceededDesc: 'Este fue un pago de prueba de Stripe — no se cobró ninguna tarjeta real. Se está creando una reserva de prueba en Guesty.',
       contactUs: 'Contáctanos',
       eurEstimate: '≈ €{amount} estimado',
+      eurChargeNotice: 'Se te cobrarán €{amount}. Es un precio fijo en euros al tipo de cambio de hoy. Para pagar en libras, cambia la moneda a GBP.',
       eurEstimateDisclaimer: 'Estimado en EUR como referencia. Todas las reservas online se cobran en GBP (£{amount}). El importe final en euros depende del tipo de cambio y las comisiones de tu banco. Si prefieres pagar en euros, contáctanos antes de reservar.',
     },
     confirmation: {

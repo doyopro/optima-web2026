@@ -57,6 +57,7 @@ export function createLegacyReservationSession(
 export interface GuestReservation {
   id: string
   contact_id: string | null
+  channel_booking_id?: string | null
   property_id: string | null
   property_name: string | null
   guest_name: string | null
@@ -82,7 +83,7 @@ export interface GuestContact {
 }
 
 const RESERVATION_COLUMNS =
-  'id, contact_id, property_id, property_name, guest_name, guest_email, guest_phone, check_in, check_out, nights, num_guests, status, paid, amount_gbp, amount_eur, currency, payment_method'
+  'id, contact_id, channel_booking_id, property_id, property_name, guest_name, guest_email, guest_phone, check_in, check_out, nights, num_guests, status, paid, amount_gbp, amount_eur, currency, payment_method'
 
 // Bookings a guest should actually see. Excludes 'inquiry' (never became a
 // real booking), 'canceled', 'declined', 'expired'. 'closed' is ALSO

@@ -11,6 +11,8 @@ interface CurrencyContextValue {
   currency: Currency
   setCurrency: (currency: Currency) => void
   gbpToEurRate: number
+  /** Rate guests are actually charged at when paying in EUR (null while EUR checkout is off). */
+  checkoutRate: number | null
 }
 
 const CurrencyContext = createContext<CurrencyContextValue | undefined>(undefined)
@@ -18,6 +20,7 @@ const CurrencyContext = createContext<CurrencyContextValue | undefined>(undefine
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [currency, setCurrencyState] = useState<Currency>('GBP')
   const [gbpToEurRate, setGbpToEurRate] = useState<number>(INITIAL_GBP_TO_EUR_RATE)
+  const [checkoutRate, setCheckoutRate] = useState<number | null>(null)
 
   useEffect(() => {
     setCurrencyState(getCurrency())
@@ -26,6 +29,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       .then((r) => r.json())
       .then((d) => {
         if (typeof d.rate === 'number' && d.rate > 0) setGbpToEurRate(d.rate)
+        if (typeof d.checkoutRate === 'number' && d.checkoutRate > 0) setCheckoutRate(d.checkoutRate)
       })
       .catch(() => {
         // Keep the initial fallback rate — better than a broken toggle.
@@ -38,7 +42,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, gbpToEurRate }}>
+    <CurrencyContext.Provider value={{ currency, setCurrency, gbpToEurRate, checkoutRate }}>
       {children}
     </CurrencyContext.Provider>
   )

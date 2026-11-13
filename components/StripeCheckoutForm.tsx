@@ -34,6 +34,8 @@ interface BookingDetails {
   guestPhone: string
   totalPrice: number
   propertyName?: string
+  /** 'EUR' asks the server to charge in euros (only honoured when EUR checkout is enabled). */
+  currency?: 'GBP' | 'EUR'
 }
 
 // ANALYTICS — exactly ONE 'Purchase' dataLayer push per RESERVATION (not per

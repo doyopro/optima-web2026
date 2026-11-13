@@ -207,11 +207,29 @@ export async function POST(req: NextRequest) {
     try {
       // amount_received is in pence (Stripe minor units for GBP) — Guesty
       // expects major currency units.
+      // Guesty keeps the reservation in GBP. For a EUR payment we register
+      // the GBP equivalent of what was charged (the GBP price it covers) and
+      // put the real euro figure and fixed rate in the note.
+      const paidInEur = paymentIntent.currency === 'eur' && meta.payCurrency === 'EUR'
       await registerGuestyPayment({
         reservationId: reservation.id,
-        amount: paymentIntent.amount_received / 100,
-        note: `Stripe PaymentIntent ${paymentIntent.id}`,
+        amount: paidInEur ? Number(meta.amountGbp) : paymentIntent.amount_received / 100,
+        note: paidInEur
+          ? `Stripe PaymentIntent ${paymentIntent.id} — paid €${paymentIntent.amount_received / 100} at fixed rate 1 GBP = ${meta.fxRate} EUR (stay total €${meta.totalEur})`
+          : `Stripe PaymentIntent ${paymentIntent.id}`,
       })
+      if (paidInEur) {
+        const { error: rateErr } = await supabaseServer.from('eur_checkout_rates').upsert({
+          payment_intent_id: paymentIntent.id,
+          channel_booking_id: reservation.confirmationCode ?? null,
+          fx_rate: Number(meta.fxRate),
+          amount_eur: paymentIntent.amount_received / 100,
+          amount_gbp: Number(meta.amountGbp),
+          total_eur: Number(meta.totalEur),
+          total_gbp: Number(meta.totalPrice),
+        })
+        if (rateErr) console.error('[stripe webhook] eur_checkout_rates insert failed', rateErr.message)
+      }
       console.log('[POST /api/stripe/webhook] BETA payment registered in Guesty', reservation.id)
 
       // Paid → confirm, so Guesty's "Booking (Direct)" messages fire. A failure
@@ -231,6 +249,7 @@ export async function POST(req: NextRequest) {
         confirmationCode: reservation.confirmationCode,
         paymentChoice: meta.paymentChoice,
         amount: paymentIntent.amount_received / 100,
+        currency: paymentIntent.currency,
         confirmed,
         ...(confirmError ? { confirmError } : {}),
       }, !confirmed)
