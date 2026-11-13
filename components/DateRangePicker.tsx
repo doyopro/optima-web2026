@@ -45,6 +45,11 @@ export default function DateRangePicker({ lang, bookedRanges, from, to, onChange
     })
     .filter((r): r is { from: Date; to: Date } => r !== null)
 
+  // Prices and rate strategy are only set about 18 months ahead, so the
+  // calendar stops there instead of letting guests browse into the 2030s.
+  const maxDate = new Date(today)
+  maxDate.setMonth(maxDate.getMonth() + 18)
+
   const selected: DateRange | undefined = from
     ? { from: fromISO(from), to: to ? fromISO(to) : undefined }
     : undefined
@@ -60,7 +65,9 @@ export default function DateRangePicker({ lang, bookedRanges, from, to, onChange
         locale={lang === 'es' ? es : enGB}
         selected={selected}
         onSelect={handleSelect}
-        disabled={[{ before: today }, ...disabledRanges]}
+        disabled={[{ before: today }, { after: maxDate }, ...disabledRanges]}
+        startMonth={today}
+        endMonth={maxDate}
         excludeDisabled
         numberOfMonths={1}
         defaultMonth={selected?.from ?? today}

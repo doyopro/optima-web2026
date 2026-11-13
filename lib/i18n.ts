@@ -37,7 +37,7 @@ export const translations = {
           {
             title: 'PERSONALISED SERVICE',
             description:
-              'A dedicated local team is on hand throughout your stay, from booking to check-out, whenever you need us.',
+              'A dedicated local team is on hand throughout your stay, with 24/7 support. Every stay includes a welcome pack and pool heating all year round.',
           },
         ],
         stats: {
@@ -76,6 +76,8 @@ export const translations = {
       infantsSub: 'Using a cot',
       villaOptional: 'Villa (optional)',
       selectProperty: 'Select a property',
+      groupCasas: 'Casas',
+      groupVillas: 'Villas',
       guestWord: 'Guest',
       guestWordPlural: 'Guests',
       infantWord: 'Infant',
@@ -158,6 +160,7 @@ export const translations = {
     ],
     whatsapp: {
       ariaLabel: 'Chat on WhatsApp',
+      label: 'Message us on WhatsApp',
       messageGeneric: "Hi, I'm interested in villas in Lanzarote",
       messageVilla: "Hi, I'm interested in information about the villa: {name}",
     },
@@ -260,7 +263,7 @@ export const translations = {
         ctaContact: 'Tell us about your property',
         ctaWhatsapp: 'Talk on WhatsApp',
         whatsappMessage:
-          "Hi, I have a property in Lanzarote and I'd like to know more about management with Óptima Villas",
+          "Hi, I have a property in Lanzarote and I'd like to know more about management with Optima Villas",
       },
       trust: {
         title: 'Why entrust your villa to us',
@@ -279,8 +282,8 @@ export const translations = {
       founder: {
         title: 'Our story',
         name: 'Sonia Vargas',
-        role: 'Founder, Óptima Villas',
-        text: "Sonia Vargas first arrived in Lanzarote in 1986, and was captivated by its volcanic landscapes and serene way of life. After more than a decade building an international career in the fashion world — working with top-tier designers and travelling between the fashion weeks of Paris, Milan, New York and London — she decided to settle permanently on the island in 2001. She began getting involved in real estate development in some of what are today Lanzarote's most recognised areas, closely participating in the construction and marketing of new developments. In 2003 she founded what is today the Óptima group, with a clear goal: to do things with professionalism and integrity, in an industry not always known for that. More than 20 years later, that same standard still guides how we manage every property entrusted to us.",
+        role: 'Founder, Optima Villas',
+        text: "Sonia Vargas first arrived in Lanzarote in 1986, and was captivated by its volcanic landscapes and serene way of life. After more than a decade building an international career in the fashion world — working with top-tier designers and travelling between the fashion weeks of Paris, Milan, New York and London — she decided to settle permanently on the island in 2001. She began getting involved in real estate development in some of what are today Lanzarote's most recognised areas, closely participating in the construction and marketing of new developments. In 2003 she founded what is today the Optima group, with a clear goal: to do things with professionalism and integrity, in an industry not always known for that. More than 20 years later, that same standard still guides how we manage every property entrusted to us.",
         optimaEstateCta: 'Visit Optima Estate by Optima Group',
       },
       testimonials: {
@@ -365,7 +368,7 @@ export const translations = {
     },
     blog: {
       title: 'Blog',
-      subtitle: 'Stories, guides and news from Óptima Villas and Lanzarote.',
+      subtitle: 'Stories, guides and news from Optima Villas and Lanzarote.',
       readMore: 'Read more',
       publishedOn: 'Published on',
       by: 'By',
@@ -450,7 +453,7 @@ export const translations = {
     },
     termsPage: {
       title: 'Terms and Conditions',
-      intro: 'Please read these terms carefully before booking. By completing a booking with Óptima Villas, you agree to the terms set out below.',
+      intro: 'Please read these terms carefully before booking. By completing a booking with Optima Villas, you agree to the terms set out below.',
       backHome: 'Back to home',
       sections: [
         {
@@ -459,11 +462,11 @@ export const translations = {
         },
         {
           heading: 'Payment and Deposits',
-          body: 'To secure a booking you pay either the full amount or, when your arrival date is more than 45 days away, a deposit of 20% of the total booking cost. If you pay a deposit, the remaining balance is due 45 days before your arrival date. If your arrival date is 45 days away or less, the full amount is payable when you book.\n\nPayments are taken by card through our payment provider, Stripe, in pounds sterling (£). Prices shown in euros (€) on the website are estimates for reference only: you are charged in pounds, and your bank may apply its own exchange rate or fees.\n\nYou can pay any outstanding balance online from the "Manage my booking" page using your booking reference and last name. If you have any problem with a payment, please contact us at enquiries@optimavillas.com.',
+          body: 'To secure a booking you pay either the full amount or, when your arrival date is more than 45 days away, a deposit of 20% of the total booking cost. If you pay a deposit, the remaining balance is due 45 days before your arrival date. If your arrival date is 45 days away or less, the full amount is payable when you book.\n\nPayments are taken by card through our secure payment provider in pounds sterling (£). Prices shown in euros (€) on the website are estimates for reference only: you are charged in pounds, and your bank may apply its own exchange rate or fees.\n\nYou can pay any outstanding balance online from the "Manage my booking" page using your booking reference and last name. If you have any problem with a payment, please contact us at enquiries@optimavillas.com.',
         },
         {
           heading: 'Complaints and Disputes',
-          body: 'We will do our best to resolve any complaints raised during or after your stay, although we are under no obligation to do so. Compensation or relocation to alternative accommodation will only be considered where the property is uninhabitable due to unforeseen circumstances beyond our control. We cannot guarantee that alternative accommodation from our own portfolio will be available.',
+          body: 'We will do our best to resolve any complaints raised during or after your stay. Relocation to alternative accommodation will only be considered where the property is uninhabitable due to unforeseen circumstances beyond our control. We cannot guarantee that alternative accommodation from our own portfolio will be available.',
         },
         {
           heading: 'Property Damage',
@@ -471,7 +474,7 @@ export const translations = {
         },
         {
           heading: 'Insurance',
-          body: 'All guests must have comprehensive travel insurance that covers personal injury and death, as well as costs relating to cancellation such as flights, transfers, car hire and alternative accommodation.',
+          body: 'We strongly recommend that all guests take out comprehensive travel insurance covering personal injury, as well as costs relating to cancellation such as flights, transfers, car hire and alternative accommodation.',
         },
         {
           heading: 'Personal Injury',
@@ -483,7 +486,7 @@ export const translations = {
         },
         {
           heading: 'Loss of Amenities',
-          body: 'Loss of water or electricity supply is sometimes beyond our control. Where this happens, we will help you find alternative accommodation, although the cost of this will be your responsibility — this can usually be reclaimed through your travel insurance.',
+          body: 'Interruptions to water or electricity supplies may occasionally occur due to circumstances beyond our control. Should this happen, we will make every reasonable effort to assist and minimise any disruption to your stay. Where necessary, we will help explore alternative accommodation options, with any associated costs or refunds considered according to the circumstances and your statutory rights.',
         },
         {
           heading: 'Accommodation Description',
@@ -494,8 +497,14 @@ export const translations = {
           body: 'We are not responsible for nuisance caused by third parties, including building works, other guests, noise or traffic.',
         },
         {
+          heading: 'Guest Responsibilities',
+          body: 'During your stay, we ask that you:\n\n• Occupy the property only with the number of guests confirmed on your booking. Additional overnight guests are not permitted without prior agreement.\n• Treat the property, furnishings and equipment with reasonable care and leave everything in a reasonable condition on departure.\n• Report any damage, breakages or maintenance issues promptly so that we have the opportunity to address them.\n• Respect neighbouring properties and avoid excessive noise or antisocial behaviour, particularly during evening and night-time hours.\n• Not hold parties or events without prior written agreement.\n• Supervise children appropriately, particularly around swimming pools and other potentially hazardous areas.\n• Follow any property-specific instructions relating to facilities, equipment and safety.\n\nGuests may be responsible for reasonable costs arising from damage, misuse or breaches of the booking conditions, subject to the applicable damage cover and your consumer rights.',
+        },
+        {
           heading: 'Data Protection',
-          body: 'We collect personal data including your name, contact details and, where relevant, payment information, in order to process and manage your booking. Payments are processed directly and securely by Stripe — we do not store your card details on our own systems.\n\nYou have the right to request access to, or deletion of, the personal data we hold about you at any time by contacting us at enquiries@optimavillas.com.',
+          body: 'We handle your personal data as described in our Privacy Policy.',
+          href: '/privacy',
+          linkLabel: 'Read our Privacy Policy',
         },
         {
           heading: 'Company Details',
@@ -854,7 +863,7 @@ export const translations = {
           {
             title: 'ESPECIALISTAS EN LANZAROTE',
             description:
-              'Cada propiedad es seleccionada e inspeccionada personalmente por nuestro equipo, así siempre sabés exactamente qué esperar.',
+              'Cada propiedad es seleccionada e inspeccionada personalmente por nuestro equipo, así siempre sabes exactamente qué esperar.',
           },
           {
             title: 'EXPERIENCIA LOCAL',
@@ -864,7 +873,7 @@ export const translations = {
           {
             title: 'SERVICIO PERSONALIZADO',
             description:
-              'Un equipo local dedicado te acompaña durante toda tu estancia, desde la reserva hasta el check-out, siempre que nos necesites.',
+              'Un equipo local dedicado te acompaña durante toda tu estancia, con atención 24/7. Todas las estancias incluyen welcome pack y piscina climatizada todo el año.',
           },
         ],
         stats: {
@@ -903,6 +912,8 @@ export const translations = {
       infantsSub: 'Con cuna',
       villaOptional: 'Villa (opcional)',
       selectProperty: 'Selecciona una propiedad',
+      groupCasas: 'Casas',
+      groupVillas: 'Villas',
       guestWord: 'Huésped',
       guestWordPlural: 'Huéspedes',
       infantWord: 'Bebé',
@@ -985,6 +996,7 @@ export const translations = {
     ],
     whatsapp: {
       ariaLabel: 'Chatea por WhatsApp',
+      label: 'Escríbenos por WhatsApp',
       messageGeneric: 'Hola, me interesa información sobre las villas en Lanzarote',
       messageVilla: 'Hola, me interesa información sobre la villa: {name}',
     },
@@ -1087,7 +1099,7 @@ export const translations = {
         ctaContact: 'Contanos sobre tu propiedad',
         ctaWhatsapp: 'Hablar por WhatsApp',
         whatsappMessage:
-          'Hola, tengo una propiedad en Lanzarote y quiero saber más sobre la gestión con Óptima Villas',
+          'Hola, tengo una propiedad en Lanzarote y quiero saber más sobre la gestión con Optima Villas',
       },
       trust: {
         title: 'Por qué confiarnos tu villa',
@@ -1106,8 +1118,8 @@ export const translations = {
       founder: {
         title: 'Nuestra historia',
         name: 'Sonia Vargas',
-        role: 'Fundadora, Óptima Villas',
-        text: 'Sonia Vargas llegó por primera vez a Lanzarote en 1986, y quedó cautivada por sus paisajes volcánicos y su estilo de vida sereno. Después de más de una década construyendo una carrera internacional en el mundo de la moda —trabajando con diseñadores de primer nivel y viajando entre las semanas de la moda de París, Milán, Nueva York y Londres— decidió instalarse de forma permanente en la isla en 2001. Empezó a involucrarse en el desarrollo inmobiliario de algunas de las zonas hoy más reconocidas de Lanzarote, participando de cerca en la construcción y comercialización de nuevas urbanizaciones. En 2003 fundó lo que hoy es el grupo Óptima, con un objetivo claro: hacer las cosas con profesionalismo e integridad, en un sector no siempre conocido por eso. Más de 20 años después, ese mismo criterio sigue guiando cómo gestionamos cada propiedad que nos confían.',
+        role: 'Fundadora, Optima Villas',
+        text: 'Sonia Vargas llegó por primera vez a Lanzarote en 1986, y quedó cautivada por sus paisajes volcánicos y su estilo de vida sereno. Después de más de una década construyendo una carrera internacional en el mundo de la moda —trabajando con diseñadores de primer nivel y viajando entre las semanas de la moda de París, Milán, Nueva York y Londres— decidió instalarse de forma permanente en la isla en 2001. Empezó a involucrarse en el desarrollo inmobiliario de algunas de las zonas hoy más reconocidas de Lanzarote, participando de cerca en la construcción y comercialización de nuevas urbanizaciones. En 2003 fundó lo que hoy es el grupo Optima, con un objetivo claro: hacer las cosas con profesionalismo e integridad, en un sector no siempre conocido por eso. Más de 20 años después, ese mismo criterio sigue guiando cómo gestionamos cada propiedad que nos confían.',
         optimaEstateCta: 'Visita Optima Estate, del Grupo Optima',
       },
       testimonials: {
@@ -1192,7 +1204,7 @@ export const translations = {
     },
     blog: {
       title: 'Blog',
-      subtitle: 'Historias, guías y noticias de Óptima Villas y Lanzarote.',
+      subtitle: 'Historias, guías y noticias de Optima Villas y Lanzarote.',
       readMore: 'Leer más',
       publishedOn: 'Publicado el',
       by: 'Por',
@@ -1277,7 +1289,7 @@ export const translations = {
     },
     termsPage: {
       title: 'Términos y Condiciones',
-      intro: 'Por favor, lee atentamente estos términos antes de reservar. Al completar una reserva con Óptima Villas, aceptas los términos que se indican a continuación.',
+      intro: 'Por favor, lee atentamente estos términos antes de reservar. Al completar una reserva con Optima Villas, aceptas los términos que se indican a continuación.',
       backHome: 'Volver al inicio',
       sections: [
         {
@@ -1286,11 +1298,11 @@ export const translations = {
         },
         {
           heading: 'Pagos y Depósito',
-          body: 'Para asegurar una reserva puedes pagar el importe total o, cuando la fecha de llegada es en más de 45 días, un depósito del 20% del coste total de la reserva. Si pagas un depósito, el saldo restante vence 45 días antes de la fecha de llegada. Si la fecha de llegada es en 45 días o menos, el importe total se abona en el momento de reservar.\n\nLos pagos se realizan con tarjeta a través de nuestro proveedor de pagos, Stripe, en libras esterlinas (£). Los precios en euros (€) que se muestran en la web son estimaciones orientativas: el cargo se realiza en libras y tu banco puede aplicar su propio tipo de cambio o comisiones.\n\nPuedes pagar cualquier saldo pendiente en línea desde la página "Gestiona tu reserva" con tu referencia de reserva y tu apellido. Si tienes algún problema con un pago, contacta con nosotros en enquiries@optimavillas.com.',
+          body: 'Para asegurar una reserva puedes pagar el importe total o, cuando la fecha de llegada es en más de 45 días, un depósito del 20% del coste total de la reserva. Si pagas un depósito, el saldo restante vence 45 días antes de la fecha de llegada. Si la fecha de llegada es en 45 días o menos, el importe total se abona en el momento de reservar.\n\nLos pagos se realizan con tarjeta a través de nuestro proveedor de pagos seguro, en libras esterlinas (£). Los precios en euros (€) que se muestran en la web son estimaciones orientativas: el cargo se realiza en libras y tu banco puede aplicar su propio tipo de cambio o comisiones.\n\nPuedes pagar cualquier saldo pendiente en línea desde la página "Gestiona tu reserva" con tu referencia de reserva y tu apellido. Si tienes algún problema con un pago, contacta con nosotros en enquiries@optimavillas.com.',
         },
         {
           heading: 'Quejas y Disputas',
-          body: 'Haremos todo lo posible por resolver cualquier queja planteada durante o después de tu estancia, aunque no estamos obligados a ello. Solo se considerará una compensación o el traslado a otro alojamiento cuando la propiedad no sea habitable debido a circunstancias imprevistas fuera de nuestro control. No podemos garantizar la disponibilidad de alojamiento alternativo dentro de nuestra propia cartera de propiedades.',
+          body: 'Haremos todo lo posible por resolver cualquier queja planteada durante o después de tu estancia. Solo se considerará el traslado a otro alojamiento cuando la propiedad no sea habitable debido a circunstancias imprevistas fuera de nuestro control. No podemos garantizar la disponibilidad de alojamiento alternativo dentro de nuestra propia cartera de propiedades.',
         },
         {
           heading: 'Daños en la Propiedad',
@@ -1298,7 +1310,7 @@ export const translations = {
         },
         {
           heading: 'Seguro',
-          body: 'Todos los huéspedes deben contar con un seguro de viaje completo que cubra lesiones personales y fallecimiento, así como los costes relacionados con una cancelación, como vuelos, traslados, alquiler de coche y alojamiento alternativo.',
+          body: 'Recomendamos encarecidamente a todos los huéspedes contratar un seguro de viaje completo que cubra lesiones personales, así como los costes relacionados con una cancelación, como vuelos, traslados, alquiler de coche y alojamiento alternativo.',
         },
         {
           heading: 'Lesiones Personales',
@@ -1310,7 +1322,7 @@ export const translations = {
         },
         {
           heading: 'Pérdida de Suministros',
-          body: 'La pérdida del suministro de agua o electricidad a veces escapa a nuestro control. En caso de que esto ocurra, te ayudaremos a encontrar alojamiento alternativo, si bien el coste correrá de tu cuenta — este importe normalmente puede reclamarse a través de tu seguro de viaje.',
+          body: 'Pueden producirse ocasionalmente interrupciones del suministro de agua o electricidad por circunstancias ajenas a nuestro control. Si ocurre, haremos todo lo razonable por ayudarte y minimizar las molestias durante tu estancia. Cuando sea necesario, te ayudaremos a buscar alternativas de alojamiento, y los costes o reembolsos asociados se valorarán según las circunstancias y tus derechos legales.',
         },
         {
           heading: 'Descripción del Alojamiento',
@@ -1321,12 +1333,18 @@ export const translations = {
           body: 'No somos responsables de las molestias causadas por terceros, incluyendo obras de construcción, otros huéspedes, ruido o tráfico.',
         },
         {
+          heading: 'Responsabilidades del Huésped',
+          body: 'Durante tu estancia, te pedimos que:\n\n• Ocupes la propiedad únicamente con el número de huéspedes confirmado en tu reserva. No se permiten huéspedes adicionales para pernoctar sin acuerdo previo.\n• Trates la propiedad, el mobiliario y los equipos con un cuidado razonable y lo dejes todo en condiciones razonables a tu salida.\n• Comuniques con prontitud cualquier daño, rotura o incidencia de mantenimiento para que podamos solucionarlo.\n• Respetes a las propiedades vecinas y evites ruidos excesivos o comportamientos antisociales, especialmente por la tarde y la noche.\n• No organices fiestas ni eventos sin acuerdo previo por escrito.\n• Vigiles adecuadamente a los niños, en especial cerca de piscinas y otras zonas potencialmente peligrosas.\n• Sigas las instrucciones específicas de cada propiedad sobre instalaciones, equipos y seguridad.\n\nLos huéspedes pueden ser responsables de los costes razonables derivados de daños, mal uso o incumplimiento de las condiciones de la reserva, sujeto a la cobertura de daños aplicable y a tus derechos como consumidor.',
+        },
+        {
           heading: 'Protección de Datos',
-          body: 'Recopilamos datos personales, incluyendo tu nombre, datos de contacto y, cuando corresponda, información de pago, con el fin de procesar y gestionar tu reserva. Los pagos son procesados de forma directa y segura por Stripe — no almacenamos los datos de tu tarjeta en nuestros propios sistemas.\n\nTienes derecho a solicitar acceso a, o la eliminación de, los datos personales que conservamos sobre ti en cualquier momento, contactando con nosotros en enquiries@optimavillas.com.',
+          body: 'Tratamos tus datos personales según se describe en nuestra Política de Privacidad.',
+          href: '/privacy',
+          linkLabel: 'Consulta nuestra Política de Privacidad',
         },
         {
           heading: 'Datos de la Empresa',
-          body: 'Óptima Villas es el nombre comercial de Sonrisa 1 S.C.P. (NIF J76063056), con domicilio en C/ Macedonia 8, Playa Blanca, Yaiza, Lanzarote, 35580, Islas Canarias, España. Contacto: enquiries@optimavillas.com.',
+          body: 'Optima Villas es el nombre comercial de Sonrisa 1 S.C.P. (NIF J76063056), con domicilio en C/ Macedonia 8, Playa Blanca, Yaiza, Lanzarote, 35580, Islas Canarias, España. Contacto: enquiries@optimavillas.com.',
         },
       ],
     },

@@ -27,6 +27,11 @@ export default function TermsPage() {
               <div key={section.heading}>
                 <h2 className="text-lg font-bold text-dark mb-2">{section.heading}</h2>
                 <p className="text-dark/70 leading-relaxed whitespace-pre-line">{section.body}</p>
+                {'href' in section && (
+                  <Link href={section.href} className="inline-block mt-2 text-orange font-semibold text-sm hover:underline">
+                    {section.linkLabel} →
+                  </Link>
+                )}
               </div>
             ))}
           </div>

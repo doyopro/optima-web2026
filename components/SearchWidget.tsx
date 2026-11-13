@@ -80,6 +80,13 @@ export default function SearchWidget() {
       .finally(() => setLoadingVillas(false))
   }, [])
 
+  // Listed as "Casas" first, then "Villas", each alphabetical — same grouping
+  // as the previous website, which makes finding a specific property easier.
+  const byName = (a: { name: string }, b: { name: string }) =>
+    a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+  const casas = villas.filter((v) => /^casa\b/i.test(v.name)).sort(byName)
+  const otherVillas = villas.filter((v) => !/^casa\b/i.test(v.name)).sort(byName)
+
   const totalGuests = adults + children
   const guestWord = totalGuests !== 1 ? t.guestWordPlural : t.guestWord
   const infantWord = infants !== 1 ? t.infantWordPlural : t.infantWord
@@ -240,11 +247,21 @@ export default function SearchWidget() {
             className="w-full text-sm text-dark font-medium bg-transparent focus:outline-none cursor-pointer appearance-none pr-6 py-1.5 disabled:opacity-50"
           >
             <option value="">{loadingVillas ? t.loading : t.selectProperty}</option>
-            {villas.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.name}
-              </option>
-            ))}
+            {[
+              { label: t.groupCasas, items: casas },
+              { label: t.groupVillas, items: otherVillas },
+            ].map(
+              (group) =>
+                group.items.length > 0 && (
+                  <optgroup key={group.label} label={group.label}>
+                    {group.items.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                ),
+            )}
           </select>
           <ChevronDown
             className="h-4 w-4 text-dark/50 shrink-0 pointer-events-none absolute right-0 top-1/2 -translate-y-1/2"
