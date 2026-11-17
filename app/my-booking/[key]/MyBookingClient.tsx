@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { translations, type Language } from '@/lib/i18n'
 import { useLanguage } from '@/lib/LanguageContext'
+import { useCurrency } from '@/lib/CurrencyContext'
 import Footer from '@/components/Footer'
 import WhatsAppWidget from '@/components/WhatsAppWidget'
 import PaymentSummaryCard from '@/components/PaymentSummaryCard'
@@ -48,8 +49,14 @@ export default function MyBookingClient({ reservation, paymentSummary, basePath,
     }
   }
 
-  const amount = reservation.currency === 'EUR' ? reservation.amount_eur : reservation.amount_gbp
-  const currencySymbol = reservation.currency === 'EUR' ? '€' : '£'
+  const { currency } = useCurrency()
+  // Bookings made through the EUR checkout follow the selected currency, in
+  // euros at the rate fixed when they were booked; all others stay as stored.
+  const eur = currency === 'EUR' ? paymentSummary?.eur ?? null : null
+  const amount = eur ? eur.totalEur : reservation.currency === 'EUR' ? reservation.amount_eur : reservation.amount_gbp
+  const currencySymbol = eur || reservation.currency === 'EUR' ? '€' : '£'
+  const settled = reservation.paid || (paymentSummary?.eur ? paymentSummary.eur.balanceDueEur <= 0.005 : false)
+  const partial = !settled && (paymentSummary ? paymentSummary.paidSoFarGbp > 0.005 : false)
 
   return (
     <>
@@ -73,10 +80,10 @@ export default function MyBookingClient({ reservation, paymentSummary, basePath,
               <span className="text-xs text-dark/40 uppercase tracking-wide font-semibold">{t.paymentStatus}</span>
               <span
                 className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                  reservation.paid ? 'bg-green/10 text-green-700' : 'bg-orange/10 text-orange'
+                  settled ? 'bg-green/10 text-green-700' : 'bg-orange/10 text-orange'
                 }`}
               >
-                {reservation.paid ? t.paid : t.pending}
+                {settled ? t.paid : partial ? t.partiallyPaid : t.pending}
               </span>
             </div>
             {amount != null && (

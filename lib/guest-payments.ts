@@ -56,17 +56,19 @@ export async function getPaymentSummary(reservation: GuestReservation): Promise<
   // empty), so they would count as "nothing paid". Give each one a GBP
   // equivalent: the exact figure from the website's EUR checkout when we have
   // it (eur_checkout_rates, fixed at booking), otherwise today's rate.
-  const rawRows = data ?? []
+  const rawRows: NonNullable<typeof data> = [...(data ?? [])]
   const needsGbp = rawRows.some((r) => r.amount_gbp == null && r.currency === 'EUR')
-  let fixedRates: { amount_eur: number; amount_gbp: number; fx_rate: number }[] = []
+  let fixedRates: { id: string; created_at: string | null; amount_eur: number; amount_gbp: number; fx_rate: number }[] = []
   let liveRate = 0
   let totalEurFixed = 0
   if ((needsGbp || EUR_CHECKOUT_ENABLED) && reservation.channel_booking_id) {
     const { data: rates } = await supabaseServer
       .from('eur_checkout_rates')
-      .select('amount_eur, amount_gbp, fx_rate, total_eur')
+      .select('payment_intent_id, created_at, amount_eur, amount_gbp, fx_rate, total_eur')
       .eq('channel_booking_id', reservation.channel_booking_id)
     fixedRates = (rates ?? []).map((r) => ({
+      id: String(r.payment_intent_id),
+      created_at: r.created_at ?? null,
       amount_eur: Number(r.amount_eur),
       amount_gbp: Number(r.amount_gbp),
       fx_rate: Number(r.fx_rate),
@@ -74,6 +76,33 @@ export async function getPaymentSummary(reservation: GuestReservation): Promise<
     totalEurFixed = Math.max(0, ...(rates ?? []).map((r) => Number(r.total_eur ?? 0)))
   }
   if (needsGbp) liveRate = await getGbpToEurRate()
+  // The website's EUR checkout charge is written to `payments` by an external
+  // workflow that can't link it to the reservation yet (the GY- code only
+  // exists after the charge). Until that row is linked, count the checkout's
+  // own record (eur_checkout_rates, written by the verified webhook) so the
+  // guest never sees a deposit they paid as "nothing paid".
+  if (EUR_CHECKOUT_ENABLED) {
+    const linked = rawRows.filter((r) => r.currency === 'EUR')
+    const used = new Set<number>()
+    for (const rate of fixedRates) {
+      const i = linked.findIndex(
+        (r, idx) => !used.has(idx) && Math.abs(Number(r.amount_eur_gross ?? 0) - rate.amount_eur) < 0.01,
+      )
+      if (i >= 0) {
+        used.add(i)
+        continue
+      }
+      rawRows.push({
+        id: `checkout-${rate.id}`,
+        amount_gbp: rate.amount_gbp,
+        amount_eur_gross: rate.amount_eur,
+        currency: 'EUR',
+        payment_date: rate.created_at,
+        payment_reference: null,
+        status: 'succeeded',
+      } as (typeof rawRows)[number])
+    }
+  }
   const rows = rawRows.map((row) => {
     if (row.amount_gbp != null || row.currency !== 'EUR') return row
     const eur = Number(row.amount_eur_gross ?? 0)
