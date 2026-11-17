@@ -5,6 +5,7 @@ import { type Language, translations } from '@/lib/i18n'
 import GuestPayBalanceForm from './GuestPayBalanceForm'
 import { CHECKOUT_ENABLED } from '@/lib/features'
 import type { PaymentSummary } from '@/lib/guest-payments'
+import { useCurrency } from '@/lib/CurrencyContext'
 
 function formatDate(value: string | null, lang: Language) {
   if (!value) return '—'
@@ -48,9 +49,20 @@ export default function PaymentSummaryCard({
   // Reflects payments made in this session immediately, without a full
   // page reload — re-fetching the real server-computed summary is still
   // worth doing on next visit, this is just for instant feedback.
-  const [balanceDueGbp, setBalanceDueGbp] = useState(summary.balanceDueGbp)
+  const [paidInSession, setPaidInSession] = useState(false)
+  const { currency } = useCurrency()
 
-  const fullyPaid = balanceDueGbp <= 0.005
+  // EUR view only for bookings made through the EUR checkout (fixed rate);
+  // everything else stays in GBP exactly as before.
+  const eur = currency === 'EUR' ? summary.eur : null
+  const symbol = eur ? '€' : '£'
+  const rate = eur?.rate ?? 1
+  const total = eur ? eur.totalEur : summary.totalPriceGbp
+  const paid = eur ? eur.paidEur : summary.paidSoFarGbp
+  const balanceDue = paidInSession ? 0 : eur ? eur.balanceDueEur : summary.balanceDueGbp
+  // A booking paid in euros is settled once the euro balance is zero, even if
+  // the GBP equivalent differs by pennies from Guesty's total.
+  const fullyPaid = paidInSession || (summary.eur ? summary.eur.balanceDueEur <= 0.005 : summary.balanceDueGbp <= 0.005)
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 sm:p-8 space-y-5">
@@ -59,11 +71,11 @@ export default function PaymentSummaryCard({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <p className="text-xs text-dark/40 uppercase tracking-wide font-semibold mb-1">{t.totalPrice}</p>
-          <p className="text-sm font-medium text-dark">£{summary.totalPriceGbp.toFixed(2)}</p>
+          <p className="text-sm font-medium text-dark">{symbol}{total.toFixed(2)}</p>
         </div>
         <div>
           <p className="text-xs text-dark/40 uppercase tracking-wide font-semibold mb-1">{t.paidSoFar}</p>
-          <p className="text-sm font-medium text-dark">£{summary.paidSoFarGbp.toFixed(2)}</p>
+          <p className="text-sm font-medium text-dark">{symbol}{paid.toFixed(2)}</p>
         </div>
       </div>
 
@@ -74,7 +86,7 @@ export default function PaymentSummaryCard({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-dark/40 uppercase tracking-wide font-semibold mb-1">{t.balanceDue}</p>
-              <p className="text-lg font-bold text-orange">£{balanceDueGbp.toFixed(2)}</p>
+              <p className="text-lg font-bold text-orange">{symbol}{balanceDue.toFixed(2)}</p>
             </div>
             {summary.balanceDueDate && (
               <div className="text-right">
@@ -93,7 +105,7 @@ export default function PaymentSummaryCard({
             {summary.payments.map((p) => (
               <li key={p.id} className="flex items-center justify-between text-sm">
                 <span className="text-dark/60">{formatDateTime(p.date, lang)}</span>
-                <span className="font-medium text-dark">£{p.amountGbp.toFixed(2)}</span>
+                <span className="font-medium text-dark">{symbol}{(eur ? (p.amountEur ?? p.amountGbp * rate) : p.amountGbp).toFixed(2)}</span>
               </li>
             ))}
           </ul>
@@ -106,11 +118,12 @@ export default function PaymentSummaryCard({
             <GuestPayBalanceForm
               lang={lang}
               reservationId={reservationId}
-              balanceDueGbp={balanceDueGbp}
+              balanceDue={balanceDue}
+              currency={eur ? 'EUR' : 'GBP'}
               onSuccess={() => {
                 setJustPaid(true)
                 setPaying(false)
-                setBalanceDueGbp(0)
+                setPaidInSession(true)
               }}
             />
           ) : (

@@ -4,6 +4,7 @@ import { supabaseServer } from '@/lib/supabase-server'
 import { stripeServer, stripeConfigured } from '@/lib/stripe-server'
 import { guestSessionCanAccessReservation } from '@/lib/guest-auth'
 import { getPaymentSummary } from '@/lib/guest-payments'
+import { EUR_CHECKOUT_ENABLED } from '@/lib/features'
 
 // Lets a logged-in guest pay any amount up to their remaining balance — not
 // just the fixed 20%/100% choice the new-booking checkout offers
@@ -48,7 +49,21 @@ export async function POST(req: NextRequest) {
     }
 
     const summary = await getPaymentSummary(reservation)
-    if (amount > summary.balanceDueGbp + 0.005) {
+
+    // EUR only when the flag is on AND the booking has a rate fixed at
+    // checkout (summary.eur); `amount` is then in euros, never converted again.
+    const payInEur = EUR_CHECKOUT_ENABLED && body.currency === 'EUR'
+    if (payInEur && !summary.eur) {
+      return NextResponse.json({ error: 'This booking cannot be paid in EUR' }, { status: 400 })
+    }
+    if (payInEur && summary.eur) {
+      if (amount > summary.eur.balanceDueEur + 0.005) {
+        return NextResponse.json(
+          { error: `Amount exceeds the remaining balance of €${summary.eur.balanceDueEur.toFixed(2)}` },
+          { status: 400 },
+        )
+      }
+    } else if (amount > summary.balanceDueGbp + 0.005) {
       return NextResponse.json(
         { error: `Amount exceeds the remaining balance of £${summary.balanceDueGbp.toFixed(2)}` },
         { status: 400 },
@@ -73,8 +88,16 @@ export async function POST(req: NextRequest) {
     // in `description` — see payment_type below.
     const paymentIntent = await stripeServer.paymentIntents.create({
       amount: Math.round(amount * 100),
-      currency: 'gbp',
+      currency: payInEur ? 'eur' : 'gbp',
       metadata: {
+        ...(payInEur && summary.eur
+          ? {
+              payCurrency: 'EUR',
+              amountEur: String(amount),
+              amountGbp: String(Math.round((amount / summary.eur.rate) * 100) / 100),
+              fxRate: String(summary.eur.rate),
+            }
+          : {}),
         kind: 'guest_balance_payment',
         payment_type: 'balance',
         reservation_id: reservation.id,

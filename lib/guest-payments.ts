@@ -2,10 +2,12 @@ import { supabaseServer } from '@/lib/supabase-server'
 import { getBalanceDueDate } from '@/lib/booking'
 import { type GuestReservation } from '@/lib/guest-auth'
 import { getGbpToEurRate } from '@/lib/fx-rate'
+import { EUR_CHECKOUT_ENABLED } from '@/lib/features'
 
 export interface GuestPaymentEntry {
   id: string
   amountGbp: number
+  amountEur: number | null // exact euros when the payment was charged in EUR
   date: string | null
   reference: string | null
 }
@@ -16,6 +18,9 @@ export interface PaymentSummary {
   balanceDueGbp: number
   balanceDueDate: string | null
   payments: GuestPaymentEntry[]
+  // Only present for reservations booked through the EUR checkout: the
+  // balance in euros at the rate fixed at booking (null otherwise).
+  eur: { rate: number; totalEur: number; paidEur: number; balanceDueEur: number } | null
 }
 
 // Balance math is done entirely in GBP:
@@ -55,20 +60,20 @@ export async function getPaymentSummary(reservation: GuestReservation): Promise<
   const needsGbp = rawRows.some((r) => r.amount_gbp == null && r.currency === 'EUR')
   let fixedRates: { amount_eur: number; amount_gbp: number; fx_rate: number }[] = []
   let liveRate = 0
-  if (needsGbp) {
-    if (reservation.channel_booking_id) {
-      const { data: rates } = await supabaseServer
-        .from('eur_checkout_rates')
-        .select('amount_eur, amount_gbp, fx_rate')
-        .eq('channel_booking_id', reservation.channel_booking_id)
-      fixedRates = (rates ?? []).map((r) => ({
-        amount_eur: Number(r.amount_eur),
-        amount_gbp: Number(r.amount_gbp),
-        fx_rate: Number(r.fx_rate),
-      }))
-    }
-    liveRate = await getGbpToEurRate()
+  let totalEurFixed = 0
+  if ((needsGbp || EUR_CHECKOUT_ENABLED) && reservation.channel_booking_id) {
+    const { data: rates } = await supabaseServer
+      .from('eur_checkout_rates')
+      .select('amount_eur, amount_gbp, fx_rate, total_eur')
+      .eq('channel_booking_id', reservation.channel_booking_id)
+    fixedRates = (rates ?? []).map((r) => ({
+      amount_eur: Number(r.amount_eur),
+      amount_gbp: Number(r.amount_gbp),
+      fx_rate: Number(r.fx_rate),
+    }))
+    totalEurFixed = Math.max(0, ...(rates ?? []).map((r) => Number(r.total_eur ?? 0)))
   }
+  if (needsGbp) liveRate = await getGbpToEurRate()
   const rows = rawRows.map((row) => {
     if (row.amount_gbp != null || row.currency !== 'EUR') return row
     const eur = Number(row.amount_eur_gross ?? 0)
@@ -80,6 +85,23 @@ export async function getPaymentSummary(reservation: GuestReservation): Promise<
   const paidSoFarGbp = rows.reduce((sum, row) => sum + Number(row.amount_gbp ?? 0), 0)
   const balanceDueGbp = Math.round((totalPriceGbp - paidSoFarGbp) * 100) / 100
 
+  // EUR view: total fixed at booking minus what was actually paid in euros.
+  let eur: PaymentSummary['eur'] = null
+  if (EUR_CHECKOUT_ENABLED && fixedRates.length > 0 && totalEurFixed > 0) {
+    const paidEur = rawRows
+      .filter((r) => r.currency === 'EUR')
+      .reduce((sum, r) => {
+        const v = Math.abs(Number(r.amount_eur_gross ?? 0))
+        return sum + (r.status === 'refund' ? -v : v)
+      }, 0)
+    eur = {
+      rate: fixedRates[0].fx_rate,
+      totalEur: totalEurFixed,
+      paidEur: Math.round(paidEur * 100) / 100,
+      balanceDueEur: Math.max(0, Math.round((totalEurFixed - paidEur) * 100) / 100),
+    }
+  }
+
   const balanceDueDate =
     balanceDueGbp > 0 && reservation.check_in ? getBalanceDueDate(reservation.check_in) : null
 
@@ -88,6 +110,7 @@ export async function getPaymentSummary(reservation: GuestReservation): Promise<
     paidSoFarGbp: Math.round(paidSoFarGbp * 100) / 100,
     balanceDueGbp,
     balanceDueDate,
+    eur,
     payments: rows
       // Refund rows are already netted into paidSoFarGbp above; the
       // itemized list below is "payments the guest made", so only the
@@ -96,6 +119,7 @@ export async function getPaymentSummary(reservation: GuestReservation): Promise<
       .map((row) => ({
         id: row.id,
         amountGbp: Number(row.amount_gbp ?? 0),
+        amountEur: row.currency === 'EUR' ? Math.abs(Number(row.amount_eur_gross ?? 0)) : null,
         date: row.payment_date,
         reference: row.payment_reference,
       })),

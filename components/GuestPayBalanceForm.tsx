@@ -18,16 +18,19 @@ const stripePromise = isValidKey ? loadStripe(publishableKey) : null
 interface Props {
   lang: Language
   reservationId: string
-  balanceDueGbp: number
+  /** Balance in the currency being paid (GBP, or EUR at the rate fixed at booking). */
+  balanceDue: number
+  currency: 'GBP' | 'EUR'
   onSuccess: () => void
 }
 
-function PayBalanceButton({ lang, reservationId, balanceDueGbp, onSuccess }: Props) {
+function PayBalanceButton({ lang, reservationId, balanceDue, currency, onSuccess }: Props) {
   const stripe = useStripe()
   const elements = useElements()
   const t = translations[lang].guestPortal.payments
+  const symbol = currency === 'EUR' ? '€' : '£'
 
-  const [amount, setAmount] = useState(() => balanceDueGbp.toFixed(2))
+  const [amount, setAmount] = useState(() => balanceDue.toFixed(2))
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,7 +38,7 @@ function PayBalanceButton({ lang, reservationId, balanceDueGbp, onSuccess }: Pro
     if (!stripe || !elements) return
 
     const numericAmount = Number(amount)
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0 || numericAmount > balanceDueGbp + 0.005) {
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0 || numericAmount > balanceDue + 0.005) {
       setError(t.payBalanceInvalidAmount)
       return
     }
@@ -47,7 +50,7 @@ function PayBalanceButton({ lang, reservationId, balanceDueGbp, onSuccess }: Pro
       const res = await fetch('/api/guest/pay-balance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reservationId, amount: numericAmount }),
+        body: JSON.stringify({ reservationId, amount: numericAmount, currency }),
       })
       const data = await res.json()
       if (!res.ok || !data.clientSecret) {
@@ -84,11 +87,11 @@ function PayBalanceButton({ lang, reservationId, balanceDueGbp, onSuccess }: Pro
           {t.payBalanceLabel}
         </label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-dark/50">£</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-dark/50">{symbol}</span>
           <input
             type="number"
             min={0.01}
-            max={balanceDueGbp}
+            max={balanceDue}
             step="0.01"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
@@ -96,7 +99,7 @@ function PayBalanceButton({ lang, reservationId, balanceDueGbp, onSuccess }: Pro
           />
         </div>
         <p className="text-[11px] text-dark/40 mt-1">
-          {t.payBalanceHint.replace('{amount}', `£${balanceDueGbp.toFixed(2)}`)}
+          {t.payBalanceHint.replace('{amount}', `${symbol}${balanceDue.toFixed(2)}`)}
         </p>
       </div>
 
