@@ -82,14 +82,18 @@ export async function getPaymentSummary(reservation: GuestReservation): Promise<
   // own record (eur_checkout_rates, written by the verified webhook) so the
   // guest never sees a deposit they paid as "nothing paid".
   if (EUR_CHECKOUT_ENABLED) {
-    const linked = rawRows.filter((r) => r.currency === 'EUR')
+    // The external workflow labels every charge "GBP" with an approximate
+    // GBP figure, so match by the euro amount instead: a linked row whose
+    // euros equal a recorded checkout payment IS that payment — use the
+    // exact figures from eur_checkout_rates for it.
     const used = new Set<number>()
     for (const rate of fixedRates) {
-      const i = linked.findIndex(
+      const i = rawRows.findIndex(
         (r, idx) => !used.has(idx) && Math.abs(Number(r.amount_eur_gross ?? 0) - rate.amount_eur) < 0.01,
       )
       if (i >= 0) {
         used.add(i)
+        rawRows[i] = { ...rawRows[i], currency: 'EUR', amount_gbp: rate.amount_gbp }
         continue
       }
       rawRows.push({

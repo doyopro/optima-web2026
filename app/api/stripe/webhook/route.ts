@@ -83,7 +83,55 @@ export async function POST(req: NextRequest) {
 
   if (meta.kind === 'guest_balance_payment') {
     // See the comment above imports: n8n's own Stripe webhook records this
-    // charge into `payments`, not this route.
+    // charge into `payments`, not this route. The exception is a balance paid
+    // in EUR: Guesty stays in GBP, so the GBP equivalent at the booking's
+    // fixed rate is registered there, and the euro figure is kept in
+    // eur_checkout_rates so the portal's euro balance doesn't depend on how
+    // n8n labels the charge.
+    if (meta.payCurrency === 'EUR' && paymentIntent.currency === 'eur') {
+      try {
+        const { data: already } = await supabaseServer
+          .from('eur_checkout_rates')
+          .select('payment_intent_id')
+          .eq('payment_intent_id', paymentIntent.id)
+          .maybeSingle()
+        if (!already) {
+          const { data: res } = await supabaseServer
+            .from('reservations')
+            .select('guesty_reservation_id, channel_booking_id')
+            .eq('id', meta.reservation_id)
+            .maybeSingle()
+          const { data: first } = await supabaseServer
+            .from('eur_checkout_rates')
+            .select('total_eur, total_gbp')
+            .eq('channel_booking_id', res?.channel_booking_id ?? '')
+            .limit(1)
+            .maybeSingle()
+          if (res?.guesty_reservation_id && first) {
+            await registerGuestyPayment({
+              reservationId: res.guesty_reservation_id,
+              amount: Number(meta.amountGbp),
+              note: `Stripe PaymentIntent ${paymentIntent.id} — balance paid €${paymentIntent.amount_received / 100} at fixed rate 1 GBP = ${meta.fxRate} EUR (stay total €${first.total_eur})`,
+            })
+            const { error: rateErr } = await supabaseServer.from('eur_checkout_rates').upsert({
+              payment_intent_id: paymentIntent.id,
+              channel_booking_id: res.channel_booking_id,
+              fx_rate: Number(meta.fxRate),
+              amount_eur: paymentIntent.amount_received / 100,
+              amount_gbp: Number(meta.amountGbp),
+              total_eur: Number(first.total_eur),
+              total_gbp: Number(first.total_gbp),
+            })
+            if (rateErr) console.error('[stripe webhook] eur balance rate insert failed', rateErr.message)
+          } else {
+            console.error('[stripe webhook] EUR balance payment: reservation or booking rate not found', meta.reservation_id)
+          }
+        }
+      } catch (err) {
+        console.error('[stripe webhook] EUR balance payment handling failed', err instanceof Error ? err.message : err)
+        return NextResponse.json({ error: 'EUR balance handling failed' }, { status: 500 })
+      }
+    }
     return NextResponse.json({ received: true })
   }
 
