@@ -41,9 +41,16 @@ export async function POST(req: NextRequest) {
     const guestName = String(body.guestName ?? '').trim().slice(0, 120)
     const guestEmail = String(body.guestEmail ?? '').trim().slice(0, 200)
     const guestPhone = String(body.guestPhone ?? '').trim().slice(0, 40)
+    const count = (v: unknown) => (Number.isInteger(Number(v)) && Number(v) >= 0 && Number(v) <= 50 ? Number(v) : NaN)
+    const adults = count(body.adults)
+    const children = count(body.children ?? 0)
+    const infants = count(body.infants ?? 0)
 
     if (!propertyId || !DATE_RE.test(checkIn) || !DATE_RE.test(checkOut) || !guestName || !EMAIL_RE.test(guestEmail)) {
       return bad('Missing or invalid booking details')
+    }
+    if (!(adults >= 1) || Number.isNaN(children) || Number.isNaN(infants)) {
+      return bad('Please enter the number of guests')
     }
     const today = new Date().toISOString().slice(0, 10)
     if (checkIn < today || checkOut <= checkIn) {
@@ -52,12 +59,17 @@ export async function POST(req: NextRequest) {
 
     const { data: property } = await supabaseServer
       .from('properties')
-      .select('id, guesty_listing_id, status, is_bookable')
+      .select('id, guesty_listing_id, status, is_bookable, max_guests')
       .eq('id', propertyId)
       .maybeSingle()
 
     if (!property || property.status !== 'active' || property.is_bookable === false || !property.guesty_listing_id) {
       return bad('This villa is not available for online booking', 404)
+    }
+
+    // Adults + children can't exceed what the villa sleeps (infants don't count).
+    if (property.max_guests && adults + children > property.max_guests) {
+      return bad(`This villa sleeps up to ${property.max_guests} guests`, 422)
     }
 
     // Our own reservations mirror — catches a stay Guesty's calendar call
@@ -111,6 +123,9 @@ export async function POST(req: NextRequest) {
         guestEmail,
         guestPhone,
         totalPrice: String(pricing.totalPrice),
+        adults: String(adults),
+        children: String(children),
+        infants: String(infants),
         ...(fxRate && amountEur != null && totalEur != null
           ? {
               payCurrency: 'EUR',

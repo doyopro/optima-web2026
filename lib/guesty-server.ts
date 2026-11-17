@@ -284,6 +284,22 @@ export async function createGuestyReservation(
 }
 
 /**
+ * Sets the number of guests on a reservation. Called AFTER the reservation
+ * exists and never blocks the booking: the create call is known-good as it is,
+ * and an unexpected field there would fail it (see createGuestyReservation).
+ */
+export async function setGuestyReservationGuests(reservationId: string, guestsCount: number): Promise<void> {
+  const res = await guestyFetch(`/reservations/${reservationId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ guestsCount }),
+  })
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(`Guesty guests update failed: ${res.status} — ${body}`)
+  }
+}
+
+/**
  * Moves a paid reservation from "reserved" to "confirmed"
  * (PUT /v1/reservations-v3/{id}/status). Guesty's "Booking (Direct)"
  * automation messages key off a confirmed reservation, so without this the

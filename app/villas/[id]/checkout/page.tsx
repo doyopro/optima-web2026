@@ -74,7 +74,7 @@ function CheckoutContent({ params }: Props) {
 
   const initialCheckIn = searchParams.get('from') ?? ''
   const initialCheckOut = searchParams.get('to') ?? ''
-  const guests = searchParams.get('guests') ?? '2'
+  const initialGuests = Math.max(1, Math.floor(Number(searchParams.get('guests'))) || 2)
 
   // Editable in place (task: let guests fix dates without leaving
   // checkout) rather than fixed values read once from the URL — every
@@ -83,6 +83,13 @@ function CheckoutContent({ params }: Props) {
   const [checkIn, setCheckIn] = useState(initialCheckIn)
   const [checkOut, setCheckOut] = useState(initialCheckOut)
   const [bookedRanges, setBookedRanges] = useState<BookedRange[]>([])
+
+  // Who is travelling. Adults + children count toward the villa's capacity
+  // (properties.max_guests); infants don't. Checked again on the server.
+  const [adults, setAdults] = useState(initialGuests)
+  const [children, setChildren] = useState(0)
+  const [infants, setInfants] = useState(0)
+  const guests = adults + children
 
   const [property, setProperty] = useState<Property | null>(null)
   const [loadingProperty, setLoadingProperty] = useState(true)
@@ -100,7 +107,12 @@ function CheckoutContent({ params }: Props) {
   useEffect(() => {
     fetch(`/api/properties/${id}`)
       .then((r) => r.json())
-      .then((d) => setProperty(d.property ?? null))
+      .then((d) => {
+        setProperty(d.property ?? null)
+        // A search can arrive with more guests than this villa sleeps.
+        const max = Number(d.property?.guests_max) || 0
+        if (max > 0) setAdults((a) => Math.min(a, max))
+      })
       .catch(() => setProperty(null))
       .finally(() => setLoadingProperty(false))
   }, [id])
@@ -134,6 +146,19 @@ function CheckoutContent({ params }: Props) {
     setCheckIn(from)
     setCheckOut(to)
     router.replace(`/villas/${id}/checkout?from=${from}&to=${to}&guests=${guests}`, { scroll: false })
+  }
+
+  const maxGuests = property?.guests_max ?? 0
+  const atCapacity = maxGuests > 0 && adults + children >= maxGuests
+  const guestsInvalid = adults < 1 || (maxGuests > 0 && adults + children > maxGuests)
+
+  function updateGuests(nextAdults: number, nextChildren: number, nextInfants: number) {
+    setAdults(nextAdults)
+    setChildren(nextChildren)
+    setInfants(nextInfants)
+    if (checkIn && checkOut) {
+      router.replace(`/villas/${id}/checkout?from=${checkIn}&to=${checkOut}&guests=${nextAdults + nextChildren}`, { scroll: false })
+    }
   }
 
   const datesBlocked = Boolean(checkIn && checkOut && rangeOverlapsBooking(checkIn, checkOut, bookedRanges))
@@ -289,6 +314,59 @@ function CheckoutContent({ params }: Props) {
                 {datesBlocked && (
                   <p className="text-xs text-red-600 mt-2">{t.availability.datesUnavailable}</p>
                 )}
+              </div>
+
+              {/* Guests — adults + children count toward the villa's capacity */}
+              <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-5">
+                <h3 className="font-bold text-dark mb-1">{t.checkout.guestsTitle}</h3>
+                {maxGuests > 0 && (
+                  <p className="text-xs text-dark/50 mb-3">{t.checkout.guestsMax.replace('{max}', String(maxGuests))}</p>
+                )}
+                <div className="divide-y divide-neutral-100">
+                  {[
+                    { key: 'adults', label: t.checkout.adults, sub: t.checkout.adultsSub, value: adults, min: 1, counts: true },
+                    { key: 'children', label: t.checkout.children, sub: t.checkout.childrenSub, value: children, min: 0, counts: true },
+                    { key: 'infants', label: t.checkout.infants, sub: t.checkout.infantsSub, value: infants, min: 0, counts: false },
+                  ].map((row) => {
+                    const canIncrease = row.counts ? !atCapacity : infants < 5
+                    const change = (delta: number) => {
+                      const v = Math.max(row.min, row.value + delta)
+                      if (row.key === 'adults') updateGuests(v, children, infants)
+                      else if (row.key === 'children') updateGuests(adults, v, infants)
+                      else updateGuests(adults, children, v)
+                    }
+                    return (
+                      <div key={row.key} className="flex items-center justify-between gap-3 py-3">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-dark">{row.label}</p>
+                          <p className="text-xs text-dark/50">{row.sub}</p>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <button
+                            type="button"
+                            aria-label={`${t.checkout.decrease} ${row.label}`}
+                            disabled={row.value <= row.min}
+                            onClick={() => change(-1)}
+                            className="h-11 w-11 rounded-full border border-neutral-300 text-lg text-dark disabled:opacity-30 hover:border-orange transition-colors"
+                          >
+                            −
+                          </button>
+                          <span className="w-6 text-center text-sm font-semibold text-dark">{row.value}</span>
+                          <button
+                            type="button"
+                            aria-label={`${t.checkout.increase} ${row.label}`}
+                            disabled={!canIncrease}
+                            onClick={() => change(1)}
+                            className="h-11 w-11 rounded-full border border-neutral-300 text-lg text-dark disabled:opacity-30 hover:border-orange transition-colors"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+                {atCapacity && <p className="text-xs text-dark/50 mt-1">{t.checkout.guestsMaxReached}</p>}
               </div>
 
               {/* Pricing */}
@@ -496,7 +574,7 @@ function CheckoutContent({ params }: Props) {
                 {!paymentSucceeded && !stayTooShort && pricing?.available && paymentOptions && property.guesty_listing_id && (
                   <StripeCheckoutForm
                     lang={lang}
-                    disabled={!guestName || !guestEmail}
+                    disabled={!guestName || !guestEmail || guestsInvalid}
                     booking={{
                       amountGbp: amountDueToday,
                       propertyId: id,
@@ -509,6 +587,9 @@ function CheckoutContent({ params }: Props) {
                       guestEmail,
                       guestPhone,
                       totalPrice: pricing.totalPrice,
+                      adults,
+                      children,
+                      infants,
                       currency: payInEur ? 'EUR' : 'GBP',
                     }}
                     onSuccess={() => setPaymentSucceeded(true)}

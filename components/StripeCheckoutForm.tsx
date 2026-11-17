@@ -33,6 +33,9 @@ interface BookingDetails {
   guestEmail: string
   guestPhone: string
   totalPrice: number
+  adults: number
+  children: number
+  infants: number
   propertyName?: string
   /** 'EUR' asks the server to charge in euros (only honoured when EUR checkout is enabled). */
   currency?: 'GBP' | 'EUR'

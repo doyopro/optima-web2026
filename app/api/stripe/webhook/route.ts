@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { stripeServer, stripeConfigured, stripeWebhookSecret } from '@/lib/stripe-server'
-import { createGuestyReservation, registerGuestyPayment, confirmGuestyReservation } from '@/lib/guesty-server'
+import { createGuestyReservation, registerGuestyPayment, confirmGuestyReservation, setGuestyReservationGuests } from '@/lib/guesty-server'
 import { supabaseServer } from '@/lib/supabase-server'
 
 // Audit trail + "needs a human" flag, read by the dashboard (checkout_events).
@@ -225,6 +225,19 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    // Number of guests (adults + children; infants don't count). Best effort:
+    // a failure is logged on the event for a human but never blocks the booking.
+    let guestsError: string | undefined
+    const guestsCount = Number(meta.adults ?? 0) + Number(meta.children ?? 0)
+    if (guestsCount > 0) {
+      try {
+        await setGuestyReservationGuests(reservation.id, guestsCount)
+      } catch (gErr) {
+        guestsError = gErr instanceof Error ? gErr.message : String(gErr)
+        console.error('[stripe webhook] could not set guests on the reservation', guestsError)
+      }
+    }
+
     // The charge must carry the booking code as its Stripe description,
     // EXACTLY and nothing else: the payments sync (n8n / dashboard
     // sync-stripe) matches a Stripe charge to reservations.channel_booking_id
@@ -299,6 +312,8 @@ export async function POST(req: NextRequest) {
         amount: paymentIntent.amount_received / 100,
         currency: paymentIntent.currency,
         confirmed,
+        guests: { adults: meta.adults, children: meta.children, infants: meta.infants },
+        ...(guestsError ? { guestsError } : {}),
         ...(confirmError ? { confirmError } : {}),
       }, !confirmed)
     } catch (err) {
