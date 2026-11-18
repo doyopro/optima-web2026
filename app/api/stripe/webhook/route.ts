@@ -108,9 +108,23 @@ export async function POST(req: NextRequest) {
             .limit(1)
             .maybeSingle()
           if (res?.guesty_reservation_id && first) {
+            // When this payment clears the whole euro balance, register exactly the
+            // GBP still missing so Guesty closes at £0 (the fixed-rate conversion
+            // of a whole-euro amount can otherwise leave a few pence open).
+            const { data: prevRates } = await supabaseServer
+              .from('eur_checkout_rates')
+              .select('amount_eur, amount_gbp')
+              .eq('channel_booking_id', res.channel_booking_id ?? '')
+            const prevEur = (prevRates ?? []).reduce((sum, r) => sum + Number(r.amount_eur), 0)
+            const prevGbp = (prevRates ?? []).reduce((sum, r) => sum + Number(r.amount_gbp), 0)
+            let amountGbp = Number(meta.amountGbp)
+            if (prevEur + paymentIntent.amount_received / 100 >= Number(first.total_eur) - 0.005) {
+              const remaining = Math.round((Number(first.total_gbp) - prevGbp) * 100) / 100
+              if (remaining > 0) amountGbp = remaining
+            }
             await registerGuestyPayment({
               reservationId: res.guesty_reservation_id,
-              amount: Number(meta.amountGbp),
+              amount: amountGbp,
               note: `Stripe PaymentIntent ${paymentIntent.id} — balance paid €${paymentIntent.amount_received / 100} at fixed rate 1 GBP = ${meta.fxRate} EUR (stay total €${first.total_eur})`,
             })
             const { error: rateErr } = await supabaseServer.from('eur_checkout_rates').upsert({
@@ -118,7 +132,7 @@ export async function POST(req: NextRequest) {
               channel_booking_id: res.channel_booking_id,
               fx_rate: Number(meta.fxRate),
               amount_eur: paymentIntent.amount_received / 100,
-              amount_gbp: Number(meta.amountGbp),
+              amount_gbp: amountGbp,
               total_eur: Number(first.total_eur),
               total_gbp: Number(first.total_gbp),
             })
