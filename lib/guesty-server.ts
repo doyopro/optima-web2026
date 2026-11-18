@@ -309,6 +309,9 @@ export async function setGuestyReservationGuests(reservationId: string, guestsCo
 export async function setGuestyReservationCustomFields(
   reservationId: string,
   values: Record<string, string | number>,
+  // Names that are filled when the field exists in Guesty and silently skipped
+  // when it doesn't (so a field the team hasn't created yet is not an error).
+  optional: string[] = [],
 ): Promise<void> {
   const listRes = await guestyFetch('/custom-fields?limit=200')
   if (!listRes.ok) {
@@ -324,7 +327,7 @@ export async function setGuestyReservationCustomFields(
     const field = fields.find((f) => (f.name ?? f.displayName ?? '').toLowerCase() === name.toLowerCase())
     const fieldId = field?._id ?? field?.fieldId
     if (!fieldId) {
-      missing.push(name)
+      if (!optional.includes(name)) missing.push(name)
       continue
     }
     customFields.push({ fieldId, value: field?.type === 'number' ? Number(value) : String(value) })

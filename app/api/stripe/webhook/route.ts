@@ -132,8 +132,8 @@ export async function POST(req: NextRequest) {
               const paidEur = (all ?? []).reduce((sum, r) => sum + Number(r.amount_eur), 0)
               await setGuestyReservationCustomFields(res.guesty_reservation_id, {
                 eurpaid: paidEur,
-                eurbalance: Math.max(0, Number(first.total_eur) - paidEur),
-              })
+                eurobalance: Math.max(0, Number(first.total_eur) - paidEur),
+              }, ['eurpaid'])
             } catch (fErr) {
               console.error('[stripe webhook] could not update euro custom fields', fErr instanceof Error ? fErr.message : fErr)
             }
@@ -262,8 +262,8 @@ export async function POST(req: NextRequest) {
         await setGuestyReservationCustomFields(reservation.id, {
           eurobooking: 'Yes',
           eurpaid: paidEur,
-          eurbalance: Math.max(0, Number(meta.totalEur) - paidEur),
-        })
+          eurobalance: Math.max(0, Number(meta.totalEur) - paidEur),
+        }, ['eurpaid'])
       } catch (fErr) {
         eurobookingError = fErr instanceof Error ? fErr.message : String(fErr)
         console.error('[stripe webhook] could not set the euro custom fields', eurobookingError)
@@ -308,7 +308,7 @@ export async function POST(req: NextRequest) {
         reservationId: reservation.id,
         amount: paidInEur ? Number(meta.amountGbp) : paymentIntent.amount_received / 100,
         note: paidInEur
-          ? `Stripe PaymentIntent ${paymentIntent.id} — paid €${paymentIntent.amount_received / 100} at fixed rate 1 GBP = ${meta.fxRate} EUR (stay total €${meta.totalEur})`
+          ? `Stripe PaymentIntent ${paymentIntent.id} — paid €${paymentIntent.amount_received / 100} at fixed rate 1 GBP = ${meta.fxRate} EUR (stay total €${meta.totalEur}, euro balance €${Math.max(0, Number(meta.totalEur) - paymentIntent.amount_received / 100)})`
           : `Stripe PaymentIntent ${paymentIntent.id}`,
       })
       if (paidInEur) {
