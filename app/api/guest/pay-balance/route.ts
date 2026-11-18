@@ -94,7 +94,13 @@ export async function POST(req: NextRequest) {
           ? {
               payCurrency: 'EUR',
               amountEur: String(amount),
-              amountGbp: String(Math.round((amount / summary.eur.rate) * 100) / 100),
+              // Paying the whole euro balance settles exactly the GBP still open
+              // (so the books close at £0); a partial payment converts at the fixed rate.
+              amountGbp: String(
+                amount >= summary.eur.balanceDueEur - 0.005 && summary.balanceDueGbp > 0
+                  ? summary.balanceDueGbp
+                  : Math.round((amount / summary.eur.rate) * 100) / 100,
+              ),
               fxRate: String(summary.eur.rate),
             }
           : {}),
