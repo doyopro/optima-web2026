@@ -49,6 +49,9 @@ export async function POST(req: NextRequest) {
     if (!propertyId || !DATE_RE.test(checkIn) || !DATE_RE.test(checkOut) || !guestName || !EMAIL_RE.test(guestEmail)) {
       return bad('Missing or invalid booking details')
     }
+    if (guestPhone.replace(/\D/g, '').length < 6) {
+      return bad('A valid phone number is required')
+    }
     if (!(adults >= 1) || Number.isNaN(children) || Number.isNaN(infants)) {
       return bad('Please enter the number of guests')
     }

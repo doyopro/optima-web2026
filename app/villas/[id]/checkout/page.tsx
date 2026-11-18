@@ -150,6 +150,8 @@ function CheckoutContent({ params }: Props) {
 
   const maxGuests = property?.guests_max ?? 0
   const atCapacity = maxGuests > 0 && adults + children >= maxGuests
+  // Phone is required: at least 6 digits (international formats vary).
+  const phoneValid = guestPhone.replace(/\D/g, '').length >= 6
   const guestsInvalid = adults < 1 || (maxGuests > 0 && adults + children > maxGuests)
 
   function updateGuests(nextAdults: number, nextChildren: number, nextInfants: number) {
@@ -514,10 +516,12 @@ function CheckoutContent({ params }: Props) {
                     </div>
                     <div>
                       <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-1.5">
-                        {t.checkout.phone}
+                        {t.checkout.phone} *
                       </label>
                       <input
                         type="tel"
+                        required
+                        autoComplete="tel"
                         value={guestPhone}
                         onChange={(e) => setGuestPhone(e.target.value)}
                         className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-orange focus:outline-none"
@@ -581,7 +585,7 @@ function CheckoutContent({ params }: Props) {
                 {!paymentSucceeded && !stayTooShort && pricing?.available && paymentOptions && property.guesty_listing_id && (
                   <StripeCheckoutForm
                     lang={lang}
-                    disabled={!guestName || !guestEmail || guestsInvalid}
+                    disabled={!guestName || !guestEmail || !phoneValid || guestsInvalid}
                     booking={{
                       amountGbp: amountDueToday,
                       propertyId: id,
