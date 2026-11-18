@@ -300,6 +300,38 @@ export async function setGuestyReservationGuests(reservationId: string, guestsCo
 }
 
 /**
+ * Sets a Guesty reservation custom field by its NAME (e.g. "eurobooking") —
+ * the field id is looked up from Guesty's custom-field list, so nothing is
+ * hard-coded. Best effort, called after the reservation exists; never blocks a booking.
+ */
+export async function setGuestyReservationCustomField(
+  reservationId: string,
+  fieldName: string,
+  value: string,
+): Promise<void> {
+  const listRes = await guestyFetch('/custom-fields?limit=200')
+  if (!listRes.ok) {
+    throw new Error(`Guesty custom fields lookup failed: ${listRes.status} — ${await listRes.text()}`)
+  }
+  const listBody = await listRes.json()
+  const fields: Array<{ _id?: string; fieldId?: string; name?: string; displayName?: string }> = Array.isArray(listBody)
+    ? listBody
+    : (listBody.results ?? listBody.data ?? [])
+  const wanted = fieldName.toLowerCase()
+  const field = fields.find((f) => (f.name ?? f.displayName ?? '').toLowerCase() === wanted)
+  const fieldId = field?._id ?? field?.fieldId
+  if (!fieldId) throw new Error(`Guesty custom field "${fieldName}" not found`)
+
+  const res = await guestyFetch(`/reservations/${reservationId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ customFields: [{ fieldId, value }] }),
+  })
+  if (!res.ok) {
+    throw new Error(`Guesty custom field update failed: ${res.status} — ${await res.text()}`)
+  }
+}
+
+/**
  * Moves a paid reservation from "reserved" to "confirmed"
  * (PUT /v1/reservations-v3/{id}/status). Guesty's "Booking (Direct)"
  * automation messages key off a confirmed reservation, so without this the

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { stripeServer, stripeConfigured, stripeWebhookSecret } from '@/lib/stripe-server'
-import { createGuestyReservation, registerGuestyPayment, confirmGuestyReservation, setGuestyReservationGuests } from '@/lib/guesty-server'
+import { createGuestyReservation, registerGuestyPayment, confirmGuestyReservation, setGuestyReservationGuests, setGuestyReservationCustomField } from '@/lib/guesty-server'
 import { supabaseServer } from '@/lib/supabase-server'
 
 // Audit trail + "needs a human" flag, read by the dashboard (checkout_events).
@@ -238,6 +238,18 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Flag reservations paid in euros (Guesty custom field "eurobooking" = Yes)
+    // so the team can follow up on them. Best effort, like the guests update.
+    let eurobookingError: string | undefined
+    if (paymentIntent.currency === 'eur' && meta.payCurrency === 'EUR') {
+      try {
+        await setGuestyReservationCustomField(reservation.id, 'eurobooking', 'Yes')
+      } catch (fErr) {
+        eurobookingError = fErr instanceof Error ? fErr.message : String(fErr)
+        console.error('[stripe webhook] could not set eurobooking on the reservation', eurobookingError)
+      }
+    }
+
     // The charge must carry the booking code as its Stripe description,
     // EXACTLY and nothing else: the payments sync (n8n / dashboard
     // sync-stripe) matches a Stripe charge to reservations.channel_booking_id
@@ -314,6 +326,7 @@ export async function POST(req: NextRequest) {
         confirmed,
         guests: { adults: meta.adults, children: meta.children, infants: meta.infants },
         ...(guestsError ? { guestsError } : {}),
+        ...(eurobookingError ? { eurobookingError } : {}),
         ...(confirmError ? { confirmError } : {}),
       }, !confirmed)
     } catch (err) {
