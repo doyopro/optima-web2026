@@ -3,9 +3,9 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { type Currency, getCurrency, setCurrency as persistCurrency } from './currency'
 
-// Mirrors lib/fx-rate.ts's own fallback — used only for the brief window
+// Mirrors lib/fx-rate.ts static default — used only for the brief window
 // before /api/fx-rate responds on first load.
-const INITIAL_GBP_TO_EUR_RATE = 1.17
+const INITIAL_GBP_TO_EUR_RATE = 1.2
 
 interface CurrencyContextValue {
   currency: Currency

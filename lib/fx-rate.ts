@@ -1,23 +1,62 @@
-// Server-only. GBP->EUR exchange rate for DISPLAY purposes only — never used
-// for anything that actually charges a guest (Stripe stays GBP, always).
+// Server-only. GBP->EUR market exchange rate. It feeds the site's GBP/EUR
+// toggle AND the rate guests are charged at in the EUR checkout (see
+// lib/eur-checkout.ts, which adds the margin on top), so a wrong value here
+// costs real money.
 //
-// Source: Frankfurter (https://frankfurter.dev), a free, no-API-key-required
-// FX rate API backed by the European Central Bank's daily reference rates.
-// Confirmed live: GET https://api.frankfurter.dev/v1/latest?base=GBP&symbols=EUR
-// -> { "amount": 1.0, "base": "GBP", "date": "...", "rates": { "EUR": 1.1687 } }
+// Source: Frankfurter (https://frankfurter.dev), backed by the European
+// Central Bank's daily reference rates.
+// GET https://api.frankfurter.dev/v1/latest?base=GBP&symbols=EUR
+// -> { "amount": 1.0, "base": "GBP", "date": "...", "rates": { "EUR": 1.2004 } }
 //
-// Cached via Next's fetch Data Cache (next: { revalidate: 86400 }) — the
-// external API is only actually called once per 24h no matter how many
-// times getGbpToEurRate() itself is invoked; every other call in that
-// window is served from Next's cache. See app/api/fx-rate/route.ts, the
-// only caller.
+// Cached via Next's fetch Data Cache (revalidate 24h): the external API is
+// called about once per day.
+//
+// If the live call fails the order is:
+//   1. the last rate we stored (table fx_rate_log, one row per day, written on
+//      every successful fetch) if it is at most 7 days old;
+//   2. a static default — 1.20 unless FX_FALLBACK_GBP_TO_EUR says otherwise.
+//      Revisit it from time to time: it should sit at or just above the market.
+import { supabaseServer } from '@/lib/supabase-server'
 
 const FX_API_URL = 'https://api.frankfurter.dev/v1/latest?base=GBP&symbols=EUR'
 const CACHE_SECONDS = 60 * 60 * 24 // 24h
+const MAX_STORED_AGE_DAYS = 7
+const DEFAULT_FALLBACK_GBP_TO_EUR = 1.2
 
-// Used only if the FX API is unreachable and there's no cached value yet —
-// a stale-but-reasonable estimate is better than the page breaking.
-const FALLBACK_GBP_TO_EUR_RATE = 1.17
+export function staticFallbackRate(): number {
+  const v = Number(process.env.FX_FALLBACK_GBP_TO_EUR ?? '')
+  return Number.isFinite(v) && v > 1 && v < 2 ? v : DEFAULT_FALLBACK_GBP_TO_EUR
+}
+
+let lastLoggedDate = ''
+
+async function storeRate(date: string | undefined, rate: number): Promise<void> {
+  if (!date || date === lastLoggedDate) return
+  lastLoggedDate = date
+  try {
+    const { error } = await supabaseServer.from('fx_rate_log').upsert({ rate_date: date, rate }, { onConflict: 'rate_date' })
+    if (error) console.error('[getGbpToEurRate] could not store the rate', error.message)
+  } catch (err) {
+    console.error('[getGbpToEurRate] could not store the rate', err instanceof Error ? err.message : err)
+  }
+}
+
+async function lastStoredRate(): Promise<{ rate: number; date: string } | null> {
+  try {
+    const { data } = await supabaseServer
+      .from('fx_rate_log')
+      .select('rate_date, rate')
+      .order('rate_date', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (!data) return null
+    const ageDays = (Date.now() - new Date(`${data.rate_date}T12:00:00Z`).getTime()) / 86_400_000
+    const rate = Number(data.rate)
+    return ageDays <= MAX_STORED_AGE_DAYS && rate > 0 ? { rate, date: String(data.rate_date) } : null
+  } catch {
+    return null
+  }
+}
 
 export async function getGbpToEurRate(): Promise<number> {
   try {
@@ -31,12 +70,17 @@ export async function getGbpToEurRate(): Promise<number> {
       throw new Error('FX rate response missing a usable EUR rate')
     }
 
+    await storeRate(typeof data?.date === 'string' ? data.date : undefined, rate)
     return rate
   } catch (err) {
-    console.error(
-      '[getGbpToEurRate] falling back to static rate',
-      err instanceof Error ? err.message : err,
-    )
-    return FALLBACK_GBP_TO_EUR_RATE
+    const reason = err instanceof Error ? err.message : String(err)
+    const stored = await lastStoredRate()
+    if (stored) {
+      console.error(`[getGbpToEurRate] live rate unavailable (${reason}); using the stored rate from ${stored.date}: ${stored.rate}`)
+      return stored.rate
+    }
+    const fallback = staticFallbackRate()
+    console.error(`[getGbpToEurRate] live rate unavailable (${reason}) and no recent stored rate; using the static default ${fallback}`)
+    return fallback
   }
 }
