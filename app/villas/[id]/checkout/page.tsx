@@ -235,6 +235,13 @@ function CheckoutContent({ params }: Props) {
   const payInEur = EUR_CHECKOUT_ENABLED && currency === 'EUR' && checkoutRate != null
   const amountDueEur = payInEur ? Math.round(amountDueToday * (checkoutRate as number)) : 0
 
+  // When the guest really pays in euros every price is shown as the exact euro
+  // amount that will be charged (same rounding as the server) — no "estimate".
+  // The estimate line only remains for EUR browsing without euro payment.
+  const money = (gbp: number) =>
+    payInEur ? `€${Math.round(gbp * (checkoutRate as number))}` : `£${gbp.toFixed(0)}`
+  const estimateCurrency: 'GBP' | 'EUR' = payInEur ? 'GBP' : currency
+
   return (
     <>
       <Toaster position="top-center" />
@@ -386,15 +393,15 @@ function CheckoutContent({ params }: Props) {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between text-dark/70">
                       <span>{pricing.nights} {pricing.nights === 1 ? t.checkout.night : t.checkout.nights}</span>
-                      <span>£{pricing.nightlyAverage.toFixed(0)} {t.checkout.pricePerNightAvg.toLowerCase()}</span>
+                      <span>{money(pricing.nightlyAverage)} {t.checkout.pricePerNightAvg.toLowerCase()}</span>
                     </div>
                     <div className="flex justify-between pt-2 border-t border-neutral-100 font-bold text-dark">
                       <span>{t.checkout.totalPrice}</span>
-                      <span>£{pricing.totalPrice.toFixed(0)}</span>
+                      <span>{money(pricing.totalPrice)}</span>
                     </div>
                     <EurEstimate
                       amountGbp={pricing.totalPrice}
-                      currency={currency}
+                      currency={estimateCurrency}
                       gbpToEurRate={gbpToEurRate}
                       label={t.checkout.eurEstimate}
                       className="text-right text-xs text-dark/40"
@@ -426,11 +433,11 @@ function CheckoutContent({ params }: Props) {
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
                             <span className="font-semibold text-dark">{t.checkout.payDeposit}</span>
-                            <span className="font-bold text-dark">£{paymentOptions.depositAmount.toFixed(0)}</span>
+                            <span className="font-bold text-dark">{money(paymentOptions.depositAmount)}</span>
                           </div>
                           <EurEstimate
                             amountGbp={paymentOptions.depositAmount}
-                            currency={currency}
+                            currency={estimateCurrency}
                             gbpToEurRate={gbpToEurRate}
                             label={t.checkout.eurEstimate}
                             className="text-right text-xs text-dark/40"
@@ -438,7 +445,7 @@ function CheckoutContent({ params }: Props) {
                           <p className="text-xs text-dark/50 mt-1">{t.checkout.payDepositDesc}</p>
                           {paymentOptions.balanceDueDate && (
                             <p className="text-xs text-dark/50 mt-1">
-                              {t.checkout.dueBefore} {formatDate(paymentOptions.balanceDueDate, lang)}: £{paymentOptions.depositBalanceAmount.toFixed(0)}
+                              {t.checkout.dueBefore} {formatDate(paymentOptions.balanceDueDate, lang)}: {payInEur ? `€${Math.round(pricing.totalPrice * (checkoutRate as number)) - Math.round(paymentOptions.depositAmount * (checkoutRate as number))}` : `£${paymentOptions.depositBalanceAmount.toFixed(0)}`}
                             </p>
                           )}
                         </div>
@@ -459,11 +466,11 @@ function CheckoutContent({ params }: Props) {
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <span className="font-semibold text-dark">{t.checkout.payInFull}</span>
-                          <span className="font-bold text-dark">£{paymentOptions.fullAmount.toFixed(0)}</span>
+                          <span className="font-bold text-dark">{money(paymentOptions.fullAmount)}</span>
                         </div>
                         <EurEstimate
                           amountGbp={paymentOptions.fullAmount}
-                          currency={currency}
+                          currency={estimateCurrency}
                           gbpToEurRate={gbpToEurRate}
                           label={t.checkout.eurEstimate}
                           className="text-right text-xs text-dark/40"
