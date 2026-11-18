@@ -300,35 +300,46 @@ export async function setGuestyReservationGuests(reservationId: string, guestsCo
 }
 
 /**
- * Sets a Guesty reservation custom field by its NAME (e.g. "eurobooking") —
- * the field id is looked up from Guesty's custom-field list, so nothing is
- * hard-coded. Best effort, called after the reservation exists; never blocks a booking.
+ * Sets Guesty reservation custom fields by NAME (e.g. { eurobooking: 'Yes' }) —
+ * field ids are looked up from Guesty's custom-field list, so nothing is
+ * hard-coded. Fields that don't exist in Guesty are skipped and reported in the
+ * thrown error after the others were set. Best effort, called after the
+ * reservation exists; callers must never let a failure here block a booking.
  */
-export async function setGuestyReservationCustomField(
+export async function setGuestyReservationCustomFields(
   reservationId: string,
-  fieldName: string,
-  value: string,
+  values: Record<string, string | number>,
 ): Promise<void> {
   const listRes = await guestyFetch('/custom-fields?limit=200')
   if (!listRes.ok) {
     throw new Error(`Guesty custom fields lookup failed: ${listRes.status} — ${await listRes.text()}`)
   }
   const listBody = await listRes.json()
-  const fields: Array<{ _id?: string; fieldId?: string; name?: string; displayName?: string }> = Array.isArray(listBody)
-    ? listBody
-    : (listBody.results ?? listBody.data ?? [])
-  const wanted = fieldName.toLowerCase()
-  const field = fields.find((f) => (f.name ?? f.displayName ?? '').toLowerCase() === wanted)
-  const fieldId = field?._id ?? field?.fieldId
-  if (!fieldId) throw new Error(`Guesty custom field "${fieldName}" not found`)
+  const fields: Array<{ _id?: string; fieldId?: string; name?: string; displayName?: string; type?: string }> =
+    Array.isArray(listBody) ? listBody : (listBody.results ?? listBody.data ?? [])
 
-  const res = await guestyFetch(`/reservations/${reservationId}`, {
-    method: 'PUT',
-    body: JSON.stringify({ customFields: [{ fieldId, value }] }),
-  })
-  if (!res.ok) {
-    throw new Error(`Guesty custom field update failed: ${res.status} — ${await res.text()}`)
+  const customFields: Array<{ fieldId: string; value: string | number }> = []
+  const missing: string[] = []
+  for (const [name, value] of Object.entries(values)) {
+    const field = fields.find((f) => (f.name ?? f.displayName ?? '').toLowerCase() === name.toLowerCase())
+    const fieldId = field?._id ?? field?.fieldId
+    if (!fieldId) {
+      missing.push(name)
+      continue
+    }
+    customFields.push({ fieldId, value: field?.type === 'number' ? Number(value) : String(value) })
   }
+
+  if (customFields.length > 0) {
+    const res = await guestyFetch(`/reservations/${reservationId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ customFields }),
+    })
+    if (!res.ok) {
+      throw new Error(`Guesty custom field update failed: ${res.status} — ${await res.text()}`)
+    }
+  }
+  if (missing.length > 0) throw new Error(`Guesty custom fields not found: ${missing.join(', ')}`)
 }
 
 /**

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { stripeServer, stripeConfigured, stripeWebhookSecret } from '@/lib/stripe-server'
-import { createGuestyReservation, registerGuestyPayment, confirmGuestyReservation, setGuestyReservationGuests, setGuestyReservationCustomField } from '@/lib/guesty-server'
+import { createGuestyReservation, registerGuestyPayment, confirmGuestyReservation, setGuestyReservationGuests, setGuestyReservationCustomFields } from '@/lib/guesty-server'
 import { supabaseServer } from '@/lib/supabase-server'
 
 // Audit trail + "needs a human" flag, read by the dashboard (checkout_events).
@@ -123,6 +123,20 @@ export async function POST(req: NextRequest) {
               total_gbp: Number(first.total_gbp),
             })
             if (rateErr) console.error('[stripe webhook] eur balance rate insert failed', rateErr.message)
+            // Update the euro status fields in Guesty (best effort).
+            try {
+              const { data: all } = await supabaseServer
+                .from('eur_checkout_rates')
+                .select('amount_eur')
+                .eq('channel_booking_id', res.channel_booking_id)
+              const paidEur = (all ?? []).reduce((sum, r) => sum + Number(r.amount_eur), 0)
+              await setGuestyReservationCustomFields(res.guesty_reservation_id, {
+                eurpaid: paidEur,
+                eurbalance: Math.max(0, Number(first.total_eur) - paidEur),
+              })
+            } catch (fErr) {
+              console.error('[stripe webhook] could not update euro custom fields', fErr instanceof Error ? fErr.message : fErr)
+            }
           } else {
             console.error('[stripe webhook] EUR balance payment: reservation or booking rate not found', meta.reservation_id)
           }
@@ -238,15 +252,21 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Flag reservations paid in euros (Guesty custom field "eurobooking" = Yes)
-    // so the team can follow up on them. Best effort, like the guests update.
+    // Euro status for the team, as Guesty reservation custom fields (Guesty
+    // itself stays in GBP): eurobooking = Yes, euros paid so far, euro balance.
+    // Best effort, like the guests update.
     let eurobookingError: string | undefined
     if (paymentIntent.currency === 'eur' && meta.payCurrency === 'EUR') {
       try {
-        await setGuestyReservationCustomField(reservation.id, 'eurobooking', 'Yes')
+        const paidEur = paymentIntent.amount_received / 100
+        await setGuestyReservationCustomFields(reservation.id, {
+          eurobooking: 'Yes',
+          eurpaid: paidEur,
+          eurbalance: Math.max(0, Number(meta.totalEur) - paidEur),
+        })
       } catch (fErr) {
         eurobookingError = fErr instanceof Error ? fErr.message : String(fErr)
-        console.error('[stripe webhook] could not set eurobooking on the reservation', eurobookingError)
+        console.error('[stripe webhook] could not set the euro custom fields', eurobookingError)
       }
     }
 
