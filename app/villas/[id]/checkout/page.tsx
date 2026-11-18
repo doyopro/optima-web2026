@@ -1,5 +1,7 @@
 'use client'
 
+import { PhoneInput } from 'react-international-phone'
+import 'react-international-phone/style.css'
 import { Suspense, use, useEffect, useRef, useState } from 'react'
 import { pushEvent } from '@/lib/analytics'
 import Image from 'next/image'
@@ -150,8 +152,8 @@ function CheckoutContent({ params }: Props) {
 
   const maxGuests = property?.guests_max ?? 0
   const atCapacity = maxGuests > 0 && adults + children >= maxGuests
-  // Phone is required: at least 6 digits (international formats vary).
-  const phoneValid = guestPhone.replace(/\D/g, '').length >= 6
+  // Phone is required: country code + number (at least 8 digits in total).
+  const phoneValid = guestPhone.replace(/\D/g, '').length >= 8
   const guestsInvalid = adults < 1 || (maxGuests > 0 && adults + children > maxGuests)
 
   function updateGuests(nextAdults: number, nextChildren: number, nextInfants: number) {
@@ -518,13 +520,17 @@ function CheckoutContent({ params }: Props) {
                       <label className="block text-xs font-semibold uppercase tracking-wide text-dark/60 mb-1.5">
                         {t.checkout.phone} *
                       </label>
-                      <input
-                        type="tel"
-                        required
-                        autoComplete="tel"
+                      {/* Country flag + dial code, then the mobile number (stored as +CC number). */}
+                      <PhoneInput
+                        defaultCountry={lang === 'es' ? 'es' : 'gb'}
                         value={guestPhone}
-                        onChange={(e) => setGuestPhone(e.target.value)}
-                        className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm focus:border-orange focus:outline-none"
+                        onChange={(phone) => setGuestPhone(phone)}
+                        inputProps={{ required: true, autoComplete: 'tel', inputMode: 'tel' }}
+                        className="w-full"
+                        inputClassName="!w-full !h-[38px] !text-sm !rounded-r-lg !border-neutral-200 focus:!border-orange"
+                        countrySelectorStyleProps={{
+                          buttonClassName: '!h-[38px] !rounded-l-lg !border-neutral-200 !px-2',
+                        }}
                       />
                     </div>
                   </div>
